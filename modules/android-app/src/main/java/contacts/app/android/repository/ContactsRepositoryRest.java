@@ -16,10 +16,10 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.util.Log;
 import contacts.app.android.R;
-import contacts.app.android.model.Contact;
 import contacts.app.android.rest.AuthorizationException;
 import contacts.app.android.rest.NetworkException;
 import contacts.app.android.rest.RestClient;
+import contacts.model.Contact;
 
 /**
  * Remote repository that provides access through REST.
@@ -27,6 +27,13 @@ import contacts.app.android.rest.RestClient;
 public class ContactsRepositoryRest implements ContactsRepository {
 
     private static final String TAG = ContactsRepositoryRest.class.getName();
+
+    private static final String JSON_USER_NAME = "userName";
+    private static final String JSON_FIRST_NAME = "firstName";
+    private static final String JSON_LAST_NAME = "lastName";
+    private static final String JSON_PHONE = "phone";
+    private static final String JSON_MAIL = "mail";
+    private static final String JSON_LOCATION = "location";
 
     private Context context;
     private AccountManager accountManager;
@@ -65,7 +72,7 @@ public class ContactsRepositoryRest implements ContactsRepository {
         List<Contact> contacts = new ArrayList<Contact>();
         for (int i = 0; i < jsonContacts.length(); ++i) {
             JSONObject jsonContact = jsonContacts.getJSONObject(i);
-            contacts.add(Contact.fromJson(jsonContact));
+            contacts.add(parseContact(jsonContact));
         }
         return contacts;
     }
@@ -77,6 +84,22 @@ public class ContactsRepositoryRest implements ContactsRepository {
         } catch (URISyntaxException exception) {
             throw new NetworkException("Invalid URI.", exception);
         }
+    }
+
+    /**
+     * Creates a contact from JSON object.
+     */
+    private static Contact parseContact(JSONObject json) throws JSONException {
+        Contact contact = new Contact();
+
+        contact.setUserName(json.getString(JSON_USER_NAME));
+        contact.setFirstName(json.getString(JSON_FIRST_NAME));
+        contact.setLastName(json.getString(JSON_LAST_NAME));
+        contact.setPhone(json.getString(JSON_PHONE));
+        contact.setMail(json.getString(JSON_MAIL));
+        contact.setLastName(json.getString(JSON_LOCATION));
+
+        return contact;
     }
 
 }

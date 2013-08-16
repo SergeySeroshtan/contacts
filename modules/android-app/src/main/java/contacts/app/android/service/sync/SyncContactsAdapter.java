@@ -25,11 +25,11 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 import contacts.app.android.R;
-import contacts.app.android.model.Contact;
 import contacts.app.android.repository.ContactsRepository;
 import contacts.app.android.repository.ContactsRepositoryRest;
 import contacts.app.android.rest.AuthorizationException;
 import contacts.app.android.rest.NetworkException;
+import contacts.model.Contact;
 
 /**
  * Synchronizes contacts.
@@ -216,7 +216,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         ops.add(addContactData(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
                 ContactsContract.CommonDataKinds.Phone.NUMBER,
-                contact.getFormattedPhone()));
+                getFormattedPhone(contact)));
         ops.add(addContactData(
                 ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE,
                 ContactsContract.CommonDataKinds.Organization.OFFICE_LOCATION,
@@ -233,6 +233,15 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
                     exception);
             throw new SyncException("Contact not added.", exception);
         }
+    }
+
+    /**
+     * Formats phone number according to requirements of address book.
+     * 
+     * FIXME https://github.com/grytsenko/contacts/issues/8.
+     */
+    private static String getFormattedPhone(Contact contact) {
+        return "+" + contact.getPhone();
     }
 
     /**

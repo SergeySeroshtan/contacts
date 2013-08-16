@@ -64,10 +64,10 @@ public class SearchController {
         LOGGER.debug("Search contacts for people from {}.",
                 Arrays.toString(locations));
 
-        Set<String> uniqueLocations = new HashSet<>();
+        Set<String> uniqueLocations = new HashSet<String>();
         Collections.addAll(uniqueLocations, locations);
 
-        List<Contact> allContacts = new ArrayList<>();
+        List<Contact> allContacts = new ArrayList<Contact>();
         for (String location : uniqueLocations) {
             LOGGER.debug("Search contacts for people from {}.", location);
             List<Contact> localContacts = searchContactsService

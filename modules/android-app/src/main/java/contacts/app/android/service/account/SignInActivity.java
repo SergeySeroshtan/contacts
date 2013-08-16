@@ -23,7 +23,7 @@ import contacts.app.android.R;
 import contacts.app.android.rest.AuthorizationException;
 import contacts.app.android.rest.NetworkException;
 import contacts.app.android.rest.RestClient;
-import contacts.app.android.util.StringUtils;
+import contacts.util.StringUtils;
 
 /**
  * Allows user to sign in.
