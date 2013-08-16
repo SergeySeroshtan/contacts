@@ -98,17 +98,18 @@ objectClass: inetOrgPerson
 objectClass: organizationalPerson
 objectClass: top
 givenName: Anton
-mobile: 3800000004
 uid: grytsenko
+mobile: 3800000004
 cn: grytsenko
 sn: Grytsenko
 userPassword: {SSHA}j1jzYlI7hKlqKE13D0Rbx41CvuBO6Vyy6E7rtg==
 mail: grytsenko@test.com
 l: Donetsk
+labeledURI: http://www.gravatar.com/avatar/f5d2ccf3d729f67f42445ece7747e3e8.png
 createTimestamp: 20130722105220Z
 pwdChangedTime: 20130722105546.872Z
 entryUUID: 2a242de3-61f3-423e-ace0-b721dbfc6312
 creatorsName: cn=Directory Manager,cn=Root DNs,cn=config
-modifyTimestamp: 20130722110134Z
+modifyTimestamp: 20130816084558Z
 modifiersName: cn=Directory Manager,cn=Root DNs,cn=config
 

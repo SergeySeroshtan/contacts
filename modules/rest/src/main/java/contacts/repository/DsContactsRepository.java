@@ -46,6 +46,8 @@ public class DsContactsRepository implements ContactsRepository {
     protected String firstnameAttr;
     @Value("#{ldapProperties['ldap.user.lastname']}")
     protected String lastnameAttr;
+    @Value("#{ldapProperties['ldap.user.photoUrl']}")
+    protected String photoUrlAttr;
     @Value("#{ldapProperties['ldap.user.mail']}")
     protected String mailAttr;
     @Value("#{ldapProperties['ldap.user.phone']}")
@@ -104,6 +106,8 @@ public class DsContactsRepository implements ContactsRepository {
 
             contact.setFirstName(asString(firstnameAttr, attrs));
             contact.setLastName(asString(lastnameAttr, attrs));
+
+            contact.setPhotoUrl(asString(photoUrlAttr, attrs));
 
             contact.setMail(asString(mailAttr, attrs));
             contact.setPhone(digitsOnly(asString(phoneAttr, attrs)));

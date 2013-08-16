@@ -97,7 +97,7 @@ public class ContactsRepositoryRest implements ContactsRepository {
         contact.setLastName(json.getString(JSON_LAST_NAME));
         contact.setPhone(json.getString(JSON_PHONE));
         contact.setMail(json.getString(JSON_MAIL));
-        contact.setLastName(json.getString(JSON_LOCATION));
+        contact.setLocation(json.getString(JSON_LOCATION));
 
         return contact;
     }
