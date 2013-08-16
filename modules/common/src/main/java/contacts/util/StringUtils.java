@@ -6,6 +6,11 @@ package contacts.util;
 public final class StringUtils {
 
     /**
+     * Constants for empty string.
+     */
+    public static final String EMPTY = "";
+
+    /**
      * Determines that string is <code>null</code> or empty.
      */
     public static boolean isNullOrEmpty(String str) {

@@ -78,18 +78,17 @@ objectClass: inetOrgPerson
 objectClass: organizationalPerson
 objectClass: top
 givenName: Pavel
-mobile: 3800000003
 uid: popov
 cn: popov
 sn: Popov
 userPassword: {SSHA}wYWVZu7MiSem1kIkok+LG9hh5eKyhCW1v5LLrw==
-mail: popov@test.com
 l: Donetsk
-createTimestamp: 20130722105132Z
+mail: popov@test.com
 pwdChangedTime: 20130722105132.702Z
+createTimestamp: 20130722105132Z
 entryUUID: 90822041-f190-44f9-9e72-deefeab92cf5
 creatorsName: cn=Directory Manager,cn=Root DNs,cn=config
-modifyTimestamp: 20130722110127Z
+modifyTimestamp: 20130816115254Z
 modifiersName: cn=Directory Manager,cn=Root DNs,cn=config
 
 dn: cn=grytsenko,ou=Users,dc=test,dc=com

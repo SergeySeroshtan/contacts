@@ -216,7 +216,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         ops.add(addContactData(
                 ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
                 ContactsContract.CommonDataKinds.Phone.NUMBER,
-                getFormattedPhone(contact)));
+                contact.getPhone()));
         ops.add(addContactData(
                 ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE,
                 ContactsContract.CommonDataKinds.Organization.OFFICE_LOCATION,
@@ -233,15 +233,6 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
                     exception);
             throw new SyncException("Contact not added.", exception);
         }
-    }
-
-    /**
-     * Formats phone number according to requirements of address book.
-     * 
-     * FIXME https://github.com/grytsenko/contacts/issues/8.
-     */
-    private static String getFormattedPhone(Contact contact) {
-        return "+" + contact.getPhone();
     }
 
     /**

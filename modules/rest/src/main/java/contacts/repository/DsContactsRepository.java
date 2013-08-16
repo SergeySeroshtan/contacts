@@ -19,6 +19,7 @@ import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.stereotype.Repository;
 
 import contacts.model.Contact;
+import contacts.util.StringUtils;
 
 /**
  * Repository of contacts in directory service.
@@ -110,17 +111,42 @@ public class DsContactsRepository implements ContactsRepository {
             contact.setPhotoUrl(asString(photoUrlAttr, attrs));
 
             contact.setMail(asString(mailAttr, attrs));
-            contact.setPhone(digitsOnly(asString(phoneAttr, attrs)));
+            contact.setPhone(asPhone(attrs));
 
             contact.setLocation(asString(locationAttr, attrs));
 
             return contact;
         }
 
+        /**
+         * Returns string value of attribute.
+         * 
+         * <p>
+         * If attribute is not found, then returns empty string.
+         */
         private String asString(String attrId, Attributes attrs)
                 throws NamingException {
             Attribute attr = attrs.get(attrId);
-            return attr == null ? null : (String) attr.get();
+            if (attr == null) {
+                return StringUtils.EMPTY;
+            }
+
+            return (String) attr.get();
+        }
+
+        /**
+         * Considers that attribute contains phone number.
+         * 
+         * <p>
+         * Parses and returns this phone number.
+         */
+        private String asPhone(Attributes attrs) throws NamingException {
+            String digits = digitsOnly(asString(phoneAttr, attrs));
+            if (StringUtils.isNullOrEmpty(digits)) {
+                return StringUtils.EMPTY;
+            }
+
+            return '+' + digits;
         }
 
     }
