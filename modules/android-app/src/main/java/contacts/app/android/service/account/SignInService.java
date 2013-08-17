@@ -6,7 +6,7 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * Service for adding of new user accounts.
+ * Service that allows user to create new account.
  */
 public class SignInService extends Service {
 

@@ -22,11 +22,10 @@ import contacts.app.android.rest.NotAvailableException;
 import contacts.util.StringUtils;
 
 /**
- * Allows user to sign in.
+ * Allows user to enter credentials and create new account.
  * 
  * <p>
- * When user account is created we store password as is. Maybe, we should think
- * about using of tokens.
+ * We use {@link ContactsRestClient#getMy(String, String)} to check credentials.
  */
 public class SignInActivity extends AccountAuthenticatorActivity {
 
