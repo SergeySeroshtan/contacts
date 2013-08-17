@@ -42,7 +42,7 @@ public class SearchController {
 
         LOGGER.debug("Search contact of {}.", userName);
 
-        return searchContactsService.findByUserName(userName);
+        return searchContactsService.findByUser(userName);
     }
 
     /**
@@ -57,7 +57,8 @@ public class SearchController {
             Principal principal,
             @RequestParam(value = "locations", required = false) String[] locations) {
         if (locations == null || locations.length == 0) {
-            String userLocation = getLocationOfUser(principal.getName());
+            String userLocation = searchContactsService
+                    .findLocationOfUser(principal.getName());
             locations = new String[] { userLocation };
         }
 
@@ -79,16 +80,6 @@ public class SearchController {
         LOGGER.debug("Found {} contacts.", allContacts.size());
 
         return allContacts;
-    }
-
-    private String getLocationOfUser(String userName) {
-        LOGGER.debug("Get location of user {}.", userName);
-
-        Contact userContact = searchContactsService.findByUserName(userName);
-        String location = userContact.getLocation();
-        LOGGER.debug("Location of user {} is {}.", userName, location);
-
-        return location;
     }
 
 }
