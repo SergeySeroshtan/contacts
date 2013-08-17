@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.ContentProviderOperation;
@@ -25,10 +26,9 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 import contacts.app.android.R;
-import contacts.app.android.repository.ContactsRepository;
-import contacts.app.android.repository.ContactsRepositoryRest;
-import contacts.app.android.rest.AuthorizationException;
-import contacts.app.android.rest.NetworkException;
+import contacts.app.android.rest.ContactsRestClient;
+import contacts.app.android.rest.NotAuthorizedException;
+import contacts.app.android.rest.NotAvailableException;
 import contacts.model.Contact;
 
 /**
@@ -41,14 +41,11 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
     private static final String TAG = SyncContactsAdapter.class.getName();
 
-    private ContactsRepository contactsRepository;
-
     private ContentResolver contentResolver;
 
     public SyncContactsAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
 
-        contactsRepository = new ContactsRepositoryRest(context);
         contentResolver = context.getContentResolver();
     }
 
@@ -65,7 +62,11 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
-            List<Contact> contacts = contactsRepository.findByOffice(account);
+            String username = account.name;
+            AccountManager accountManager = AccountManager.get(getContext());
+            String password = accountManager.getPassword(account);
+            ContactsRestClient restClient = new ContactsRestClient(getContext());
+            List<Contact> contacts = restClient.getCoworkers(username, password);
             Log.d(TAG,
                     format("Found {0} contacts in repository.", contacts.size()));
 
@@ -77,10 +78,11 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         } catch (SyncException exception) {
             Log.e(TAG, "Sync could not be completed.", exception);
             return;
-        } catch (AuthorizationException exception) {
-            Log.e(TAG, "Authorization failed.", exception);
-        } catch (NetworkException exception) {
-            Log.e(TAG, "Repository is not accessible.", exception);
+        } catch (NotAvailableException exception) {
+            Log.e(TAG, "Not available.", exception);
+            return;
+        } catch (NotAuthorizedException exception) {
+            Log.e(TAG, "Invalid credentials", exception);
             return;
         }
 

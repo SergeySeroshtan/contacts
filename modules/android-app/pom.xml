@@ -19,6 +19,10 @@
 
     <properties>
         <platform.version>4.1.1.4</platform.version>
+
+        <spring-android-version>1.0.1.RELEASE</spring-android-version>
+        <jackson-version>1.9.13</jackson-version>
+
         <android.plugin.version>3.6.0</android.plugin.version>
     </properties>
 
@@ -27,6 +31,17 @@
             <groupId>contacts</groupId>
             <artifactId>contacts-common</artifactId>
             <version>${version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.android</groupId>
+            <artifactId>spring-android-rest-template</artifactId>
+            <version>${spring-android-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>${jackson-version}</version>
         </dependency>
 
         <dependency>

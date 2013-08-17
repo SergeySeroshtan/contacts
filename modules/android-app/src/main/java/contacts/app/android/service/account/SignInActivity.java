@@ -1,10 +1,6 @@
 package contacts.app.android.service.account;
 
 import static java.text.MessageFormat.format;
-
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -20,9 +16,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import contacts.app.android.R;
-import contacts.app.android.rest.AuthorizationException;
-import contacts.app.android.rest.NetworkException;
-import contacts.app.android.rest.RestClient;
+import contacts.app.android.rest.ContactsRestClient;
+import contacts.app.android.rest.NotAuthorizedException;
+import contacts.app.android.rest.NotAvailableException;
 import contacts.util.StringUtils;
 
 /**
@@ -172,19 +168,15 @@ public class SignInActivity extends AccountAuthenticatorActivity {
 
         @Override
         protected Boolean doInBackground(Void... args) {
-            RestClient restClient = new RestClient();
             try {
-                URI uri = new URI(getString(R.string.restScheme),
-                        getString(R.string.restAuthority),
-                        getString(R.string.restPathMyContact), null, null);
-                restClient.doGet(username, password, uri);
+                ContactsRestClient restClient = new ContactsRestClient(
+                        SignInActivity.this);
+                restClient.getMy(username, password);
                 return true;
-            } catch (AuthorizationException exception) {
+            } catch (NotAvailableException exception) {
+                Log.d(TAG, "Not available.", exception);
+            } catch (NotAuthorizedException exception) {
                 Log.d(TAG, "Invalid credentials.", exception);
-            } catch (NetworkException exception) {
-                Log.d(TAG, "Network error.", exception);
-            } catch (URISyntaxException exception) {
-                Log.d(TAG, "Invalid URI.", exception);
             }
 
             return false;
