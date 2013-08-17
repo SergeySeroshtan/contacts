@@ -57,6 +57,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         try {
             String groupTitle = getContext().getString(R.string.groupCoworkers);
             String groupId = findGroup(account, groupTitle);
+            if (groupId == null) {
+                groupId = createGroup(account, groupTitle);
+            }
 
             if (isCanceled()) {
                 return;
@@ -66,9 +69,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             AccountManager accountManager = AccountManager.get(getContext());
             String password = accountManager.getPassword(account);
             ContactsRestClient restClient = new ContactsRestClient(getContext());
-            List<Contact> contacts = restClient.getCoworkers(username, password);
-            Log.d(TAG,
-                    format("Found {0} contacts in repository.", contacts.size()));
+            List<Contact> contacts = restClient
+                    .getCoworkers(username, password);
+            Log.d(TAG, format("Found {0} contacts.", contacts.size()));
 
             if (isCanceled()) {
                 return;
@@ -92,11 +95,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Finds group for contacts and returns its identifier.
      * 
-     * <p>
-     * If group was not found, then tries to create a new group.
+     * @return identifier of group or <code>null</code> if group was not found.
      */
-    private String findGroup(Account account, String title)
-            throws SyncException {
+    private String findGroup(Account account, String title) {
         String[] projection = new String[] { ContactsContract.Groups._ID,
                 ContactsContract.Groups.TITLE };
         String selection = ContactsContract.Groups.TITLE + "=? and "
@@ -109,7 +110,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         try {
             if (cursor.getCount() <= 0) {
                 Log.d(TAG, format("Group {0} not found.", title));
-                return createGroup(account, title);
+                return null;
             }
 
             cursor.moveToNext();
