@@ -1,4 +1,4 @@
-package contacts.app.android.rest;
+package contacts.app.data;
 
 import java.io.IOException;
 import java.io.InputStream;

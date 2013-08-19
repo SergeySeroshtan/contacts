@@ -1,4 +1,4 @@
-package contacts.app.android.service.sync;
+package contacts.app.service.sync;
 
 import android.app.Service;
 import android.content.Intent;

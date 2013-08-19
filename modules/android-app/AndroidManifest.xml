@@ -28,7 +28,7 @@
         android:label="@string/appName"
         android:theme="@style/AppTheme">
         <activity
-            android:name="contacts.app.android.service.account.SignInActivity"
+            android:name="contacts.app.service.account.SignInActivity"
             android:label="@string/appName">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -36,7 +36,7 @@
         </activity>
 
         <service
-            android:name="contacts.app.android.service.account.SignInService"
+            android:name="contacts.app.service.account.SignInService"
             android:exported="false"
             android:process=":sync">
             <intent-filter>
@@ -48,7 +48,7 @@
                 android:resource="@xml/authenticator" />
         </service>
         <service
-            android:name="contacts.app.android.service.sync.SyncContactsService"
+            android:name="contacts.app.service.sync.SyncContactsService"
             android:exported="false"
             android:process=":sync">
             <intent-filter>

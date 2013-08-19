@@ -1,4 +1,4 @@
-package contacts.app.android.rest;
+package contacts.app.data;
 
 import static java.text.MessageFormat.format;
 import static java.util.Collections.singletonList;
@@ -49,11 +49,11 @@ public final class ContactsRestClient {
      * @param username
      *            the name of user.
      * @param password
-     *            the password.
+     *            the password of user.
      * 
      * @return the contact of user.
      * 
-     * @throws NotAvailableExceptio
+     * @throws NotAvailableException
      *             if service is not available.
      * @throws NotAuthorizedException
      *             if user is not authorized.
@@ -72,11 +72,11 @@ public final class ContactsRestClient {
      * @param username
      *            the name of user.
      * @param password
-     *            the password.
+     *            the password of user.
      * 
      * @return the contacts of people, including contact for user.
      * 
-     * @throws NotAvailableExceptio
+     * @throws NotAvailableException
      *             if service is not available.
      * @throws NotAuthorizedException
      *             if user is not authorized.

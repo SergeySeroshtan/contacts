@@ -1,4 +1,4 @@
-package contacts.app.android.rest;
+package contacts.app.data;
 
 /**
  * Thrown if user is not authorized to use network resource.

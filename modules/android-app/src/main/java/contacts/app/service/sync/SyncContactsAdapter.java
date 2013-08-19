@@ -1,4 +1,4 @@
-package contacts.app.android.service.sync;
+package contacts.app.service.sync;
 
 import static java.lang.Thread.currentThread;
 import static java.text.MessageFormat.format;
@@ -30,10 +30,10 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 import contacts.app.android.R;
-import contacts.app.android.rest.ContactsRestClient;
-import contacts.app.android.rest.NetUtils;
-import contacts.app.android.rest.NotAuthorizedException;
-import contacts.app.android.rest.NotAvailableException;
+import contacts.app.data.ContactsRestClient;
+import contacts.app.data.NetUtils;
+import contacts.app.data.NotAuthorizedException;
+import contacts.app.data.NotAvailableException;
 import contacts.model.Contact;
 import contacts.util.StringUtils;
 

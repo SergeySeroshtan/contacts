@@ -1,4 +1,4 @@
-package contacts.app.android.service.account;
+package contacts.app.service.account;
 
 import android.app.Service;
 import android.content.Intent;

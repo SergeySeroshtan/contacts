@@ -1,4 +1,4 @@
-package contacts.app.android.service.sync;
+package contacts.app.service.sync;
 
 /**
  * Thrown if synchronization should be interrupted.

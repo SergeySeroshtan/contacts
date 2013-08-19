@@ -1,4 +1,4 @@
-package contacts.app.android.rest;
+package contacts.app.data;
 
 /**
  * Thrown if network resource is not available.

@@ -1,4 +1,4 @@
-package contacts.app.android.service.account;
+package contacts.app.service.account;
 
 import static android.accounts.AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE;
 import android.accounts.AbstractAccountAuthenticator;

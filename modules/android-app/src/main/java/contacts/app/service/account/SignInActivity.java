@@ -1,4 +1,4 @@
-package contacts.app.android.service.account;
+package contacts.app.service.account;
 
 import static java.text.MessageFormat.format;
 import android.accounts.Account;
@@ -16,9 +16,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import contacts.app.android.R;
-import contacts.app.android.rest.ContactsRestClient;
-import contacts.app.android.rest.NotAuthorizedException;
-import contacts.app.android.rest.NotAvailableException;
+import contacts.app.data.ContactsRestClient;
+import contacts.app.data.NotAuthorizedException;
+import contacts.app.data.NotAvailableException;
 import contacts.util.StringUtils;
 
 /**
