@@ -30,10 +30,10 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 import contacts.app.android.R;
-import contacts.app.data.ContactsRestClient;
 import contacts.app.data.NetUtils;
 import contacts.app.data.NotAuthorizedException;
 import contacts.app.data.NotAvailableException;
+import contacts.app.data.RestClient;
 import contacts.model.Contact;
 import contacts.util.StringUtils;
 
@@ -74,7 +74,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             String username = account.name;
             AccountManager accountManager = AccountManager.get(getContext());
             String password = accountManager.getPassword(account);
-            ContactsRestClient restClient = new ContactsRestClient(getContext());
+            RestClient restClient = new RestClient(getContext());
             List<Contact> contacts = restClient
                     .getCoworkers(username, password);
             Log.d(TAG, format("Found {0} contacts.", contacts.size()));

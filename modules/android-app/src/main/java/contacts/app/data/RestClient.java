@@ -27,16 +27,16 @@ import contacts.model.Contact;
 /**
  * Client to access REST services for contacts.
  */
-public final class ContactsRestClient {
+public final class RestClient {
 
-    private static final String TAG = ContactsRestClient.class.getName();
+    private static final String TAG = RestClient.class.getName();
 
     private Context context;
 
     /**
      * Creates a client in the given context.
      */
-    public ContactsRestClient(Context context) {
+    public RestClient(Context context) {
         this.context = context;
     }
 

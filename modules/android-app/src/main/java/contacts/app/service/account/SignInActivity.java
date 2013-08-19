@@ -16,16 +16,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import contacts.app.android.R;
-import contacts.app.data.ContactsRestClient;
 import contacts.app.data.NotAuthorizedException;
 import contacts.app.data.NotAvailableException;
+import contacts.app.data.RestClient;
 import contacts.util.StringUtils;
 
 /**
  * Allows user to enter credentials and create new account.
  * 
  * <p>
- * We use {@link ContactsRestClient#getMy(String, String)} to check credentials.
+ * We use {@link RestClient#getMy(String, String)} to check credentials.
  */
 public class SignInActivity extends AccountAuthenticatorActivity {
 
@@ -168,8 +168,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
         @Override
         protected Boolean doInBackground(Void... args) {
             try {
-                ContactsRestClient restClient = new ContactsRestClient(
-                        SignInActivity.this);
+                RestClient restClient = new RestClient(SignInActivity.this);
                 restClient.getMy(username, password);
                 return true;
             } catch (NotAvailableException exception) {
