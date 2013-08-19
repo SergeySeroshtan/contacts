@@ -61,41 +61,44 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         Log.d(TAG, "Sync started.");
 
         try {
+            List<Contact> contacts = downloadContacts(account);
+            Log.d(TAG, format("Loaded {0} contacts.", contacts.size()));
+
+            checkCanceled();
+
             String groupTitle = getContext().getString(R.string.groupCoworkers);
             String groupId = findGroup(account, groupTitle);
             if (groupId == null) {
                 groupId = createGroup(account, groupTitle);
             }
+            Log.d(TAG, format("Group {0} has id {1}.", groupTitle, groupId));
 
-            if (isCanceled()) {
-                return;
-            }
-
-            String username = account.name;
-            AccountManager accountManager = AccountManager.get(getContext());
-            String password = accountManager.getPassword(account);
-            RestClient restClient = new RestClient(getContext());
-            List<Contact> contacts = restClient
-                    .getCoworkers(username, password);
-            Log.d(TAG, format("Found {0} contacts.", contacts.size()));
-
-            if (isCanceled()) {
-                return;
-            }
+            checkCanceled();
 
             addContacts(account, groupId, contacts);
         } catch (SyncException exception) {
-            Log.e(TAG, "Sync could not be completed.", exception);
-            return;
-        } catch (NotAvailableException exception) {
-            Log.e(TAG, "Not available.", exception);
-            return;
-        } catch (NotAuthorizedException exception) {
-            Log.e(TAG, "Invalid credentials", exception);
+            Log.e(TAG, "Sync interrupted.", exception);
             return;
         }
 
         Log.d(TAG, "Sync finished.");
+    }
+
+    private List<Contact> downloadContacts(Account account)
+            throws SyncException {
+        String username = account.name;
+        AccountManager accountManager = AccountManager.get(getContext());
+        String password = accountManager.getPassword(account);
+
+        RestClient restClient = new RestClient(getContext());
+
+        try {
+            return restClient.getCoworkers(username, password);
+        } catch (NotAvailableException exception) {
+            throw new SyncException("Service not available.", exception);
+        } catch (NotAuthorizedException exception) {
+            throw new SyncException("Invalid credentials.", exception);
+        }
     }
 
     /**
@@ -120,10 +123,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             }
 
             cursor.moveToNext();
-            String id = cursor.getString(cursor
+            return cursor.getString(cursor
                     .getColumnIndex(ContactsContract.Groups._ID));
-            Log.d(TAG, format("Group {0} with id {1} was found.", title, id));
-            return id;
         } finally {
             cursor.close();
         }
@@ -149,11 +150,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         try {
             ContentProviderResult[] results = contentResolver.applyBatch(
                     ContactsContract.AUTHORITY, ops);
-            String id = Long.toString(ContentUris.parseId(results[0].uri));
-            Log.d(TAG, format("Group {0} with id {1} was created.", title, id));
-            return id;
+            return Long.toString(ContentUris.parseId(results[0].uri));
         } catch (Exception exception) {
-            Log.e(TAG, format("Can not create group {0}.", title), exception);
+            Log.e(TAG, format("Could not create group {0}.", title), exception);
             throw new SyncException("Group not created.", exception);
         }
     }
@@ -165,24 +164,22 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * If contact already exists, then it will not be changed.
      */
     private void addContacts(Account account, String groupId,
-            List<Contact> contacts) {
+            List<Contact> contacts) throws SyncException {
         Set<String> knownContacts = getKnownContacts(account);
 
         for (Contact contact : contacts) {
             String userName = contact.getUserName();
             Log.d(TAG, format("Sync contact for {0}.", userName));
-            if (isCanceled()) {
-                return;
-            }
+
+            checkCanceled();
 
             if (knownContacts.contains(userName)) {
                 Log.d(TAG, format("Contact for {0} already exists.", userName));
                 continue;
             }
 
-            try {
-                addContact(account, groupId, contact);
-            } catch (SyncException exception) {
+            boolean contactAdded = addContact(account, groupId, contact);
+            if (!contactAdded) {
                 Log.d(TAG, format("Contact for {0} skipped.", userName));
             }
         }
@@ -191,8 +188,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Adds a contact into specified group.
      */
-    private void addContact(Account account, String groupId, Contact contact)
-            throws SyncException {
+    private boolean addContact(Account account, String groupId, Contact contact) {
         String userName = contact.getUserName();
 
         Log.d(TAG, format("Add contact for {0}.", userName));
@@ -244,10 +240,11 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, ops);
+            return true;
         } catch (Exception exception) {
             Log.w(TAG, format("Can not add contact for {0}.", userName),
                     exception);
-            throw new SyncException("Contact not added.", exception);
+            return false;
         }
     }
 
@@ -326,13 +323,12 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Checks, that synchronization is canceled.
      */
-    private boolean isCanceled() {
+    private void checkCanceled() throws SyncException {
         boolean canceled = currentThread().isInterrupted();
         if (canceled) {
             Log.d(TAG, "Sync canceled.");
+            throw new SyncException("Sync canceled.");
         }
-
-        return canceled;
     }
 
 }
