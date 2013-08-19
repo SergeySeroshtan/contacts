@@ -3,6 +3,8 @@ package contacts.app.android.service.sync;
 import static java.lang.Thread.currentThread;
 import static java.text.MessageFormat.format;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,6 +22,8 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.SyncResult;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -27,9 +31,11 @@ import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 import contacts.app.android.R;
 import contacts.app.android.rest.ContactsRestClient;
+import contacts.app.android.rest.NetUtils;
 import contacts.app.android.rest.NotAuthorizedException;
 import contacts.app.android.rest.NotAvailableException;
 import contacts.model.Contact;
+import contacts.util.StringUtils;
 
 /**
  * Synchronizes contacts.
@@ -191,6 +197,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
         Log.d(TAG, format("Add contact for {0}.", userName));
 
+        byte[] photo = downloadPhoto(contact);
+
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
         ops.add(ContentProviderOperation.newInsert(RawContacts.CONTENT_URI)
                 .withValue(RawContacts.ACCOUNT_NAME, account.name)
@@ -212,6 +220,11 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
                         ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID,
                         0).build());
 
+        if (photo != null) {
+            ops.add(addContactData(
+                    ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE,
+                    ContactsContract.CommonDataKinds.Photo.PHOTO, photo));
+        }
         ops.add(addContactData(
                 ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
                 ContactsContract.CommonDataKinds.Email.ADDRESS,
@@ -236,6 +249,34 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
                     exception);
             throw new SyncException("Contact not added.", exception);
         }
+    }
+
+    private byte[] downloadPhoto(Contact contact) {
+        Log.d(TAG, format("Download photo of {0}.", contact.getUserName()));
+
+        String photoUrl = contact.getPhotoUrl();
+        if (StringUtils.isNullOrEmpty(photoUrl)) {
+            Log.d(TAG, "Location of photo is not defined.");
+            return null;
+        }
+
+        try {
+            Bitmap photo = NetUtils.downloadBitmap(photoUrl);
+            ByteArrayOutputStream compressStream = new ByteArrayOutputStream();
+
+            try {
+                photo.compress(CompressFormat.PNG, 100, compressStream);
+                return compressStream.toByteArray();
+            } finally {
+                compressStream.close();
+            }
+        } catch (NotAvailableException e) {
+            Log.d(TAG, "Could not download photo.");
+        } catch (IOException exception) {
+            Log.d(TAG, "Could not convert photo.");
+        }
+
+        return null;
     }
 
     /**
@@ -271,8 +312,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         }
     }
 
-    private static ContentProviderOperation addContactData(String type,
-            String key, String value) {
+    private static <T> ContentProviderOperation addContactData(String type,
+            String key, T value) {
         return ContentProviderOperation
                 .newInsert(ContactsContract.Data.CONTENT_URI)
                 .withValue(ContactsContract.Data.MIMETYPE, type)

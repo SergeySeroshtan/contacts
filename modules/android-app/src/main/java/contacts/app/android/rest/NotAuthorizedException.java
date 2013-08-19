@@ -1,7 +1,7 @@
 package contacts.app.android.rest;
 
 /**
- * Thrown if user is not authorized to use REST service.
+ * Thrown if user is not authorized to use network resource.
  */
 public class NotAuthorizedException extends Exception {
 
