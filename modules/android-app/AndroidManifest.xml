@@ -38,7 +38,7 @@
         <service
             android:name="contacts.app.service.account.SignInService"
             android:exported="false"
-            android:process=":sync">
+            android:process=":signin">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
