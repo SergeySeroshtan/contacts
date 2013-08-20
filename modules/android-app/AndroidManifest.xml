@@ -57,7 +57,7 @@
 
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_contacts" />
+                android:resource="@xml/sync_adapter" />
         </service>
     </application>
 
