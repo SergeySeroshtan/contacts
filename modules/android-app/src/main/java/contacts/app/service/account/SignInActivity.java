@@ -46,7 +46,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.add_account_layout);
+        setContentView(R.layout.signin_activity_layout);
 
         accountType = getString(R.string.accountType);
 
