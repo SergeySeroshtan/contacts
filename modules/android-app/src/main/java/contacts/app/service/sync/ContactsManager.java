@@ -5,9 +5,7 @@ import static java.text.MessageFormat.format;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import android.accounts.Account;
 import android.content.ContentProviderOperation;
@@ -135,13 +133,13 @@ public class ContactsManager {
      * 
      * @return the set of names of users.
      */
-    public Set<String> getExistingContacts(Account account) {
+    public Map<String, Long> getExistingContacts(Account account) {
         Uri uri = RawContacts.CONTENT_URI.buildUpon()
                 .appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name)
                 .appendQueryParameter(RawContacts.ACCOUNT_TYPE, account.type)
                 .build();
 
-        String[] projection = new String[] { RawContacts.SYNC1 };
+        String[] projection = new String[] { RawContacts.SYNC1, RawContacts._ID };
         Cursor cursor = contentResolver
                 .query(uri, projection, null, null, null);
 
@@ -150,13 +148,14 @@ public class ContactsManager {
             Log.d(TAG,
                     format("Found {0} contacts in address book.", contactsNum));
             if (contactsNum == 0) {
-                return Collections.emptySet();
+                return Collections.emptyMap();
             }
 
-            Set<String> existingContacts = new HashSet<String>(contactsNum);
+            Map<String, Long> existingContacts = new HashMap<String, Long>(
+                    contactsNum);
             for (int i = 0; i < contactsNum; ++i) {
                 cursor.moveToNext();
-                existingContacts.add(cursor.getString(0));
+                existingContacts.put(cursor.getString(0), cursor.getLong(1));
             }
 
             return existingContacts;
@@ -268,6 +267,37 @@ public class ContactsManager {
                 0);
 
         return builder.build();
+    }
+
+    /**
+     * Removes existing contact.
+     * 
+     * @param account
+     *            the account of user, who performs operation.
+     * @param id
+     *            the identifier of contact.
+     * 
+     * @throws NotCompletedException
+     *             if contact could not be removed.
+     */
+    public void removeContact(Account account, long id)
+            throws NotCompletedException {
+        Log.d(TAG, format("Remove contact {0}.", id));
+
+        ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
+        Uri contactUri = ContentUris
+                .withAppendedId(RawContacts.CONTENT_URI, id)
+                .buildUpon()
+                .appendQueryParameter(ContactsContract.CALLER_IS_SYNCADAPTER,
+                        "true").build();
+        batch.add(ContentProviderOperation.newDelete(contactUri).build());
+
+        try {
+            contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
+        } catch (Exception exception) {
+            throw new NotCompletedException("Could not remove contact.",
+                    exception);
+        }
     }
 
 }

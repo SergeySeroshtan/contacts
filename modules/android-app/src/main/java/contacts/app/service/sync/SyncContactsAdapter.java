@@ -6,7 +6,7 @@ import static java.text.MessageFormat.format;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -101,13 +101,10 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
     /**
      * Synchronizes contacts.
-     * 
-     * <p>
-     * FIXME Ignores contacts of users, that already exist.
      */
     private void syncContacts(Account account, long groupId,
             List<Contact> contacts) throws CanceledException {
-        Set<String> existingContacts = contactsManager
+        Map<String, Long> existingContacts = contactsManager
                 .getExistingContacts(account);
 
         for (Contact contact : contacts) {
@@ -116,12 +113,14 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             checkCanceled();
 
-            if (existingContacts.contains(userName)) {
-                Log.d(TAG, format("Contact for {0} already exists.", userName));
-                continue;
-            }
-
             try {
+                if (existingContacts.containsKey(userName)) {
+                    Log.d(TAG, format("Contact for {0} exists.", userName));
+
+                    Long contactId = existingContacts.get(userName);
+                    contactsManager.removeContact(account, contactId);
+                }
+
                 byte[] photo = downloadPhoto(contact);
                 contactsManager.createContact(account, groupId, contact, photo);
             } catch (NotCompletedException exception) {
