@@ -14,7 +14,7 @@ To work on this project you can use: [Git][tool:git], [Maven][tool:maven], [Ecli
 
 To run application locally, follow next steps:
 
-1. Install and configure local directory service (for example, [Open DJ][tool:opendj]). File [test.ldif](https://github.com/grytsenko/contacts/blob/master/modules/rest/config/test.ldif) contains test data for directory service.
+1. Install and configure local directory service (for example, [Open DJ][tool:opendj]). File [test.ldif](https://github.com/grytsenko/contacts/blob/master/modules/rest/config/test.ldif) contains test data for directory service (password for all users is `pass`).
 1. Build module and deploy it on web server.
 1. Open `http://localhost:8080/contacts/search.json` in browser and enter user name and password for authentication.
  
@@ -27,7 +27,7 @@ Returns contact of current user.
 ##### JSON
 
 ```json
-{"userName":"grytsenko","firstName":"Anton","lastName":"Grytsenko","mail":"grytsenko@test.com","phone":"3800000004","location":"Donetsk"}
+{"userName":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"3800000004","location":"Donetsk"}
 ```
 
 ### GET search.json
@@ -35,17 +35,19 @@ Returns contact of current user.
 Returns contacts of people from certain location.
 By default, returns contacts of people from one location with current user.
 
+For properties that have no value, the empty string is returned.
+
 ##### Parameters
 locations (optional) - list of locations.
 
 ##### JSON
 
 ```json
-[{"userName":"ivanov","firstName":"Ivan","lastName":"Ivanov","mail":"ivanov@test.com","phone":"3800000000","location":"Donetsk"},
-{"userName":"petrov","firstName":"Petr","lastName":"Petrov","mail":"petrov@test.ua.com","phone":"3800000001","location":"Donetsk"},
-{"userName":"kuznetsov","firstName":"Kuzma","lastName":"Kuznetsov","mail":"kuznetsov@test.com","phone":"3800000002","location":"Donetsk"},
-{"userName":"popov","firstName":"Pavel","lastName":"Popov","mail":"popov@test.com","phone":"3800000003","location":"Donetsk"},
-{"userName":"grytsenko","firstName":"Anton","lastName":"Grytsenko","mail":"grytsenko@test.com","phone":"3800000004","location":"Donetsk"}]
+[{"userName":"ivanov","firstName":"Ivan","lastName":"Ivanov","photoUrl":"","mail":"ivanov@test.com","phone":"+3800000000","location":"Donetsk"},
+{"userName":"petrov","firstName":"Petr","lastName":"Petrov","photoUrl":"","mail":"petrov@test.ua.com","phone":"+3800000001","location":"Donetsk"},
+{"userName":"kuznetsov","firstName":"Kuzma","lastName":"Kuznetsov","photoUrl":"","mail":"kuznetsov@test.com","phone":"+3800000002","location":"Donetsk"},
+{"userName":"popov","firstName":"Pavel","lastName":"Popov","photoUrl":"","mail":"popov@test.com","phone":"","location":"Donetsk"},
+{"userName":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"+3800000004","location":"Donetsk"}]
 ```
 
 [framework:spring]: http://www.springsource.org/
