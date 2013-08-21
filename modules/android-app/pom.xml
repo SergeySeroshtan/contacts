@@ -30,7 +30,7 @@
         <dependency>
             <groupId>contacts</groupId>
             <artifactId>common</artifactId>
-            <version>${version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
