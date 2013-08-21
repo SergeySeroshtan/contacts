@@ -11,10 +11,18 @@ import android.accounts.Account;
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.CommonDataKinds.Email;
+import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
+import android.provider.ContactsContract.CommonDataKinds.Organization;
+import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.provider.ContactsContract.CommonDataKinds.Photo;
+import android.provider.ContactsContract.CommonDataKinds.StructuredName;
+import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 import contacts.model.Contact;
@@ -108,36 +116,22 @@ public class ContactsManager {
                 .withValue(RawContacts.ACCOUNT_TYPE, account.type)
                 .withValue(RawContacts.SYNC1, userName).build());
 
-        Map<String, Object> name = new HashMap<String, Object>();
-        name.put(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
-                contact.getFirstName());
-        name.put(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
-                contact.getLastName());
-        batch.add(insertOperation(
-                ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE,
-                name));
+        ContentValues name = new ContentValues();
+        name.put(StructuredName.GIVEN_NAME, contact.getFirstName());
+        name.put(StructuredName.FAMILY_NAME, contact.getLastName());
+        batch.add(insertValues(StructuredName.CONTENT_ITEM_TYPE, name));
 
-        batch.add(insertOperation(
-                ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE,
-                ContactsContract.CommonDataKinds.Email.ADDRESS,
+        batch.add(insertValue(Email.CONTENT_ITEM_TYPE, Email.ADDRESS,
                 contact.getMail()));
-        batch.add(insertOperation(
-                ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
-                ContactsContract.CommonDataKinds.Phone.NUMBER,
+        batch.add(insertValue(Phone.CONTENT_ITEM_TYPE, Phone.NUMBER,
                 contact.getPhone()));
-        batch.add(insertOperation(
-                ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE,
-                ContactsContract.CommonDataKinds.Organization.OFFICE_LOCATION,
-                contact.getLocation()));
-        batch.add(insertOperation(
-                ContactsContract.CommonDataKinds.GroupMembership.CONTENT_ITEM_TYPE,
-                ContactsContract.CommonDataKinds.GroupMembership.GROUP_ROW_ID,
-                groupId));
+        batch.add(insertValue(Organization.CONTENT_ITEM_TYPE,
+                Organization.OFFICE_LOCATION, contact.getLocation()));
+        batch.add(insertValue(GroupMembership.CONTENT_ITEM_TYPE,
+                GroupMembership.GROUP_ROW_ID, groupId));
 
         if (photo != null) {
-            batch.add(insertOperation(
-                    ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE,
-                    ContactsContract.CommonDataKinds.Photo.PHOTO, photo));
+            batch.add(insertValue(Photo.CONTENT_ITEM_TYPE, Photo.PHOTO, photo));
         }
 
         try {
@@ -151,39 +145,21 @@ public class ContactsManager {
     /**
      * Helps build insert operation.
      */
-    private static <T> ContentProviderOperation insertOperation(String mime,
+    private static <T> ContentProviderOperation insertValue(String mime,
             String key, T value) {
-        ContentProviderOperation.Builder builder = ContentProviderOperation
-                .newInsert(ContactsContract.Data.CONTENT_URI);
-
-        builder.withValue(ContactsContract.Data.MIMETYPE, mime);
-        builder.withValue(key, value);
-
-        builder.withValueBackReference(
-                ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID,
-                0);
-
-        return builder.build();
+        return ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                .withValue(Data.MIMETYPE, mime).withValue(key, value)
+                .withValueBackReference(Data.RAW_CONTACT_ID, 0).build();
     }
 
     /**
      * Helps build insert operation.
      */
-    private static <T> ContentProviderOperation insertOperation(String mime,
-            Map<String, ?> entries) {
-        ContentProviderOperation.Builder builder = ContentProviderOperation
-                .newInsert(ContactsContract.Data.CONTENT_URI);
-
-        builder.withValue(ContactsContract.Data.MIMETYPE, mime);
-        for (Map.Entry<String, ?> entry : entries.entrySet()) {
-            builder.withValue(entry.getKey(), entry.getValue());
-        }
-
-        builder.withValueBackReference(
-                ContactsContract.CommonDataKinds.StructuredName.RAW_CONTACT_ID,
-                0);
-
-        return builder.build();
+    private static <T> ContentProviderOperation insertValues(String mime,
+            ContentValues values) {
+        return ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                .withValue(Data.MIMETYPE, mime).withValues(values)
+                .withValueBackReference(Data.RAW_CONTACT_ID, 0).build();
     }
 
     /**

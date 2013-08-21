@@ -12,6 +12,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Groups;
 import android.util.Log;
 
 /**
@@ -67,14 +68,12 @@ public class GroupsManager {
      * @return identifier of group or <code>null</code> if group was not found.
      */
     private Long findGroup(Account account, String title) {
-        String[] projection = new String[] { ContactsContract.Groups._ID,
-                ContactsContract.Groups.TITLE };
-        String selection = ContactsContract.Groups.TITLE + "=? and "
-                + ContactsContract.Groups.ACCOUNT_NAME + "=? and "
-                + ContactsContract.Groups.ACCOUNT_TYPE + "=?";
-        Cursor cursor = contentResolver.query(
-                ContactsContract.Groups.CONTENT_URI, projection, selection,
-                new String[] { title, account.name, account.type }, null);
+        String[] projection = new String[] { Groups._ID, Groups.TITLE };
+        String selection = Groups.TITLE + "=? and " + Groups.ACCOUNT_NAME
+                + "=? and " + Groups.ACCOUNT_TYPE + "=?";
+        Cursor cursor = contentResolver.query(Groups.CONTENT_URI, projection,
+                selection, new String[] { title, account.name, account.type },
+                null);
 
         try {
             if (cursor.getCount() <= 0) {
@@ -83,8 +82,7 @@ public class GroupsManager {
             }
 
             cursor.moveToNext();
-            return cursor.getLong(cursor
-                    .getColumnIndex(ContactsContract.Groups._ID));
+            return cursor.getLong(cursor.getColumnIndex(Groups._ID));
         } finally {
             cursor.close();
         }
@@ -102,12 +100,11 @@ public class GroupsManager {
             throws NotCompletedException {
         ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 
-        ops.add(ContentProviderOperation
-                .newInsert(ContactsContract.Groups.CONTENT_URI)
-                .withValue(ContactsContract.Groups.TITLE, title)
-                .withValue(ContactsContract.Groups.ACCOUNT_NAME, account.name)
-                .withValue(ContactsContract.Groups.ACCOUNT_TYPE, account.type)
-                .withValue(ContactsContract.Groups.GROUP_VISIBLE, 1).build());
+        ops.add(ContentProviderOperation.newInsert(Groups.CONTENT_URI)
+                .withValue(Groups.TITLE, title)
+                .withValue(Groups.ACCOUNT_NAME, account.name)
+                .withValue(Groups.ACCOUNT_TYPE, account.type)
+                .withValue(Groups.GROUP_VISIBLE, 1).build());
 
         try {
             ContentProviderResult[] results = contentResolver.applyBatch(
