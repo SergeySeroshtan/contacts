@@ -29,7 +29,7 @@ Returns contact of user.
 ##### JSON
 
 ```json
-{"userName":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"3800000004","location":"Donetsk"}
+{"username":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"3800000004","location":"Donetsk"}
 ```
 
 ### GET coworkers.json
@@ -39,11 +39,11 @@ Returns contacts of people from one location with user.
 ##### JSON
 
 ```json
-[{"userName":"ivanov","firstName":"Ivan","lastName":"Ivanov","photoUrl":"","mail":"ivanov@test.com","phone":"+3800000000","location":"Donetsk"},
-{"userName":"petrov","firstName":"Petr","lastName":"Petrov","photoUrl":"","mail":"petrov@test.ua.com","phone":"+3800000001","location":"Donetsk"},
-{"userName":"kuznetsov","firstName":"Kuzma","lastName":"Kuznetsov","photoUrl":"","mail":"kuznetsov@test.com","phone":"+3800000002","location":"Donetsk"},
-{"userName":"popov","firstName":"Pavel","lastName":"Popov","photoUrl":"","mail":"popov@test.com","phone":"","location":"Donetsk"},
-{"userName":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"+3800000004","location":"Donetsk"}]
+[{"username":"ivanov","firstName":"Ivan","lastName":"Ivanov","photoUrl":"","mail":"ivanov@test.com","phone":"+3800000000","location":"Donetsk"},
+{"username":"petrov","firstName":"Petr","lastName":"Petrov","photoUrl":"","mail":"petrov@test.ua.com","phone":"+3800000001","location":"Donetsk"},
+{"username":"kuznetsov","firstName":"Kuzma","lastName":"Kuznetsov","photoUrl":"","mail":"kuznetsov@test.com","phone":"+3800000002","location":"Donetsk"},
+{"username":"popov","firstName":"Pavel","lastName":"Popov","photoUrl":"","mail":"popov@test.com","phone":"","location":"Donetsk"},
+{"username":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"+3800000004","location":"Donetsk"}]
 ```
 
 [framework:spring]: http://www.springsource.org/

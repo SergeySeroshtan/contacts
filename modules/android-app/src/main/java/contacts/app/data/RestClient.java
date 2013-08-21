@@ -5,8 +5,6 @@ import static java.util.Collections.singletonList;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.List;
 
 import org.springframework.http.HttpBasicAuthentication;
 import org.springframework.http.HttpEntity;
@@ -82,13 +80,12 @@ public final class RestClient {
      * @throws NotAuthorizedException
      *             if user is not authorized.
      */
-    public List<Contact> getCoworkers(String username, String password)
+    public Contact[] getCoworkers(String username, String password)
             throws NotAvailableException, NotAuthorizedException {
-        Log.d(TAG, format("Find by office for {0}.", username));
+        Log.d(TAG, format("Find coworkers of {0}.", username));
 
         URI url = buildUrl(context.getString(R.string.restPathCoworkers));
-        Contact[] contacts = doGet(url, username, password, Contact[].class);
-        return Arrays.asList(contacts);
+        return doGet(url, username, password, Contact[].class);
     }
 
     private URI buildUrl(String path) throws NotAvailableException {

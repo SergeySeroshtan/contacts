@@ -8,6 +8,7 @@ import java.util.List;
 import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.Attributes;
+import javax.naming.directory.SearchControls;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,15 +57,18 @@ public class DsContactsRepository implements ContactsRepository {
     @Value("#{ldapProperties['ldap.user.location']}")
     protected String locationAttr;
 
-    @Override
-    public Contact findByUserName(String userName) {
-        LOGGER.debug("Search contact for {}.", userName);
+    @Value("#{ldapProperties['ldap.user.updatedAt']}")
+    protected String updatedAtAttr;
 
-        String filter = format(filterByUsernameTemplate, userName);
+    @Override
+    public Contact findByUsername(String username) {
+        LOGGER.debug("Search contact for {}.", username);
+
+        String filter = format(filterByUsernameTemplate, username);
         List<Contact> contacts = findUsingFilter(filter);
 
         if (contacts.isEmpty()) {
-            LOGGER.debug("Contact for {} was not found.", userName);
+            LOGGER.debug("Contact for {} was not found.", username);
             return null;
         }
 
@@ -84,9 +88,12 @@ public class DsContactsRepository implements ContactsRepository {
 
         LdapTemplate template = new LdapTemplate(ldapContextSource);
 
+        String[] attrs = new String[] { usernameAttr, firstnameAttr,
+                lastnameAttr, photoUrlAttr, mailAttr, phoneAttr, locationAttr,
+                updatedAtAttr };
         @SuppressWarnings("unchecked")
         List<Contact> contacts = template.search(usersGroup, filter,
-                new ContactMapper());
+                SearchControls.ONELEVEL_SCOPE, attrs, new ContactMapper());
 
         LOGGER.debug("Found {} contacts.", contacts.size());
 
@@ -103,7 +110,7 @@ public class DsContactsRepository implements ContactsRepository {
                 throws NamingException {
             Contact contact = new Contact();
 
-            contact.setUserName(asString(usernameAttr, attrs));
+            contact.setUsername(asString(usernameAttr, attrs));
 
             contact.setFirstName(asString(firstnameAttr, attrs));
             contact.setLastName(asString(lastnameAttr, attrs));
@@ -111,9 +118,11 @@ public class DsContactsRepository implements ContactsRepository {
             contact.setPhotoUrl(asString(photoUrlAttr, attrs));
 
             contact.setMail(asString(mailAttr, attrs));
-            contact.setPhone(asPhone(attrs));
+            contact.setPhone(asPhone(phoneAttr, attrs));
 
             contact.setLocation(asString(locationAttr, attrs));
+
+            contact.setVersion(asString(updatedAtAttr, attrs));
 
             return contact;
         }
@@ -140,8 +149,9 @@ public class DsContactsRepository implements ContactsRepository {
          * <p>
          * Parses and returns this phone number.
          */
-        private String asPhone(Attributes attrs) throws NamingException {
-            String digits = digitsOnly(asString(phoneAttr, attrs));
+        private String asPhone(String attrId, Attributes attrs)
+                throws NamingException {
+            String digits = digitsOnly(asString(attrId, attrs));
             if (StringUtils.isNullOrEmpty(digits)) {
                 return StringUtils.EMPTY;
             }

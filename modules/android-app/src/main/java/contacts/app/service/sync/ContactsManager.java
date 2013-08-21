@@ -9,6 +9,7 @@ import java.util.Map;
 
 import android.accounts.Account;
 import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -51,20 +52,21 @@ public class ContactsManager {
     }
 
     /**
-     * Gets the existing contacts.
+     * Provides information about contacts, that present in address book.
      * 
      * @param account
      *            the account of user, who performs operation.
      * 
-     * @return the set of names of users.
+     * @return the known contacts.
      */
-    public Map<String, Long> getExistingContacts(Account account) {
+    public Map<String, KnownContact> getKnownContacts(Account account) {
         Uri uri = RawContacts.CONTENT_URI.buildUpon()
                 .appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name)
                 .appendQueryParameter(RawContacts.ACCOUNT_TYPE, account.type)
                 .build();
 
-        String[] projection = new String[] { RawContacts.SYNC1, RawContacts._ID };
+        String[] projection = new String[] { RawContacts._ID,
+                RawContacts.SYNC1, RawContacts.SYNC2 };
         Cursor cursor = contentResolver
                 .query(uri, projection, null, null, null);
 
@@ -76,14 +78,24 @@ public class ContactsManager {
                 return Collections.emptyMap();
             }
 
-            Map<String, Long> existingContacts = new HashMap<String, Long>(
+            Map<String, KnownContact> knownContacts = new HashMap<String, KnownContact>(
                     contactsNum);
-            for (int i = 0; i < contactsNum; ++i) {
+            do {
                 cursor.moveToNext();
-                existingContacts.put(cursor.getString(0), cursor.getLong(1));
-            }
 
-            return existingContacts;
+                long id = cursor.getLong(cursor
+                        .getColumnIndexOrThrow(RawContacts._ID));
+                String username = cursor.getString(cursor
+                        .getColumnIndexOrThrow(RawContacts.SYNC1));
+                String version = cursor.getString(cursor
+                        .getColumnIndexOrThrow(RawContacts.SYNC2));
+
+                KnownContact knownContact = KnownContact.create(id, username,
+                        version);
+                knownContacts.put(knownContact.getUsername(), knownContact);
+            } while (!cursor.isLast());
+
+            return knownContacts;
         } finally {
             cursor.close();
         }
@@ -104,62 +116,121 @@ public class ContactsManager {
      * @throws NotCompletedException
      *             if contact could not be created.
      */
-    public void createContact(Account account, long groupId, Contact contact,
-            byte[] photo) throws NotCompletedException {
-        String userName = contact.getUserName();
+    public KnownContact createContact(Account account, long groupId,
+            Contact contact) throws NotCompletedException {
+        String username = contact.getUsername();
+        String version = contact.getVersion();
 
-        Log.d(TAG, format("Create contact for {0}.", userName));
+        Log.d(TAG, format("Create new contact for {0}.", username));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
         batch.add(ContentProviderOperation.newInsert(RawContacts.CONTENT_URI)
                 .withValue(RawContacts.ACCOUNT_NAME, account.name)
                 .withValue(RawContacts.ACCOUNT_TYPE, account.type)
-                .withValue(RawContacts.SYNC1, userName).build());
+                .withValue(RawContacts.SYNC1, username)
+                .withValue(RawContacts.SYNC2, version).build());
 
         ContentValues name = new ContentValues();
         name.put(StructuredName.GIVEN_NAME, contact.getFirstName());
         name.put(StructuredName.FAMILY_NAME, contact.getLastName());
-        batch.add(insertValues(StructuredName.CONTENT_ITEM_TYPE, name));
+        batch.add(doInsert(StructuredName.CONTENT_ITEM_TYPE, name));
 
-        batch.add(insertValue(Email.CONTENT_ITEM_TYPE, Email.ADDRESS,
+        batch.add(doInsert(Email.CONTENT_ITEM_TYPE, Email.ADDRESS,
                 contact.getMail()));
-        batch.add(insertValue(Phone.CONTENT_ITEM_TYPE, Phone.NUMBER,
+        batch.add(doInsert(Phone.CONTENT_ITEM_TYPE, Phone.NUMBER,
                 contact.getPhone()));
-        batch.add(insertValue(Organization.CONTENT_ITEM_TYPE,
+        batch.add(doInsert(Organization.CONTENT_ITEM_TYPE,
                 Organization.OFFICE_LOCATION, contact.getLocation()));
-        batch.add(insertValue(GroupMembership.CONTENT_ITEM_TYPE,
+        batch.add(doInsert(GroupMembership.CONTENT_ITEM_TYPE,
                 GroupMembership.GROUP_ROW_ID, groupId));
 
-        if (photo != null) {
-            batch.add(insertValue(Photo.CONTENT_ITEM_TYPE, Photo.PHOTO, photo));
+        batch.add(doInsert(Photo.CONTENT_ITEM_TYPE, Photo.PHOTO, null));
+
+        try {
+            ContentProviderResult[] results = contentResolver.applyBatch(
+                    ContactsContract.AUTHORITY, batch);
+            long id = ContentUris.parseId(results[0].uri);
+            return KnownContact.create(id, username, version);
+        } catch (Exception exception) {
+            throw new NotCompletedException("Could not create contact.",
+                    exception);
         }
+    }
+
+    /**
+     * Updates existing contact.
+     * 
+     * @param account
+     *            the account of user, who performs operation.
+     * @param knownContact
+     *            the information about existing contact.
+     * @param syncedContact
+     *            the synchronized contact.
+     * 
+     * @throws NotCompletedException
+     *             if contact could not be updated.
+     */
+    public void updateContact(Account account, KnownContact knownContact,
+            Contact syncedContact) throws NotCompletedException {
+        long id = knownContact.getId();
+        Log.d(TAG, format("Update photo of contact {0}.", id));
+
+        ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
+
+        batch.add(doUpdate(id, StructuredName.CONTENT_ITEM_TYPE,
+                StructuredName.GIVEN_NAME, syncedContact.getFirstName()));
+        batch.add(doUpdate(id, StructuredName.CONTENT_ITEM_TYPE,
+                StructuredName.FAMILY_NAME, syncedContact.getLastName()));
+
+        batch.add(doUpdate(id, Email.CONTENT_ITEM_TYPE, Email.ADDRESS,
+                syncedContact.getMail()));
+        batch.add(doUpdate(id, Phone.CONTENT_ITEM_TYPE, Phone.NUMBER,
+                syncedContact.getPhone()));
+
+        batch.add(doUpdate(id, Organization.CONTENT_ITEM_TYPE,
+                Organization.OFFICE_LOCATION, syncedContact.getLocation()));
+
+        Uri contactUri = ContentUris
+                .withAppendedId(RawContacts.CONTENT_URI, id);
+        batch.add(ContentProviderOperation.newUpdate(contactUri)
+                .withValue(RawContacts.SYNC2, syncedContact.getVersion())
+                .build());
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
         } catch (Exception exception) {
-            throw new NotCompletedException(format(
-                    "Could not create contact for {0}.", userName), exception);
+            throw new NotCompletedException("Could not update photo.",
+                    exception);
         }
     }
 
     /**
-     * Helps build insert operation.
+     * Updates photo of existing contact.
+     * 
+     * @param account
+     *            the account of user, who performs operation.
+     * @param knownContact
+     *            the information about existing contact.
+     * @param photo
+     *            the new photo for contact.
+     * 
+     * @throws NotCompletedException
+     *             if contact could not be updated.
      */
-    private static <T> ContentProviderOperation insertValue(String mime,
-            String key, T value) {
-        return ContentProviderOperation.newInsert(Data.CONTENT_URI)
-                .withValue(Data.MIMETYPE, mime).withValue(key, value)
-                .withValueBackReference(Data.RAW_CONTACT_ID, 0).build();
-    }
+    public void updateContactPhoto(Account account, KnownContact knownContact,
+            byte[] photo) throws NotCompletedException {
+        long id = knownContact.getId();
+        Log.d(TAG, format("Update photo of contact {0}.", id));
 
-    /**
-     * Helps build insert operation.
-     */
-    private static <T> ContentProviderOperation insertValues(String mime,
-            ContentValues values) {
-        return ContentProviderOperation.newInsert(Data.CONTENT_URI)
-                .withValue(Data.MIMETYPE, mime).withValues(values)
-                .withValueBackReference(Data.RAW_CONTACT_ID, 0).build();
+        ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
+        batch.add(doUpdate(id, Photo.CONTENT_ITEM_TYPE, Photo.PHOTO, photo));
+
+        try {
+            contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
+        } catch (Exception exception) {
+            throw new NotCompletedException("Could not update photo.",
+                    exception);
+        }
     }
 
     /**
@@ -167,14 +238,15 @@ public class ContactsManager {
      * 
      * @param account
      *            the account of user, who performs operation.
-     * @param id
-     *            the identifier of contact.
+     * @param knownContact
+     *            the information about existing contact.
      * 
      * @throws NotCompletedException
      *             if contact could not be removed.
      */
-    public void removeContact(Account account, long id)
+    public void removeContact(Account account, KnownContact knownContact)
             throws NotCompletedException {
+        long id = knownContact.getId();
         Log.d(TAG, format("Remove contact {0}.", id));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
@@ -191,6 +263,30 @@ public class ContactsManager {
             throw new NotCompletedException("Could not remove contact.",
                     exception);
         }
+    }
+
+    private static <T> ContentProviderOperation doInsert(String mime,
+            String key, T value) {
+        return ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                .withValue(Data.MIMETYPE, mime).withValue(key, value)
+                .withValueBackReference(Data.RAW_CONTACT_ID, 0).build();
+    }
+
+    private static <T> ContentProviderOperation doInsert(String mime,
+            ContentValues values) {
+        return ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                .withValue(Data.MIMETYPE, mime).withValues(values)
+                .withValueBackReference(Data.RAW_CONTACT_ID, 0).build();
+    }
+
+    private static <T> ContentProviderOperation doUpdate(long id, String mime,
+            String key, T value) {
+        String selection = Data.CONTACT_ID + "=? and " + Data.MIMETYPE + "=?";
+        return ContentProviderOperation
+                .newUpdate(Data.CONTENT_URI)
+                .withSelection(selection,
+                        new String[] { Long.toString(id), mime })
+                .withValue(key, value).build();
     }
 
 }

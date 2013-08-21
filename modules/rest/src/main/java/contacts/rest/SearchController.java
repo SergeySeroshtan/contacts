@@ -32,11 +32,11 @@ public class SearchController {
     @RequestMapping(value = "my", method = RequestMethod.GET)
     @ResponseBody
     public Contact my(Principal principal) {
-        String userName = principal.getName();
+        String username = principal.getName();
 
-        LOGGER.debug("Search contact of {}.", userName);
+        LOGGER.debug("Search contact of {}.", username);
 
-        return searchContactsService.findByUser(userName);
+        return searchContactsService.findByUser(username);
     }
 
     /**

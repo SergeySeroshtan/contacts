@@ -28,12 +28,12 @@ public class SearchContactsService {
      * 
      * @return the found contact or <code>null</code> if contact was not found.
      */
-    public Contact findByUser(String userName) {
-        if (StringUtils.isNullOrEmpty(userName)) {
+    public Contact findByUser(String username) {
+        if (StringUtils.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("User not defined.");
         }
 
-        return contactsRepository.findByUserName(userName);
+        return contactsRepository.findByUsername(username);
     }
 
     /**
@@ -41,16 +41,16 @@ public class SearchContactsService {
      * 
      * @return the location of user.
      */
-    public String findLocationOfUser(String userName) {
-        if (StringUtils.isNullOrEmpty(userName)) {
+    public String findLocationOfUser(String username) {
+        if (StringUtils.isNullOrEmpty(username)) {
             throw new IllegalArgumentException("User not defined.");
         }
 
-        LOGGER.debug("Get location of user {}.", userName);
+        LOGGER.debug("Get location of user {}.", username);
 
-        Contact contact = findByUser(userName);
+        Contact contact = findByUser(username);
         String location = contact.getLocation();
-        LOGGER.debug("Location of user {} is {}.", userName, location);
+        LOGGER.debug("Location of user {} is {}.", username, location);
 
         return location;
     }

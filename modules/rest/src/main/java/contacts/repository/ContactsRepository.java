@@ -15,7 +15,7 @@ public interface ContactsRepository {
      * 
      * @return the found contact or <code>null</code> if contact was not found.
      */
-    Contact findByUserName(String userName);
+    Contact findByUsername(String username);
 
     /**
      * Finds all contacts of people from one location.
