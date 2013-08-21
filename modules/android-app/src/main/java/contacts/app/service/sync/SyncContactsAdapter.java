@@ -37,12 +37,16 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     private static final String TAG = SyncContactsAdapter.class.getName();
 
     private RestClient restClient;
+
+    private GroupsManager groupsManager;
     private ContactsManager contactsManager;
 
     public SyncContactsAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
 
         restClient = new RestClient(context);
+
+        groupsManager = new GroupsManager(context);
         contactsManager = new ContactsManager(context);
     }
 
@@ -58,7 +62,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             checkCanceled();
 
             String groupTitle = getContext().getString(R.string.groupCoworkers);
-            long groupId = contactsManager.getGroup(account, groupTitle);
+            long groupId = groupsManager.getGroup(account, groupTitle);
             Log.d(TAG, format("Group {0} has id {1}.", groupTitle, groupId));
 
             checkCanceled();
