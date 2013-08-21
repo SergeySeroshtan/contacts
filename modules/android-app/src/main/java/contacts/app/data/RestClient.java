@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonHttpMessageConverter;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -117,11 +118,13 @@ public final class RestClient {
         try {
             ResponseEntity<T> response = template.exchange(url, HttpMethod.GET,
                     request, responseClass);
-            if (response.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+            return response.getBody();
+        } catch (HttpClientErrorException exception) {
+            if (exception.getStatusCode() == HttpStatus.UNAUTHORIZED) {
                 throw new NotAuthorizedException("Invalid credentials.");
             }
 
-            return response.getBody();
+            throw new NotAvailableException("Client Error.", exception);
         } catch (RestClientException exception) {
             throw new NotAvailableException("REST-service is not available.",
                     exception);
