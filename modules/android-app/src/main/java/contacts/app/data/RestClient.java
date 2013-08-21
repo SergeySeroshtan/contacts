@@ -62,7 +62,7 @@ public final class RestClient {
             throws NotAvailableException, NotAuthorizedException {
         Log.d(TAG, format("Get contact for {0}.", username));
 
-        URI url = buildUrl(context.getString(R.string.restPathMyContact));
+        URI url = buildUrl(context.getString(R.string.restPathMy));
         return doGet(url, username, password, Contact.class);
     }
 
@@ -85,7 +85,7 @@ public final class RestClient {
             throws NotAvailableException, NotAuthorizedException {
         Log.d(TAG, format("Find by office for {0}.", username));
 
-        URI url = buildUrl(context.getString(R.string.restPathSearchContacts));
+        URI url = buildUrl(context.getString(R.string.restPathCoworkers));
         Contact[] contacts = doGet(url, username, password, Contact[].class);
         return Arrays.asList(contacts);
     }

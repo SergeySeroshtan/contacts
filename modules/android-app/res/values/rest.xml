@@ -3,7 +3,7 @@
 
     <string name="restScheme">http</string>
     <string name="restAuthority">10.0.2.2:8080</string>
-    <string name="restPathMyContact">/contacts/my.json</string>
-    <string name="restPathSearchContacts">/contacts/search.json</string>
+    <string name="restPathMy">/contacts/my.json</string>
+    <string name="restPathCoworkers">/contacts/coworkers.json</string>
 
 </resources>

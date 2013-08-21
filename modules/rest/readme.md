@@ -20,9 +20,11 @@ To run application locally, follow next steps:
  
 ## REST API
 
+Notice, that for properties that have no value, the empty string is returned.
+
 ### GET my.json
 
-Returns contact of current user.
+Returns contact of user.
 
 ##### JSON
 
@@ -30,15 +32,9 @@ Returns contact of current user.
 {"userName":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"3800000004","location":"Donetsk"}
 ```
 
-### GET search.json
+### GET coworkers.json
 
-Returns contacts of people from certain location.
-By default, returns contacts of people from one location with current user.
-
-For properties that have no value, the empty string is returned.
-
-##### Parameters
-locations (optional) - list of locations.
+Returns contacts of people from one location with user.
 
 ##### JSON
 
