@@ -56,14 +56,38 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         Log.d(TAG, "Sync started.");
 
         try {
-            Map<String, Contact> loadedCoworkers = loadContactsOfCoworkers(account);
+            /*
+             * Synchronize group, which contains contacts of coworkers.
+             */
+            SyncedGroup groupCoworkers;
+            try {
+                groupCoworkers = syncGroupForCoworkers(account);
+            } catch (SyncOperationException exception) {
+                Log.e(TAG, "Could not sync group for coworkers.", exception);
+                return;
+            }
 
             checkCanceled();
 
-            SyncedGroup groupCoworkers = syncGroupForCoworkers(account);
+            /*
+             * Load actual contacts of coworkers.
+             */
+            Map<String, Contact> loadedCoworkers;
+            try {
+                loadedCoworkers = loadContactsOfCoworkers(account);
+            } catch (NotAuthorizedException exception) {
+                Log.e(TAG, "Could not access contacts of coworkers.", exception);
+                return;
+            } catch (NotAvailableException exception) {
+                Log.e(TAG, "Could not get contacts of coworkers.", exception);
+                return;
+            }
 
             checkCanceled();
 
+            /*
+             * Synchronize contacts of coworkers.
+             */
             Map<String, SyncedContact> syncedCoworkers = contactsManager
                     .allFromGroup(groupCoworkers);
 
@@ -72,11 +96,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             syncUpdatedContacts(account, loadedCoworkers, syncedCoworkers);
             syncRemovedContacts(account, loadedCoworkers, syncedCoworkers);
 
-            Log.d(TAG, "Sync was finished.");
+            Log.d(TAG, "Sync finished.");
         } catch (SyncCanceledException exception) {
-            Log.w(TAG, "Sync was canceled.", exception);
-        } catch (SyncOperationException exception) {
-            Log.e(TAG, "Sync was interrupted.", exception);
+            Log.w(TAG, "Sync canceled.", exception);
         }
     }
 
@@ -110,38 +132,28 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     }
 
     /**
-     * Downloads contacts of coworkers.
+     * Loads contacts of coworkers.
      * 
      * @param account
      *            the account of user, who performs operation.
      * 
      * @return the contacts of coworkers.
-     * 
-     * @throws SyncOperationException
-     *             if contacts could not be loaded.
      */
     private Map<String, Contact> loadContactsOfCoworkers(Account account)
-            throws SyncOperationException {
+            throws NotAuthorizedException, NotAvailableException {
         String username = account.name;
         AccountManager accountManager = AccountManager.get(getContext());
         String password = accountManager.getPassword(account);
 
-        try {
-            Contact[] contacts = restClient.getCoworkers(username, password);
-            Map<String, Contact> loadedContacts = new HashMap<String, Contact>();
-            for (Contact contact : contacts) {
-                loadedContacts.put(contact.getUsername(), contact);
-            }
-            Log.d(TAG,
-                    format("Loaded {0} contacts of coworkers.",
-                            loadedContacts.size()));
-            return loadedContacts;
-        } catch (NotAvailableException exception) {
-            throw new SyncOperationException("Service not available.",
-                    exception);
-        } catch (NotAuthorizedException exception) {
-            throw new SyncOperationException("Invalid credentials.", exception);
+        Contact[] contacts = restClient.getCoworkers(username, password);
+        Map<String, Contact> loadedContacts = new HashMap<String, Contact>();
+        for (Contact contact : contacts) {
+            loadedContacts.put(contact.getUsername(), contact);
         }
+        Log.d(TAG,
+                format("Loaded {0} contacts of coworkers.",
+                        loadedContacts.size()));
+        return loadedContacts;
     }
 
     /**
@@ -257,19 +269,19 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         Log.d(TAG,
                 format("Download photo for {0} from {1}.",
                         syncedContact.getUsername(), photoUrl));
-        byte[] photo = downloadPhoto(photoUrl);
+        byte[] photo = loadPhoto(photoUrl);
         contactsManager.updateContactPhoto(account, syncedContact, photo);
     }
 
     /**
-     * Downloads photo for contact.
+     * Loads photo for contact.
      * 
      * @param photoUrl
      *            the URL of photo.
      * 
      * @return the loaded photo.
      */
-    private byte[] downloadPhoto(String photoUrl) throws SyncOperationException {
+    private byte[] loadPhoto(String photoUrl) throws SyncOperationException {
         if (StringUtils.isNullOrEmpty(photoUrl)) {
             throw new IllegalArgumentException("URL is required.");
         }
