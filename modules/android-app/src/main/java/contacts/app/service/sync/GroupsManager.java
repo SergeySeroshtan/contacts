@@ -39,7 +39,7 @@ public class GroupsManager {
     }
 
     /**
-     * Finds group by name.
+     * Finds group by its name.
      * 
      * @param account
      *            the account of user, who performs operation.
@@ -48,7 +48,7 @@ public class GroupsManager {
      * 
      * @return the found group or <code>null</code> if group not found.
      */
-    public KnownGroup findGroup(Account account, String name) {
+    public SyncedGroup findGroup(Account account, String name) {
         String[] projection = new String[] { Groups._ID, Groups.TITLE };
         String selection = Groups.SYNC1 + "=? and " + Groups.ACCOUNT_NAME
                 + "=? and " + Groups.ACCOUNT_TYPE + "=?";
@@ -57,41 +57,43 @@ public class GroupsManager {
                 null);
 
         try {
-            if (cursor.getCount() <= 0) {
+            if (!cursor.moveToFirst()) {
                 Log.d(TAG, format("Group {0} not found.", name));
                 return null;
             }
 
-            cursor.moveToNext();
-            long id = cursor.getLong(cursor.getColumnIndex(Groups._ID));
-            String title = cursor.getString(cursor
-                    .getColumnIndexOrThrow(Groups.TITLE));
+            int idColumn = cursor.getColumnIndexOrThrow(Groups._ID);
+            long id = cursor.getLong(idColumn);
+
+            int titleColumn = cursor.getColumnIndexOrThrow(Groups.TITLE);
+            String title = cursor.getString(titleColumn);
+
             Log.d(TAG, format("Found group {0} with title {1}", id, title));
 
-            return KnownGroup.create(id, name, title);
+            return SyncedGroup.create(id, name, title);
         } finally {
             cursor.close();
         }
     }
 
     /**
-     * Creates a group with the specified title.
+     * Creates a group.
      * 
      * @param account
      *            the account of user, who performs operation.
      * @param name
      *            the name of group.
      * @param title
-     *            the title for group.
+     *            the title of group.
      * 
      * @return the created group.
      * 
      * @throws NotCompletedException
      *             if group could not be created.
      */
-    public KnownGroup createGroup(Account account, String name, String title)
+    public SyncedGroup createGroup(Account account, String name, String title)
             throws NotCompletedException {
-        Log.d(TAG, format("Crated group {0}.", name));
+        Log.d(TAG, format("Create group {0}.", name));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
@@ -105,10 +107,12 @@ public class GroupsManager {
             ContentProviderResult[] results = contentResolver.applyBatch(
                     ContactsContract.AUTHORITY, batch);
             long id = ContentUris.parseId(results[0].uri);
-            return KnownGroup.create(id, name, title);
+
+            Log.d(TAG, format("Group {0} was created.", name));
+            return SyncedGroup.create(id, name, title);
         } catch (Exception exception) {
             throw new NotCompletedException(format(
-                    "Could not create group {0}.", title), exception);
+                    "Could not create group {0}.", name), exception);
         }
     }
 

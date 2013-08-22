@@ -59,10 +59,9 @@ public class ContactsManager {
      * @param group
      *            the group where contacts are searched.
      * 
-     * @return the known contacts.
+     * @return the found contacts.
      */
-    public Map<String, KnownContact> allFromGroup(Account account,
-            KnownGroup group) {
+    public Map<String, SyncedContact> allFromGroup(SyncedGroup group) {
         String[] projection = new String[] { GroupMembership.CONTACT_ID };
         String selection = GroupMembership.GROUP_ROW_ID + "=? and "
                 + GroupMembership.MIMETYPE + "=?";
@@ -79,12 +78,12 @@ public class ContactsManager {
                 return Collections.emptyMap();
             }
 
-            Map<String, KnownContact> contacts = new HashMap<String, KnownContact>(
+            Map<String, SyncedContact> contacts = new HashMap<String, SyncedContact>(
                     contactsNum);
             do {
                 long contactId = cursor.getLong(cursor
                         .getColumnIndexOrThrow(GroupMembership.CONTACT_ID));
-                KnownContact contact = findContact(contactId);
+                SyncedContact contact = findContact(contactId);
                 if (contact == null) {
                     continue;
                 }
@@ -98,14 +97,14 @@ public class ContactsManager {
     }
 
     /**
-     * Finds contact.
+     * Finds a contact.
      * 
      * @param id
      *            the identifier of contact.
      * 
      * @return the found contact or <code>null</code> if contact was not found.
      */
-    public KnownContact findContact(long id) {
+    public SyncedContact findContact(long id) {
         String[] projection = new String[] { RawContacts.SYNC1,
                 RawContacts.SYNC2 };
         Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, id);
@@ -122,7 +121,7 @@ public class ContactsManager {
             String version = cursor.getString(cursor
                     .getColumnIndexOrThrow(RawContacts.SYNC2));
 
-            return KnownContact.create(id, username, version);
+            return SyncedContact.create(id, username, version);
         } finally {
             cursor.close();
         }
@@ -133,22 +132,20 @@ public class ContactsManager {
      * 
      * @param account
      *            the account of user, who performs operation.
-     * @param groupId
+     * @param group
      *            the group for contact.
-     * @param contact
-     *            the synchronized contact.
-     * @param photo
-     *            the photo for contact (optional).
+     * @param loadedContact
+     *            the loaded contact with new data.
      * 
      * @return the created contact.
      * 
      * @throws NotCompletedException
      *             if contact could not be created.
      */
-    public KnownContact createContact(Account account, KnownGroup group,
-            Contact contact) throws NotCompletedException {
-        String username = contact.getUsername();
-        String version = contact.getVersion();
+    public SyncedContact createContact(Account account, SyncedGroup group,
+            Contact loadedContact) throws NotCompletedException {
+        String username = loadedContact.getUsername();
+        String version = loadedContact.getVersion();
 
         Log.d(TAG,
                 format("Create contact for {0} in group {1}.", username,
@@ -162,16 +159,16 @@ public class ContactsManager {
                 .withValue(RawContacts.SYNC2, version).build());
 
         ContentValues name = new ContentValues();
-        name.put(StructuredName.GIVEN_NAME, contact.getFirstName());
-        name.put(StructuredName.FAMILY_NAME, contact.getLastName());
+        name.put(StructuredName.GIVEN_NAME, loadedContact.getFirstName());
+        name.put(StructuredName.FAMILY_NAME, loadedContact.getLastName());
         batch.add(doInsert(StructuredName.CONTENT_ITEM_TYPE, name));
 
         batch.add(doInsert(Email.CONTENT_ITEM_TYPE, Email.ADDRESS,
-                contact.getMail()));
+                loadedContact.getMail()));
         batch.add(doInsert(Phone.CONTENT_ITEM_TYPE, Phone.NUMBER,
-                contact.getPhone()));
+                loadedContact.getPhone()));
         batch.add(doInsert(Organization.CONTENT_ITEM_TYPE,
-                Organization.OFFICE_LOCATION, contact.getLocation()));
+                Organization.OFFICE_LOCATION, loadedContact.getLocation()));
         batch.add(doInsert(GroupMembership.CONTENT_ITEM_TYPE,
                 GroupMembership.GROUP_ROW_ID, group.getId()));
 
@@ -181,7 +178,9 @@ public class ContactsManager {
             ContentProviderResult[] results = contentResolver.applyBatch(
                     ContactsContract.AUTHORITY, batch);
             long id = ContentUris.parseId(results[0].uri);
-            return KnownContact.create(id, username, version);
+
+            Log.d(TAG, format("Contact for {0} was created.", username));
+            return SyncedContact.create(id, username, version);
         } catch (Exception exception) {
             throw new NotCompletedException("Could not create contact.",
                     exception);
@@ -193,42 +192,45 @@ public class ContactsManager {
      * 
      * @param account
      *            the account of user, who performs operation.
-     * @param knownContact
-     *            the information about existing contact.
      * @param syncedContact
-     *            the synchronized contact.
+     *            the updated contact.
+     * @param loadedContact
+     *            the loaded contact with new data.
      * 
      * @throws NotCompletedException
      *             if contact could not be updated.
      */
-    public void updateContact(Account account, KnownContact knownContact,
-            Contact syncedContact) throws NotCompletedException {
-        long id = knownContact.getId();
-        Log.d(TAG, format("Update photo of contact {0}.", id));
+    public void updateContact(Account account, SyncedContact syncedContact,
+            Contact loadedContact) throws NotCompletedException {
+        long id = syncedContact.getId();
+        Log.d(TAG, format("Update photo for {0}.", syncedContact.getUsername()));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
         batch.add(doUpdate(id, StructuredName.CONTENT_ITEM_TYPE,
-                StructuredName.GIVEN_NAME, syncedContact.getFirstName()));
+                StructuredName.GIVEN_NAME, loadedContact.getFirstName()));
         batch.add(doUpdate(id, StructuredName.CONTENT_ITEM_TYPE,
-                StructuredName.FAMILY_NAME, syncedContact.getLastName()));
+                StructuredName.FAMILY_NAME, loadedContact.getLastName()));
 
         batch.add(doUpdate(id, Email.CONTENT_ITEM_TYPE, Email.ADDRESS,
-                syncedContact.getMail()));
+                loadedContact.getMail()));
         batch.add(doUpdate(id, Phone.CONTENT_ITEM_TYPE, Phone.NUMBER,
-                syncedContact.getPhone()));
+                loadedContact.getPhone()));
 
         batch.add(doUpdate(id, Organization.CONTENT_ITEM_TYPE,
-                Organization.OFFICE_LOCATION, syncedContact.getLocation()));
+                Organization.OFFICE_LOCATION, loadedContact.getLocation()));
 
         Uri contactUri = ContentUris
                 .withAppendedId(RawContacts.CONTENT_URI, id);
         batch.add(ContentProviderOperation.newUpdate(contactUri)
-                .withValue(RawContacts.SYNC2, syncedContact.getVersion())
+                .withValue(RawContacts.SYNC2, loadedContact.getVersion())
                 .build());
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
+            Log.d(TAG,
+                    format("Contact for {0} was updated.",
+                            syncedContact.getUsername()));
         } catch (Exception exception) {
             throw new NotCompletedException("Could not update photo.",
                     exception);
@@ -240,24 +242,28 @@ public class ContactsManager {
      * 
      * @param account
      *            the account of user, who performs operation.
-     * @param knownContact
-     *            the information about existing contact.
+     * @param syncedContact
+     *            the updated contact.
      * @param photo
      *            the new photo for contact.
      * 
      * @throws NotCompletedException
      *             if contact could not be updated.
      */
-    public void updateContactPhoto(Account account, KnownContact knownContact,
-            byte[] photo) throws NotCompletedException {
-        long id = knownContact.getId();
-        Log.d(TAG, format("Update photo of contact {0}.", id));
+    public void updateContactPhoto(Account account,
+            SyncedContact syncedContact, byte[] photo)
+            throws NotCompletedException {
+        long id = syncedContact.getId();
+        Log.d(TAG, format("Update photo for {0}.", syncedContact.getUsername()));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
         batch.add(doUpdate(id, Photo.CONTENT_ITEM_TYPE, Photo.PHOTO, photo));
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
+            Log.d(TAG,
+                    format("Photo for {0} was update.",
+                            syncedContact.getUsername()));
         } catch (Exception exception) {
             throw new NotCompletedException("Could not update photo.",
                     exception);
@@ -269,16 +275,17 @@ public class ContactsManager {
      * 
      * @param account
      *            the account of user, who performs operation.
-     * @param knownContact
-     *            the information about existing contact.
+     * @param syncedContact
+     *            the removed contact.
      * 
      * @throws NotCompletedException
      *             if contact could not be removed.
      */
-    public void removeContact(Account account, KnownContact knownContact)
+    public void removeContact(Account account, SyncedContact syncedContact)
             throws NotCompletedException {
-        long id = knownContact.getId();
-        Log.d(TAG, format("Remove contact {0}.", id));
+        long id = syncedContact.getId();
+        Log.d(TAG,
+                format("Remove contact for {0}.", syncedContact.getUsername()));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
         Uri contactUri = ContentUris
@@ -290,6 +297,9 @@ public class ContactsManager {
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
+            Log.d(TAG,
+                    format("Photo for {0} was removed.",
+                            syncedContact.getUsername()));
         } catch (Exception exception) {
             throw new NotCompletedException("Could not remove contact.",
                     exception);

@@ -60,16 +60,16 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         Log.d(TAG, "Sync started.");
 
         try {
-            Map<String, Contact> syncedCoworkers = downloadCoworkersContacts(account);
+            Map<String, Contact> loadedCoworkers = loadContactsOfCoworkers(account);
             Log.d(TAG,
                     format("Loaded {0} contacts of coworkers.",
-                            syncedCoworkers.size()));
+                            loadedCoworkers.size()));
 
             checkCanceled();
 
             String groupCoworkersTitle = getContext().getString(
                     R.string.groupCoworkersTitle);
-            KnownGroup groupCoworkers = groupsManager.findGroup(account,
+            SyncedGroup groupCoworkers = groupsManager.findGroup(account,
                     GROUP_COWORKERS_NAME);
             if (groupCoworkers == null) {
                 groupCoworkers = groupsManager.createGroup(account,
@@ -78,13 +78,13 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             checkCanceled();
 
-            Map<String, KnownContact> knownCoworkers = contactsManager
-                    .allFromGroup(account, groupCoworkers);
+            Map<String, SyncedContact> syncedCoworkers = contactsManager
+                    .allFromGroup(groupCoworkers);
 
-            createContacts(account, groupCoworkers, syncedCoworkers,
-                    knownCoworkers);
-            updateContacts(account, syncedCoworkers, knownCoworkers);
-            removeContacts(account, syncedCoworkers, knownCoworkers);
+            createContacts(account, groupCoworkers, loadedCoworkers,
+                    syncedCoworkers);
+            updateContacts(account, loadedCoworkers, syncedCoworkers);
+            removeContacts(account, loadedCoworkers, syncedCoworkers);
 
             Log.d(TAG, "Sync was finished.");
         } catch (CanceledException exception) {
@@ -105,7 +105,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * @throws NotCompletedException
      *             if contacts could not be loaded.
      */
-    private Map<String, Contact> downloadCoworkersContacts(Account account)
+    private Map<String, Contact> loadContactsOfCoworkers(Account account)
             throws NotCompletedException {
         String username = account.name;
         AccountManager accountManager = AccountManager.get(getContext());
@@ -128,23 +128,19 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Creates new contacts.
      */
-    private void createContacts(Account account, KnownGroup group,
-            Map<String, Contact> syncedContacts,
-            Map<String, KnownContact> knownContacts) {
-        for (Contact syncedContact : syncedContacts.values()) {
-            String username = syncedContact.getUsername();
-            if (knownContacts.containsKey(username)) {
+    private void createContacts(Account account, SyncedGroup group,
+            Map<String, Contact> loadedContacts,
+            Map<String, SyncedContact> syncedContacts) {
+        for (Contact loadedContact : loadedContacts.values()) {
+            String username = loadedContact.getUsername();
+            if (syncedContacts.containsKey(username)) {
                 continue;
             }
 
             try {
-                Log.d(TAG, format("Create contact for {0}.", username));
-                KnownContact knownContact = contactsManager.createContact(
-                        account, group, syncedContact);
-                Log.d(TAG, format("Contact for {0} was created.", username));
-
-                Log.d(TAG, format("Update photo for {0}.", username));
-                updatePhoto(account, knownContact, syncedContact.getPhotoUrl());
+                SyncedContact syncedContact = contactsManager.createContact(
+                        account, group, loadedContact);
+                updatePhoto(account, syncedContact, loadedContact.getPhotoUrl());
             } catch (NotCompletedException exception) {
                 Log.w(TAG,
                         format("Contact for {0} was not created.", username),
@@ -158,28 +154,25 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * contacts.
      */
     private void updateContacts(Account account,
-            Map<String, Contact> syncedContacts,
-            Map<String, KnownContact> knownContacts) {
-        for (Contact syncedContact : syncedContacts.values()) {
-            String username = syncedContact.getUsername();
-            if (!knownContacts.containsKey(username)) {
+            Map<String, Contact> loadedContacts,
+            Map<String, SyncedContact> syncedContacts) {
+        for (Contact loadedContact : loadedContacts.values()) {
+            String username = loadedContact.getUsername();
+            if (!syncedContacts.containsKey(username)) {
                 continue;
             }
-            KnownContact knownContact = knownContacts.get(username);
+            SyncedContact syncedContact = syncedContacts.get(username);
 
-            if (syncedContact.getVersion().equals(knownContact.getVersion())) {
+            if (loadedContact.getVersion().equals(syncedContact.getVersion())) {
                 Log.d(TAG, format("Contact for {0} is up to date.", username));
                 continue;
             }
 
             try {
-                Log.d(TAG, format("Update contact for {0}.", username));
-                contactsManager.updateContact(account, knownContact,
-                        syncedContact);
-                Log.d(TAG, format("Contact for {0} was updated.", username));
+                contactsManager.updateContact(account, syncedContact,
+                        loadedContact);
 
-                Log.d(TAG, format("Update photo for {0}.", username));
-                updatePhoto(account, knownContact, syncedContact.getPhotoUrl());
+                updatePhoto(account, syncedContact, loadedContact.getPhotoUrl());
             } catch (NotCompletedException exception) {
                 Log.w(TAG,
                         format("Contact for {0} was not updated.", username),
@@ -192,18 +185,16 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * Removes obsolete contacts.
      */
     private void removeContacts(Account account,
-            Map<String, Contact> syncedContacts,
-            Map<String, KnownContact> knownContacts) {
-        for (KnownContact knownContact : knownContacts.values()) {
-            String username = knownContact.getUsername();
-            if (syncedContacts.containsKey(username)) {
+            Map<String, Contact> loadedContacts,
+            Map<String, SyncedContact> syncedContacts) {
+        for (SyncedContact syncedContact : syncedContacts.values()) {
+            String username = syncedContact.getUsername();
+            if (loadedContacts.containsKey(username)) {
                 continue;
             }
 
             try {
-                Log.d(TAG, format("Remove contact for {0}.", username));
-                contactsManager.removeContact(account, knownContact);
-                Log.d(TAG, format("Contact for {0} was removed.", username));
+                contactsManager.removeContact(account, syncedContact);
             } catch (NotCompletedException exception) {
                 Log.w(TAG,
                         format("Contact for {0} was not removed.", username),
@@ -215,7 +206,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Updates photo of contact.
      */
-    private void updatePhoto(Account account, KnownContact knownContact,
+    private void updatePhoto(Account account, SyncedContact syncedContact,
             String photoUrl) throws NotCompletedException {
         if (StringUtils.isNullOrEmpty(photoUrl)) {
             return;
@@ -223,9 +214,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
         Log.d(TAG,
                 format("Download photo for {0} from {1}.",
-                        knownContact.getUsername(), photoUrl));
+                        syncedContact.getUsername(), photoUrl));
         byte[] photo = downloadPhoto(photoUrl);
-        contactsManager.updateContactPhoto(account, knownContact, photo);
+        contactsManager.updateContactPhoto(account, syncedContact, photo);
     }
 
     /**
