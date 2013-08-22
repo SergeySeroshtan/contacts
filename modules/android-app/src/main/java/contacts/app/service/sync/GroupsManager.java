@@ -39,50 +39,36 @@ public class GroupsManager {
     }
 
     /**
-     * Finds or creates group for contacts.
+     * Finds group by name.
      * 
      * @param account
      *            the account of user, who performs operation.
-     * @param title
-     *            the title of group.
+     * @param name
+     *            the unique name of group.
      * 
-     * @return the identifier of group.
-     * 
-     * @throws NotCompletedException
-     *             if group could not be found or created.
+     * @return the found group or <code>null</code> if group not found.
      */
-    public long getGroup(Account account, String title)
-            throws NotCompletedException {
-        Long id = findGroup(account, title);
-        if (id != null) {
-            Log.d(TAG, format("Group {0} was found.", title));
-            return id;
-        }
-
-        return createGroup(account, title);
-    }
-
-    /**
-     * Finds group by title.
-     * 
-     * @return identifier of group or <code>null</code> if group was not found.
-     */
-    private Long findGroup(Account account, String title) {
+    public KnownGroup findGroup(Account account, String name) {
         String[] projection = new String[] { Groups._ID, Groups.TITLE };
-        String selection = Groups.TITLE + "=? and " + Groups.ACCOUNT_NAME
+        String selection = Groups.SYNC1 + "=? and " + Groups.ACCOUNT_NAME
                 + "=? and " + Groups.ACCOUNT_TYPE + "=?";
         Cursor cursor = contentResolver.query(Groups.CONTENT_URI, projection,
-                selection, new String[] { title, account.name, account.type },
+                selection, new String[] { name, account.name, account.type },
                 null);
 
         try {
             if (cursor.getCount() <= 0) {
-                Log.d(TAG, format("Could not find group {0}.", title));
+                Log.d(TAG, format("Group {0} not found.", name));
                 return null;
             }
 
             cursor.moveToNext();
-            return cursor.getLong(cursor.getColumnIndex(Groups._ID));
+            long id = cursor.getLong(cursor.getColumnIndex(Groups._ID));
+            String title = cursor.getString(cursor
+                    .getColumnIndexOrThrow(Groups.TITLE));
+            Log.d(TAG, format("Found group {0} with title {1}", id, title));
+
+            return KnownGroup.create(id, name, title);
         } finally {
             cursor.close();
         }
@@ -91,25 +77,35 @@ public class GroupsManager {
     /**
      * Creates a group with the specified title.
      * 
-     * @return identifier of created group.
+     * @param account
+     *            the account of user, who performs operation.
+     * @param name
+     *            the name of group.
+     * @param title
+     *            the title for group.
+     * 
+     * @return the created group.
      * 
      * @throws NotCompletedException
      *             if group could not be created.
      */
-    private Long createGroup(Account account, String title)
+    public KnownGroup createGroup(Account account, String name, String title)
             throws NotCompletedException {
-        ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+        Log.d(TAG, format("Crated group {0}.", name));
 
-        ops.add(ContentProviderOperation.newInsert(Groups.CONTENT_URI)
-                .withValue(Groups.TITLE, title)
+        ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
+
+        batch.add(ContentProviderOperation.newInsert(Groups.CONTENT_URI)
+                .withValue(Groups.SYNC1, name).withValue(Groups.TITLE, title)
                 .withValue(Groups.ACCOUNT_NAME, account.name)
                 .withValue(Groups.ACCOUNT_TYPE, account.type)
                 .withValue(Groups.GROUP_VISIBLE, 1).build());
 
         try {
             ContentProviderResult[] results = contentResolver.applyBatch(
-                    ContactsContract.AUTHORITY, ops);
-            return ContentUris.parseId(results[0].uri);
+                    ContactsContract.AUTHORITY, batch);
+            long id = ContentUris.parseId(results[0].uri);
+            return KnownGroup.create(id, name, title);
         } catch (Exception exception) {
             throw new NotCompletedException(format(
                     "Could not create group {0}.", title), exception);

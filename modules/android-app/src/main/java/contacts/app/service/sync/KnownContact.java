@@ -6,7 +6,7 @@ package contacts.app.service.sync;
 public class KnownContact {
 
     /**
-     * Creates known contact.
+     * Creates a contact with given properties.
      */
     public static KnownContact create(long id, String username, String version) {
         KnownContact knownContact = new KnownContact();

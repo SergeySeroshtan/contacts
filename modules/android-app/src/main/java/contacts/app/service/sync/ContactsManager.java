@@ -52,76 +52,107 @@ public class ContactsManager {
     }
 
     /**
-     * Provides information about contacts, that present in address book.
+     * Returns all contacts from specified group.
      * 
      * @param account
      *            the account of user, who performs operation.
+     * @param group
+     *            the group where contacts are searched.
      * 
      * @return the known contacts.
      */
-    public Map<String, KnownContact> getKnownContacts(Account account) {
-        Uri uri = RawContacts.CONTENT_URI.buildUpon()
-                .appendQueryParameter(RawContacts.ACCOUNT_NAME, account.name)
-                .appendQueryParameter(RawContacts.ACCOUNT_TYPE, account.type)
-                .build();
-
-        String[] projection = new String[] { RawContacts._ID,
-                RawContacts.SYNC1, RawContacts.SYNC2 };
-        Cursor cursor = contentResolver
-                .query(uri, projection, null, null, null);
+    public Map<String, KnownContact> allFromGroup(Account account,
+            KnownGroup group) {
+        String[] projection = new String[] { GroupMembership.CONTACT_ID };
+        String selection = GroupMembership.GROUP_ROW_ID + "=? and "
+                + GroupMembership.MIMETYPE + "=?";
+        Cursor cursor = contentResolver.query(Data.CONTENT_URI, projection,
+                selection, new String[] { Long.toString(group.getId()),
+                        GroupMembership.CONTENT_ITEM_TYPE }, null);
 
         try {
             int contactsNum = cursor.getCount();
             Log.d(TAG,
-                    format("Found {0} contacts in address book.", contactsNum));
-            if (contactsNum == 0) {
+                    format("Found {0} contacts in group {1}.", contactsNum,
+                            group.getName()));
+            if (!cursor.moveToFirst()) {
                 return Collections.emptyMap();
             }
 
-            Map<String, KnownContact> knownContacts = new HashMap<String, KnownContact>(
+            Map<String, KnownContact> contacts = new HashMap<String, KnownContact>(
                     contactsNum);
             do {
-                cursor.moveToNext();
+                long contactId = cursor.getLong(cursor
+                        .getColumnIndexOrThrow(GroupMembership.CONTACT_ID));
+                KnownContact contact = findContact(contactId);
+                if (contact == null) {
+                    continue;
+                }
+                contacts.put(contact.getUsername(), contact);
+            } while (cursor.moveToNext());
 
-                long id = cursor.getLong(cursor
-                        .getColumnIndexOrThrow(RawContacts._ID));
-                String username = cursor.getString(cursor
-                        .getColumnIndexOrThrow(RawContacts.SYNC1));
-                String version = cursor.getString(cursor
-                        .getColumnIndexOrThrow(RawContacts.SYNC2));
-
-                KnownContact knownContact = KnownContact.create(id, username,
-                        version);
-                knownContacts.put(knownContact.getUsername(), knownContact);
-            } while (!cursor.isLast());
-
-            return knownContacts;
+            return contacts;
         } finally {
             cursor.close();
         }
     }
 
     /**
-     * Creates new contact.
+     * Finds contact.
+     * 
+     * @param id
+     *            the identifier of contact.
+     * 
+     * @return the found contact or <code>null</code> if contact was not found.
+     */
+    public KnownContact findContact(long id) {
+        String[] projection = new String[] { RawContacts.SYNC1,
+                RawContacts.SYNC2 };
+        Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, id);
+        Cursor cursor = contentResolver
+                .query(uri, projection, null, null, null);
+
+        try {
+            if (!cursor.moveToFirst()) {
+                return null;
+            }
+
+            String username = cursor.getString(cursor
+                    .getColumnIndexOrThrow(RawContacts.SYNC1));
+            String version = cursor.getString(cursor
+                    .getColumnIndexOrThrow(RawContacts.SYNC2));
+
+            return KnownContact.create(id, username, version);
+        } finally {
+            cursor.close();
+        }
+    }
+
+    /**
+     * Creates new contact in specified group.
      * 
      * @param account
      *            the account of user, who performs operation.
      * @param groupId
-     *            the identifier of group for contact.
+     *            the group for contact.
      * @param contact
-     *            the data of contact.
+     *            the synchronized contact.
      * @param photo
      *            the photo for contact (optional).
+     * 
+     * @return the created contact.
      * 
      * @throws NotCompletedException
      *             if contact could not be created.
      */
-    public KnownContact createContact(Account account, long groupId,
+    public KnownContact createContact(Account account, KnownGroup group,
             Contact contact) throws NotCompletedException {
         String username = contact.getUsername();
         String version = contact.getVersion();
 
-        Log.d(TAG, format("Create new contact for {0}.", username));
+        Log.d(TAG,
+                format("Create contact for {0} in group {1}.", username,
+                        group.getName()));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
         batch.add(ContentProviderOperation.newInsert(RawContacts.CONTENT_URI)
@@ -142,7 +173,7 @@ public class ContactsManager {
         batch.add(doInsert(Organization.CONTENT_ITEM_TYPE,
                 Organization.OFFICE_LOCATION, contact.getLocation()));
         batch.add(doInsert(GroupMembership.CONTENT_ITEM_TYPE,
-                GroupMembership.GROUP_ROW_ID, groupId));
+                GroupMembership.GROUP_ROW_ID, group.getId()));
 
         batch.add(doInsert(Photo.CONTENT_ITEM_TYPE, Photo.PHOTO, null));
 

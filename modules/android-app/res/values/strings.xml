@@ -19,6 +19,7 @@
     <string name="accountAuthFailed">Your name or password is not valid.</string>
     <string name="accountAuthCancelled">Authentication is required.</string>
 
-    <string name="groupCoworkers">Coworkers</string>
+    <string name="groupCoworkersName">coworkers</string>
+    <string name="groupCoworkersTitle">Coworkers</string>
 
 </resources>

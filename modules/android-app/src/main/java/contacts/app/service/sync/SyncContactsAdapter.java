@@ -36,6 +36,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
     private static final String TAG = SyncContactsAdapter.class.getName();
 
+    private final String GROUP_COWORKERS_NAME;
+
     private RestClient restClient;
 
     private GroupsManager groupsManager;
@@ -43,6 +45,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
     public SyncContactsAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
+
+        GROUP_COWORKERS_NAME = context.getString(R.string.groupCoworkersName);
 
         restClient = new RestClient(context);
 
@@ -56,23 +60,31 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         Log.d(TAG, "Sync started.");
 
         try {
-            Map<String, Contact> syncedContacts = downloadContacts(account);
-            Log.d(TAG, format("Loaded {0} contacts.", syncedContacts.size()));
+            Map<String, Contact> syncedCoworkers = downloadCoworkersContacts(account);
+            Log.d(TAG,
+                    format("Loaded {0} contacts of coworkers.",
+                            syncedCoworkers.size()));
 
             checkCanceled();
 
-            String groupTitle = getContext().getString(R.string.groupCoworkers);
-            long groupId = groupsManager.getGroup(account, groupTitle);
-            Log.d(TAG, format("Group {0} has id {1}.", groupTitle, groupId));
+            String groupCoworkersTitle = getContext().getString(
+                    R.string.groupCoworkersTitle);
+            KnownGroup groupCoworkers = groupsManager.findGroup(account,
+                    GROUP_COWORKERS_NAME);
+            if (groupCoworkers == null) {
+                groupCoworkers = groupsManager.createGroup(account,
+                        GROUP_COWORKERS_NAME, groupCoworkersTitle);
+            }
 
             checkCanceled();
 
-            Map<String, KnownContact> knownContacts = contactsManager
-                    .getKnownContacts(account);
+            Map<String, KnownContact> knownCoworkers = contactsManager
+                    .allFromGroup(account, groupCoworkers);
 
-            createContacts(account, groupId, syncedContacts, knownContacts);
-            updateContacts(account, syncedContacts, knownContacts);
-            removeContacts(account, syncedContacts, knownContacts);
+            createContacts(account, groupCoworkers, syncedCoworkers,
+                    knownCoworkers);
+            updateContacts(account, syncedCoworkers, knownCoworkers);
+            removeContacts(account, syncedCoworkers, knownCoworkers);
 
             Log.d(TAG, "Sync was finished.");
         } catch (CanceledException exception) {
@@ -83,17 +95,17 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     }
 
     /**
-     * Downloads contacts.
+     * Downloads contacts of coworkers.
      * 
      * @param account
      *            the account of user, who performs operation.
      * 
-     * @return the contacts to be synchronized.
+     * @return the contacts of coworkers.
      * 
      * @throws NotCompletedException
      *             if contacts could not be loaded.
      */
-    private Map<String, Contact> downloadContacts(Account account)
+    private Map<String, Contact> downloadCoworkersContacts(Account account)
             throws NotCompletedException {
         String username = account.name;
         AccountManager accountManager = AccountManager.get(getContext());
@@ -116,7 +128,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Creates new contacts.
      */
-    private void createContacts(Account account, long groupId,
+    private void createContacts(Account account, KnownGroup group,
             Map<String, Contact> syncedContacts,
             Map<String, KnownContact> knownContacts) {
         for (Contact syncedContact : syncedContacts.values()) {
@@ -128,7 +140,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             try {
                 Log.d(TAG, format("Create contact for {0}.", username));
                 KnownContact knownContact = contactsManager.createContact(
-                        account, groupId, syncedContact);
+                        account, group, syncedContact);
                 Log.d(TAG, format("Contact for {0} was created.", username));
 
                 Log.d(TAG, format("Update photo for {0}.", username));
