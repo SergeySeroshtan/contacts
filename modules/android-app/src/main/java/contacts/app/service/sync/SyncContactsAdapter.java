@@ -36,8 +36,6 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
     private static final String TAG = SyncContactsAdapter.class.getName();
 
-    private final String GROUP_COWORKERS_NAME;
-
     private RestClient restClient;
 
     private GroupsManager groupsManager;
@@ -45,8 +43,6 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
     public SyncContactsAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
-
-        GROUP_COWORKERS_NAME = context.getString(R.string.groupCoworkersName);
 
         restClient = new RestClient(context);
 
@@ -61,20 +57,10 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
         try {
             Map<String, Contact> loadedCoworkers = loadContactsOfCoworkers(account);
-            Log.d(TAG,
-                    format("Loaded {0} contacts of coworkers.",
-                            loadedCoworkers.size()));
 
             checkCanceled();
 
-            String groupCoworkersTitle = getContext().getString(
-                    R.string.groupCoworkersTitle);
-            SyncedGroup groupCoworkers = groupsManager.findGroup(account,
-                    GROUP_COWORKERS_NAME);
-            if (groupCoworkers == null) {
-                groupCoworkers = groupsManager.createGroup(account,
-                        GROUP_COWORKERS_NAME, groupCoworkersTitle);
-            }
+            SyncedGroup groupCoworkers = syncGroupForCoworkers(account);
 
             checkCanceled();
 
@@ -92,6 +78,35 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         } catch (SyncOperationException exception) {
             Log.e(TAG, "Sync was interrupted.", exception);
         }
+    }
+
+    /**
+     * Synchronizes group for contacts of coworkers.
+     * 
+     * 
+     * @param account
+     *            the account of user, who performs operation.
+     * 
+     * @return the synchronized group.
+     * 
+     * @throws SyncOperationException
+     *             the group could not be synchronized.
+     */
+    private SyncedGroup syncGroupForCoworkers(Account account)
+            throws SyncOperationException {
+        String groupCoworkersName = getContext().getString(
+                R.string.groupCoworkersName);
+        String groupCoworkersTitle = getContext().getString(
+                R.string.groupCoworkersTitle);
+
+        SyncedGroup groupCoworkers = groupsManager.findGroup(account,
+                groupCoworkersName);
+        if (groupCoworkers != null) {
+            return groupCoworkers;
+        }
+
+        return groupsManager.createGroup(account, groupCoworkersName,
+                groupCoworkersTitle);
     }
 
     /**
@@ -113,11 +128,14 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
         try {
             Contact[] contacts = restClient.getCoworkers(username, password);
-            Map<String, Contact> syncedContacts = new HashMap<String, Contact>();
+            Map<String, Contact> loadedContacts = new HashMap<String, Contact>();
             for (Contact contact : contacts) {
-                syncedContacts.put(contact.getUsername(), contact);
+                loadedContacts.put(contact.getUsername(), contact);
             }
-            return syncedContacts;
+            Log.d(TAG,
+                    format("Loaded {0} contacts of coworkers.",
+                            loadedContacts.size()));
+            return loadedContacts;
         } catch (NotAvailableException exception) {
             throw new SyncOperationException("Service not available.",
                     exception);
