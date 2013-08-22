@@ -139,11 +139,11 @@ public class ContactsManager {
      * 
      * @return the created contact.
      * 
-     * @throws NotCompletedException
+     * @throws SyncOperationException
      *             if contact could not be created.
      */
     public SyncedContact createContact(Account account, SyncedGroup group,
-            Contact loadedContact) throws NotCompletedException {
+            Contact loadedContact) throws SyncOperationException {
         String username = loadedContact.getUsername();
         String version = loadedContact.getVersion();
 
@@ -182,7 +182,7 @@ public class ContactsManager {
             Log.d(TAG, format("Contact for {0} was created.", username));
             return SyncedContact.create(id, username, version);
         } catch (Exception exception) {
-            throw new NotCompletedException("Could not create contact.",
+            throw new SyncOperationException("Could not create contact.",
                     exception);
         }
     }
@@ -197,11 +197,11 @@ public class ContactsManager {
      * @param loadedContact
      *            the loaded contact with new data.
      * 
-     * @throws NotCompletedException
+     * @throws SyncOperationException
      *             if contact could not be updated.
      */
     public void updateContact(Account account, SyncedContact syncedContact,
-            Contact loadedContact) throws NotCompletedException {
+            Contact loadedContact) throws SyncOperationException {
         long id = syncedContact.getId();
         Log.d(TAG, format("Update photo for {0}.", syncedContact.getUsername()));
 
@@ -232,7 +232,7 @@ public class ContactsManager {
                     format("Contact for {0} was updated.",
                             syncedContact.getUsername()));
         } catch (Exception exception) {
-            throw new NotCompletedException("Could not update photo.",
+            throw new SyncOperationException("Could not update photo.",
                     exception);
         }
     }
@@ -247,12 +247,12 @@ public class ContactsManager {
      * @param photo
      *            the new photo for contact.
      * 
-     * @throws NotCompletedException
+     * @throws SyncOperationException
      *             if contact could not be updated.
      */
     public void updateContactPhoto(Account account,
             SyncedContact syncedContact, byte[] photo)
-            throws NotCompletedException {
+            throws SyncOperationException {
         long id = syncedContact.getId();
         Log.d(TAG, format("Update photo for {0}.", syncedContact.getUsername()));
 
@@ -265,7 +265,7 @@ public class ContactsManager {
                     format("Photo for {0} was update.",
                             syncedContact.getUsername()));
         } catch (Exception exception) {
-            throw new NotCompletedException("Could not update photo.",
+            throw new SyncOperationException("Could not update photo.",
                     exception);
         }
     }
@@ -278,11 +278,11 @@ public class ContactsManager {
      * @param syncedContact
      *            the removed contact.
      * 
-     * @throws NotCompletedException
+     * @throws SyncOperationException
      *             if contact could not be removed.
      */
     public void removeContact(Account account, SyncedContact syncedContact)
-            throws NotCompletedException {
+            throws SyncOperationException {
         long id = syncedContact.getId();
         Log.d(TAG,
                 format("Remove contact for {0}.", syncedContact.getUsername()));
@@ -301,7 +301,7 @@ public class ContactsManager {
                     format("Photo for {0} was removed.",
                             syncedContact.getUsername()));
         } catch (Exception exception) {
-            throw new NotCompletedException("Could not remove contact.",
+            throw new SyncOperationException("Could not remove contact.",
                     exception);
         }
     }

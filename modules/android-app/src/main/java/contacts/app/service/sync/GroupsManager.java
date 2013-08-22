@@ -88,11 +88,11 @@ public class GroupsManager {
      * 
      * @return the created group.
      * 
-     * @throws NotCompletedException
+     * @throws SyncOperationException
      *             if group could not be created.
      */
     public SyncedGroup createGroup(Account account, String name, String title)
-            throws NotCompletedException {
+            throws SyncOperationException {
         Log.d(TAG, format("Create group {0}.", name));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
@@ -111,7 +111,7 @@ public class GroupsManager {
             Log.d(TAG, format("Group {0} was created.", name));
             return SyncedGroup.create(id, name, title);
         } catch (Exception exception) {
-            throw new NotCompletedException(format(
+            throw new SyncOperationException(format(
                     "Could not create group {0}.", name), exception);
         }
     }
