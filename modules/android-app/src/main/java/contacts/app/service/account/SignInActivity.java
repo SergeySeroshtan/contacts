@@ -15,7 +15,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import contacts.app.android.R;
+import contacts.app.R;
 import contacts.app.data.NotAuthorizedException;
 import contacts.app.data.NotAvailableException;
 import contacts.app.data.RestClient;

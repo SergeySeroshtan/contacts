@@ -20,7 +20,7 @@ import org.springframework.web.client.RestTemplate;
 
 import android.content.Context;
 import android.util.Log;
-import contacts.app.android.R;
+import contacts.app.R;
 import contacts.model.Contact;
 
 /**

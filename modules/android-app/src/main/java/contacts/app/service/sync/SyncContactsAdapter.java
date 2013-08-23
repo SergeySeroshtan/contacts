@@ -18,7 +18,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
 import android.util.Log;
-import contacts.app.android.R;
+import contacts.app.R;
 import contacts.app.data.NetUtils;
 import contacts.app.data.NotAuthorizedException;
 import contacts.app.data.NotAvailableException;
