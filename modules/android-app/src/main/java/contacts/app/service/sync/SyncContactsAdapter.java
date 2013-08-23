@@ -90,10 +90,18 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             Map<String, SyncedContact> syncedCoworkers = contactsManager
                     .allFromGroup(groupCoworkers);
 
-            syncCreatedContacts(account, groupCoworkers, loadedCoworkers,
-                    syncedCoworkers);
-            syncUpdatedContacts(account, loadedCoworkers, syncedCoworkers);
+            Map<String, SyncedContact> createdCoworkers = syncCreatedContacts(
+                    account, groupCoworkers, loadedCoworkers, syncedCoworkers);
+            Map<String, SyncedContact> updatedCoworkers = syncUpdatedContacts(
+                    account, loadedCoworkers, syncedCoworkers);
             syncRemovedContacts(account, loadedCoworkers, syncedCoworkers);
+
+            syncedCoworkers = new HashMap<String, SyncedContact>(
+                    syncedCoworkers);
+            syncedCoworkers.putAll(createdCoworkers);
+            syncedCoworkers.putAll(updatedCoworkers);
+
+            syncPhotos(account, syncedCoworkers);
 
             Log.d(TAG, "Sync finished.");
         } catch (SyncCanceledException exception) {
@@ -103,7 +111,6 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
     /**
      * Synchronizes group for contacts of coworkers.
-     * 
      * 
      * @param account
      *            the account of user, who performs operation.
@@ -158,10 +165,12 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Creates new contacts.
      */
-    private void syncCreatedContacts(Account account, SyncedGroup group,
-            Map<String, Contact> loadedContacts,
+    private Map<String, SyncedContact> syncCreatedContacts(Account account,
+            SyncedGroup group, Map<String, Contact> loadedContacts,
             Map<String, SyncedContact> syncedContacts)
             throws SyncCanceledException {
+        Map<String, SyncedContact> createdContacts = new HashMap<String, SyncedContact>();
+
         for (Contact loadedContact : loadedContacts.values()) {
             String username = loadedContact.getUsername();
             if (syncedContacts.containsKey(username)) {
@@ -170,34 +179,32 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             checkCanceled();
 
-            SyncedContact syncedContact;
             try {
-                syncedContact = contactsManager.createContact(account, group,
-                        loadedContact);
+                SyncedContact createdContact = contactsManager.createContact(
+                        account, group, loadedContact);
+                createdContacts.put(createdContact.getUsername(),
+                        createdContact);
             } catch (SyncOperationException exception) {
                 Log.w(TAG,
                         format("Contact for {0} was not created.", username),
                         exception);
-                continue;
-            }
-
-            try {
-                updatePhoto(account, syncedContact, loadedContact.getPhotoUrl());
-            } catch (SyncOperationException exception) {
-                Log.w(TAG, format("Photo for {0} was not updated.", username),
-                        exception);
             }
         }
+
+        Log.d(TAG, format("Created {0} contacts.", createdContacts.size()));
+        return createdContacts;
     }
 
     /**
      * Updates existing contacts, if their version differ from synchronized
      * contacts.
      */
-    private void syncUpdatedContacts(Account account,
+    private Map<String, SyncedContact> syncUpdatedContacts(Account account,
             Map<String, Contact> loadedContacts,
             Map<String, SyncedContact> syncedContacts)
             throws SyncCanceledException {
+        Map<String, SyncedContact> updatedContacts = new HashMap<String, SyncedContact>();
+
         for (Contact loadedContact : loadedContacts.values()) {
             String username = loadedContact.getUsername();
             if (!syncedContacts.containsKey(username)) {
@@ -213,22 +220,19 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             }
 
             try {
-                contactsManager.updateContact(account, syncedContact,
-                        loadedContact);
+                SyncedContact updatedContact = contactsManager.updateContact(
+                        account, syncedContact, loadedContact);
+                updatedContacts.put(updatedContact.getUsername(),
+                        updatedContact);
             } catch (SyncOperationException exception) {
                 Log.w(TAG,
                         format("Contact for {0} was not updated.", username),
                         exception);
-                continue;
-            }
-
-            try {
-                updatePhoto(account, syncedContact, loadedContact.getPhotoUrl());
-            } catch (SyncOperationException exception) {
-                Log.w(TAG, format("Photo for {0} was not updated.", username),
-                        exception);
             }
         }
+
+        Log.d(TAG, format("Updated {0} contacts.", updatedContacts.size()));
+        return updatedContacts;
     }
 
     /**
@@ -257,18 +261,39 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     }
 
     /**
-     * Updates photo of contact.
+     * Synchronizes photos.
      */
-    private void updatePhoto(Account account, SyncedContact syncedContact,
-            String photoUrl) throws SyncOperationException {
-        if (StringUtils.isNullOrEmpty(photoUrl)) {
-            Log.d(TAG, "Contact has no photo.");
-            return;
-        }
-
+    private void syncPhotos(Account account,
+            Map<String, SyncedContact> syncedContacts) {
         if (!settingsManager.isPhotosSynced()) {
             Log.d(TAG, "Sync of photos is disabled.");
             return;
+        }
+
+        for (SyncedContact syncedContact : syncedContacts.values()) {
+            if (syncedContact.isPhotoSynced()) {
+                continue;
+            }
+
+            try {
+                syncPhoto(account, syncedContact);
+            } catch (SyncOperationException exception) {
+                Log.w(TAG,
+                        format("Photo for {0} was not updated.",
+                                syncedContact.getUsername()), exception);
+            }
+        }
+    }
+
+    /**
+     * Updates photo of contact.
+     */
+    private void syncPhoto(Account account, SyncedContact syncedContact)
+            throws SyncOperationException {
+        String photoUrl = syncedContact.getUnsyncedPhotoUrl();
+
+        if (StringUtils.isNullOrEmpty(photoUrl)) {
+            throw new IllegalArgumentException("URL of photo not defined.");
         }
 
         Log.d(TAG,

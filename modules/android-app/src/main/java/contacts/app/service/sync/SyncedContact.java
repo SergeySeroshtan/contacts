@@ -1,5 +1,7 @@
 package contacts.app.service.sync;
 
+import contacts.util.StringUtils;
+
 /**
  * Information about contact, that is synchronized.
  */
@@ -8,12 +10,14 @@ public class SyncedContact {
     /**
      * Creates a contact with given properties.
      */
-    public static SyncedContact create(long id, String username, String version) {
+    public static SyncedContact create(long id, String username,
+            String version, String unsyncedPhotoUrl) {
         SyncedContact contact = new SyncedContact();
 
         contact.id = id;
         contact.username = username;
         contact.version = version;
+        contact.unsyncedPhotoUrl = unsyncedPhotoUrl;
 
         return contact;
     }
@@ -21,6 +25,7 @@ public class SyncedContact {
     private long id;
     private String username;
     private String version;
+    private String unsyncedPhotoUrl;
 
     public SyncedContact() {
     }
@@ -65,6 +70,31 @@ public class SyncedContact {
      */
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    /**
+     * Returns the URL of photo for contact, that was not synced together with
+     * contact.
+     */
+    public String getUnsyncedPhotoUrl() {
+        return unsyncedPhotoUrl;
+    }
+
+    /**
+     * Sets the URL of photo.
+     */
+    public void setUnsyncedPhotoUrl(String unsyncedPhotoUrl) {
+        this.unsyncedPhotoUrl = unsyncedPhotoUrl;
+    }
+
+    /**
+     * Checks that photo for contact synchronized.
+     * 
+     * @return <code>true</code> if photo synchronized and <code>false</code>
+     *         otherwise.
+     */
+    public boolean isPhotoSynced() {
+        return StringUtils.isNullOrEmpty(unsyncedPhotoUrl);
     }
 
 }
