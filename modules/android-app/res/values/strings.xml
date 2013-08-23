@@ -19,6 +19,14 @@
     <string name="accountAuthFailed">Your name or password is not valid.</string>
     <string name="accountAuthCancelled">Authentication is required.</string>
 
+    <string name="generalSettingsTitle">General Settings</string>
+    <string name="syncSettingsTitle">Sync Settings</string>
+    <string name="syncSettingsSummary">Allow you to adjust sync.</string>
+
+    <string name="syncPhotosKey">sync_photos</string>
+    <string name="syncPhotosTitle">Sync Photos</string>
+    <string name="syncPhotosSummary">Allow downloading of photos.</string>
+
     <string name="groupCoworkersName">coworkers</string>
     <string name="groupCoworkersTitle">Coworkers</string>
 

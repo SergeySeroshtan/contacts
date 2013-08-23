@@ -4,4 +4,5 @@
 
     android:accountType="@string/accountType"
     android:icon="@drawable/ic_main"
-    android:label="@string/appName" />
+    android:label="@string/appName"
+    android:accountPreferences="@xml/account_preferences" />

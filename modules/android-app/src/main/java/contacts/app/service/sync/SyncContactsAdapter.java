@@ -37,6 +37,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
     private GroupsManager groupsManager;
     private ContactsManager contactsManager;
+    private SettingsManager settingsManager;
 
     public SyncContactsAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -45,6 +46,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
         groupsManager = new GroupsManager(context);
         contactsManager = new ContactsManager(context);
+        settingsManager = new SettingsManager(context);
     }
 
     @Override
@@ -260,6 +262,12 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     private void updatePhoto(Account account, SyncedContact syncedContact,
             String photoUrl) throws SyncOperationException {
         if (StringUtils.isNullOrEmpty(photoUrl)) {
+            Log.d(TAG, "Contact has no photo.");
+            return;
+        }
+
+        if (!settingsManager.isPhotosSynced()) {
+            Log.d(TAG, "Sync of photos is disabled.");
             return;
         }
 

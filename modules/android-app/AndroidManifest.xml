@@ -34,27 +34,28 @@
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="contacts.app.settings.SyncSettingsActivity"
+            android:label="@string/syncSettingsTitle"
+            android:excludeFromRecents="true"
+            android:theme="@android:style/Theme.Dialog" />
 
         <service
             android:name="contacts.app.service.account.SignInService"
-            android:exported="false"
-            android:process=":signin">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
-
             <meta-data
                 android:name="android.accounts.AccountAuthenticator"
-                android:resource="@xml/authenticator" />
+                android:resource="@xml/account_authenticator" />
         </service>
         <service
             android:name="contacts.app.service.sync.SyncContactsService"
-            android:exported="false"
-            android:process=":sync">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
-
             <meta-data
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_adapter" />
