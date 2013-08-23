@@ -77,7 +77,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
      * Creates new account.
      * 
      * <p>
-     * Accounts are differ by user name.
+     * We allow to create several accounts, which are differ by username.
      */
     private void onSignIn() {
         /*

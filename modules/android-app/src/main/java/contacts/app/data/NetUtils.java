@@ -8,6 +8,7 @@ import java.net.URL;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import contacts.util.StringUtils;
 
 /**
  * Utilities for work with network resources.
@@ -17,19 +18,23 @@ public final class NetUtils {
     /**
      * Downloads bitmap from the given location.
      * 
-     * @param location
-     *            the location of bitmap, that is represented with URL.
+     * @param url
+     *            the URL of bitmap.
      * 
      * @return the loaded bitmap.
      * 
      * @throws NotAvailableException
      *             if bitmap could not be loaded or has invalid format.
      */
-    public static Bitmap downloadBitmap(String location)
+    public static Bitmap downloadBitmap(String url)
             throws NotAvailableException {
+        if (StringUtils.isNullOrEmpty(url)) {
+            throw new IllegalArgumentException("URL not defined.");
+        }
+
         try {
-            URL url = new URL(location);
-            HttpURLConnection connection = (HttpURLConnection) url
+            URL validUrl = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) validUrl
                     .openConnection();
             try {
                 InputStream stream = connection.getInputStream();

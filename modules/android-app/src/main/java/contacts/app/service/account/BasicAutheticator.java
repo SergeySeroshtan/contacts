@@ -10,6 +10,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+/**
+ * The simple implementation of authenticator, which allow to create new
+ * accounts using {@link SignInActivity}.
+ */
 public class BasicAutheticator extends AbstractAccountAuthenticator {
 
     private Context context;

@@ -73,7 +73,7 @@ public final class RestClient {
      * @param password
      *            the password of user.
      * 
-     * @return the contacts of people, including contact for user.
+     * @return the contacts of coworkers, including contact for user.
      * 
      * @throws NotAvailableException
      *             if service is not available.
@@ -98,7 +98,7 @@ public final class RestClient {
         }
     }
 
-    public static <T> T doGet(URI url, String username, String password,
+    private static <T> T doGet(URI url, String username, String password,
             Class<T> responseClass) throws NotAvailableException,
             NotAuthorizedException {
         Log.d(TAG, format("Send GET request to {0}.", url.toString()));

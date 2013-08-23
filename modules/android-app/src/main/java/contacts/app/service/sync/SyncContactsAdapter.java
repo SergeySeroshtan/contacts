@@ -28,9 +28,6 @@ import contacts.util.StringUtils;
 
 /**
  * Synchronizes contacts.
- * 
- * <p>
- * If user cancels synchronization, then process will be safely interrupted.
  */
 public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
