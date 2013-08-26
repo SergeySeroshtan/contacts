@@ -5,5 +5,9 @@
         android:key="@string/syncPhotosKey"
         android:title="@string/syncPhotosTitle"
         android:summary="@string/syncPhotosSummary" />
+    <CheckBoxPreference
+        android:key="@string/syncAnywhereKey"
+        android:title="@string/syncAnywhereTitle"
+        android:summary="@string/syncAnywhereSummary" />
 
 </PreferenceScreen>

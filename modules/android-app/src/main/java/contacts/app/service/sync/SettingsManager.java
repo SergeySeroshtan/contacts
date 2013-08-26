@@ -11,6 +11,7 @@ import contacts.app.R;
 public class SettingsManager {
 
     private final String syncPhotosKey;
+    private final String syncAnywhereKey;
 
     private SharedPreferences preferences;
 
@@ -28,16 +29,27 @@ public class SettingsManager {
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         syncPhotosKey = context.getString(R.string.syncPhotosKey);
+        syncAnywhereKey = context.getString(R.string.syncAnywhereKey);
     }
 
     /**
-     * Checks that sync of photos is enabled.
+     * Checks that sync of photos is allowed.
      * 
-     * @return <code>true</code> if sync is enabled and <code>false</code>
+     * @return <code>true</code> if sync is allowed and <code>false</code>
      *         otherwise.
      */
-    public boolean isPhotosSynced() {
+    public boolean isSyncPhotos() {
         return preferences.getBoolean(syncPhotosKey, false);
+    }
+
+    /**
+     * Checks that sync can be performed in networks of any type.
+     * 
+     * @return <code>true</code> if sync is allowed and <code>false</code>
+     *         otherwise.
+     */
+    public boolean isSyncAnywhere() {
+        return preferences.getBoolean(syncAnywhereKey, false);
     }
 
 }

@@ -38,6 +38,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     private GroupsManager groupsManager;
     private ContactsManager contactsManager;
     private SettingsManager settingsManager;
+    private NetworkManager networkManager;
 
     public SyncContactsAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
@@ -47,11 +48,17 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         groupsManager = new GroupsManager(context);
         contactsManager = new ContactsManager(context);
         settingsManager = new SettingsManager(context);
+        networkManager = new NetworkManager(context);
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
             ContentProviderClient provider, SyncResult syncResult) {
+        if (!isSuitableNetwork()) {
+            Log.d(TAG, "Device is not connected to suitable network.");
+            return;
+        }
+
         Log.d(TAG, "Sync started.");
 
         try {
@@ -264,8 +271,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * Synchronizes photos.
      */
     private void syncPhotos(Account account,
-            Map<String, SyncedContact> syncedContacts) {
-        if (!settingsManager.isPhotosSynced()) {
+            Map<String, SyncedContact> syncedContacts)
+            throws SyncCanceledException {
+        if (!settingsManager.isSyncPhotos()) {
             Log.d(TAG, "Sync of photos is disabled.");
             return;
         }
@@ -274,6 +282,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             if (syncedContact.isPhotoSynced()) {
                 continue;
             }
+
+            checkCanceled();
 
             try {
                 syncPhoto(account, syncedContact);
@@ -333,6 +343,20 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             throw new SyncOperationException("Could not convert photo.",
                     exception);
         }
+    }
+
+    /**
+     * Checks that network is suitable.
+     * 
+     * @return <code>true</code> if network is suitable and <code>false</code>
+     *         otherwise.
+     */
+    public boolean isSuitableNetwork() {
+        if (settingsManager.isSyncAnywhere()) {
+            return networkManager.isConnected();
+        }
+
+        return networkManager.isConnectedToWiFi();
     }
 
     /**
