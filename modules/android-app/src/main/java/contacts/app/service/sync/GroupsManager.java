@@ -11,6 +11,7 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Groups;
 import android.util.Log;
@@ -113,6 +114,44 @@ public class GroupsManager {
         } catch (Exception exception) {
             throw new SyncOperationException(format(
                     "Could not create group {0}.", name), exception);
+        }
+    }
+
+    /**
+     * Updates title of group.
+     * 
+     * @param account
+     *            the account of user, who performs operation.
+     * @param syncedGroup
+     *            the synchronized group.
+     * @param title
+     *            the new title for group.
+     * 
+     * @return the updated group.
+     * 
+     * @throws SyncOperationException
+     *             if contact could not be updated.
+     */
+    public SyncedGroup updateTitle(SyncedGroup syncedGroup, String title)
+            throws SyncOperationException {
+        long id = syncedGroup.getId();
+        String name = syncedGroup.getName();
+        Log.d(TAG, format("Update title of group {0} to {1}.", name, title));
+
+        ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
+
+        Uri groupUri = ContentUris.withAppendedId(Groups.CONTENT_URI, id);
+        batch.add(ContentProviderOperation.newUpdate(groupUri)
+                .withValue(Groups.TITLE, title).build());
+
+        try {
+            contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
+            Log.d(TAG, format("Title for {0} was updated.", name));
+
+            return SyncedGroup.create(id, name, title);
+        } catch (Exception exception) {
+            throw new SyncOperationException("Could not update photo.",
+                    exception);
         }
     }
 

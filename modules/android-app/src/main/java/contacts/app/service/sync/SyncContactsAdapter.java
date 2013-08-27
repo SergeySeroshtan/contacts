@@ -129,19 +129,19 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      */
     private SyncedGroup syncGroupForCoworkers(Account account)
             throws SyncOperationException {
-        String groupCoworkersName = getContext().getString(
-                R.string.groupCoworkersName);
-        String groupCoworkersTitle = getContext().getString(
-                R.string.groupCoworkersTitle);
+        String name = getContext().getString(R.string.groupCoworkersName);
+        String title = settingsManager.getCoworkersTitle();
 
-        SyncedGroup groupCoworkers = groupsManager.findGroup(account,
-                groupCoworkersName);
-        if (groupCoworkers != null) {
-            return groupCoworkers;
+        SyncedGroup group = groupsManager.findGroup(account, name);
+        if (group != null) {
+            if (!title.equals(group.getTitle())) {
+                return groupsManager.updateTitle(group, title);
+            }
+
+            return group;
         }
 
-        return groupsManager.createGroup(account, groupCoworkersName,
-                groupCoworkersTitle);
+        return groupsManager.createGroup(account, name, title);
     }
 
     /**
@@ -310,7 +310,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
                 format("Download photo for {0} from {1}.",
                         syncedContact.getUsername(), photoUrl));
         byte[] photo = loadPhoto(photoUrl);
-        contactsManager.updateContactPhoto(account, syncedContact, photo);
+        contactsManager.updatePhoto(account, syncedContact, photo);
     }
 
     /**

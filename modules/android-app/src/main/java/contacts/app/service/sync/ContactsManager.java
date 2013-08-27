@@ -199,9 +199,11 @@ public class ContactsManager {
      * @param account
      *            the account of user, who performs operation.
      * @param syncedContact
-     *            the updated contact.
+     *            the synchronized contact.
      * @param loadedContact
      *            the loaded contact with new data.
+     * 
+     * @return the updated contact.
      * 
      * @throws SyncOperationException
      *             if contact could not be updated.
@@ -262,7 +264,7 @@ public class ContactsManager {
      * @throws SyncOperationException
      *             if contact could not be updated.
      */
-    public void updateContactPhoto(Account account,
+    public void updatePhoto(Account account,
             SyncedContact syncedContact, byte[] photo)
             throws SyncOperationException {
         long id = syncedContact.getId();

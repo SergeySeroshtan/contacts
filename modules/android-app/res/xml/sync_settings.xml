@@ -4,10 +4,17 @@
     <CheckBoxPreference
         android:key="@string/syncPhotosKey"
         android:title="@string/syncPhotosTitle"
-        android:summary="@string/syncPhotosSummary" />
+        android:summary="@string/syncPhotosSummary"
+        android:defaultValue="false" />
     <CheckBoxPreference
         android:key="@string/syncAnywhereKey"
         android:title="@string/syncAnywhereTitle"
-        android:summary="@string/syncAnywhereSummary" />
+        android:summary="@string/syncAnywhereSummary"
+        android:defaultValue="false" />
+    <EditTextPreference
+        android:key="@string/groupCoworkersKey"
+        android:title="@string/groupCoworkersTitle"
+        android:summary="@string/groupCoworkersSummary"
+        android:defaultValue="@string/groupCoworkersDefault" />
 
 </PreferenceScreen>

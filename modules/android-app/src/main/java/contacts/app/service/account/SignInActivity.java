@@ -9,6 +9,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,6 +24,9 @@ import contacts.util.StringUtils;
 
 /**
  * Allows user to enter credentials and create new account.
+ * 
+ * <p>
+ * In this activity we set the default settings for synchronization.
  * 
  * <p>
  * We use {@link RestClient#getMy(String, String)} to check credentials.
@@ -45,6 +49,8 @@ public class SignInActivity extends AccountAuthenticatorActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setDefaultSyncSettings();
 
         setContentView(R.layout.signin_activity_layout);
 
@@ -71,6 +77,10 @@ public class SignInActivity extends AccountAuthenticatorActivity {
             }
 
         });
+    }
+
+    private void setDefaultSyncSettings() {
+        PreferenceManager.setDefaultValues(this, R.xml.sync_settings, false);
     }
 
     /**
