@@ -28,6 +28,6 @@
 
     <mvc:annotation-driven />
 
-    <context:component-scan base-package="contacts.rest" />
+    <context:component-scan base-package="grytsenko.contacts.rest.view" />
 
 </beans>

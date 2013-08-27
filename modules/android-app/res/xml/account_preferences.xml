@@ -8,9 +8,9 @@
         android:title="@string/syncSettingsTitle"
         android:summary="@string/syncSettingsSummary">
         <intent
-            android:action="contacts.app.settings.ACCOUNT_SETTINGS"
-            android:targetPackage="contacts.app"
-            android:targetClass="contacts.app.settings.SyncSettingsActivity" />
+            android:action="grytsenko.contacts.app.settings.ACCOUNT_SETTINGS"
+            android:targetPackage="grytsenko.contacts.app"
+            android:targetClass="grytsenko.contacts.app.settings.SyncSettingsActivity" />
     </PreferenceScreen>
 
 </PreferenceScreen>

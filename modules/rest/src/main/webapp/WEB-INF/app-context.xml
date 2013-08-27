@@ -12,7 +12,7 @@
         class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
         p:basenames="i18n/messages" />
 
-    <context:component-scan base-package="contacts.service" />
-    <context:component-scan base-package="contacts.repository" />
+    <context:component-scan base-package="grytsenko.contacts.rest.service" />
+    <context:component-scan base-package="grytsenko.contacts.rest.repository" />
 
 </beans>
