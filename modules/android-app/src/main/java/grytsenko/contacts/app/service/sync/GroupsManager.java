@@ -120,8 +120,6 @@ public class GroupsManager {
     /**
      * Updates title of group.
      * 
-     * @param account
-     *            the account of user, who performs operation.
      * @param syncedGroup
      *            the synchronized group.
      * @param title

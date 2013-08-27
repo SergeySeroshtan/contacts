@@ -3,7 +3,7 @@
 
     <string name="appName">Corporate Contacts</string>
 
-    <string name="accountType">corporate.contacts</string>
+    <string name="accountType">grytsenko.contacts.app</string>
 
     <string name="accountNameHint">Name</string>
     <string name="accountPasswordHint">Password</string>

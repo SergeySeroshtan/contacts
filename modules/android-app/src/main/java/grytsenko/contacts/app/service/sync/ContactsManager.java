@@ -54,15 +54,13 @@ public class ContactsManager {
     /**
      * Returns all contacts from specified group.
      * 
-     * @param account
-     *            the account of user, who performs operation.
      * @param group
      *            the group where contacts are searched.
      * 
      * @return the found contacts.
      */
     public Map<String, SyncedContact> allFromGroup(SyncedGroup group) {
-        String[] projection = new String[] { GroupMembership.CONTACT_ID };
+        String[] projection = new String[] { GroupMembership.RAW_CONTACT_ID };
         String selection = GroupMembership.GROUP_ROW_ID + "=? and "
                 + GroupMembership.MIMETYPE + "=?";
         Cursor cursor = contentResolver.query(Data.CONTENT_URI, projection,
@@ -82,7 +80,7 @@ public class ContactsManager {
                     contactsNum);
             do {
                 long contactId = cursor.getLong(cursor
-                        .getColumnIndexOrThrow(GroupMembership.CONTACT_ID));
+                        .getColumnIndexOrThrow(GroupMembership.RAW_CONTACT_ID));
                 SyncedContact contact = findContact(contactId);
                 if (contact == null) {
                     continue;
@@ -264,9 +262,8 @@ public class ContactsManager {
      * @throws SyncOperationException
      *             if contact could not be updated.
      */
-    public void updatePhoto(Account account,
-            SyncedContact syncedContact, byte[] photo)
-            throws SyncOperationException {
+    public void updatePhoto(Account account, SyncedContact syncedContact,
+            byte[] photo) throws SyncOperationException {
         long id = syncedContact.getId();
         Log.d(TAG, format("Update photo for {0}.", syncedContact.getUsername()));
 
@@ -341,7 +338,8 @@ public class ContactsManager {
 
     private static <T> ContentProviderOperation doUpdate(long id, String mime,
             String key, T value) {
-        String selection = Data.CONTACT_ID + "=? and " + Data.MIMETYPE + "=?";
+        String selection = Data.RAW_CONTACT_ID + "=? and " + Data.MIMETYPE
+                + "=?";
         return ContentProviderOperation
                 .newUpdate(Data.CONTENT_URI)
                 .withSelection(selection,
