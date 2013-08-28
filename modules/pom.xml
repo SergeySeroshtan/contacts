@@ -5,7 +5,7 @@
 
     <groupId>contacts</groupId>
     <artifactId>parent</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.0</version>
     <packaging>pom</packaging>
 
     <name>parent</name>
@@ -25,7 +25,7 @@
         <url>https://github.com/grytsenko/contacts</url>
         <connection>scm:git:https://github.com/grytsenko/contacts.git</connection>
         <developerConnection>scm:git:https://github.com/grytsenko/contacts.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>contacts-0.2.0</tag>
     </scm>
 
     <issueManagement>
