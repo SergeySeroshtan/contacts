@@ -168,8 +168,15 @@ public class ContactsManager {
 
         batch.add(doInsert(Email.CONTENT_ITEM_TYPE, Email.ADDRESS,
                 loadedContact.getMail()));
-        batch.add(doInsert(Phone.CONTENT_ITEM_TYPE, Phone.NUMBER,
-                loadedContact.getPhone()));
+
+        /*
+         * See issue #17: for HTC Phone.TYPE is mandatory.
+         */
+        ContentValues phone = new ContentValues();
+        phone.put(Phone.NUMBER, loadedContact.getPhone());
+        phone.put(Phone.TYPE, Phone.TYPE_WORK);
+        batch.add(doInsert(Phone.CONTENT_ITEM_TYPE, phone));
+
         batch.add(doInsert(Organization.CONTENT_ITEM_TYPE,
                 Organization.OFFICE_LOCATION, loadedContact.getLocation()));
         batch.add(doInsert(GroupMembership.CONTENT_ITEM_TYPE,
