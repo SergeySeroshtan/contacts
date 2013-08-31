@@ -1,9 +1,7 @@
 package grytsenko.contacts.rest.repository;
 
-import static grytsenko.contacts.common.util.StringUtils.digitsOnly;
 import static java.text.MessageFormat.format;
 import grytsenko.contacts.common.model.Contact;
-import grytsenko.contacts.common.util.StringUtils;
 
 import java.util.List;
 
@@ -20,6 +18,7 @@ import org.springframework.ldap.core.AttributesMapper;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 /**
  * Repository of contacts in directory service.
@@ -136,7 +135,7 @@ public class DsContactsRepository implements ContactsRepository {
                 throws NamingException {
             Attribute attr = attrs.get(attrId);
             if (attr == null) {
-                return StringUtils.EMPTY;
+                return "";
             }
 
             return (String) attr.get();
@@ -150,9 +149,11 @@ public class DsContactsRepository implements ContactsRepository {
          */
         private String asPhone(String attrId, Attributes attrs)
                 throws NamingException {
-            String digits = digitsOnly(asString(attrId, attrs));
-            if (StringUtils.isNullOrEmpty(digits)) {
-                return StringUtils.EMPTY;
+            String value = asString(attrId, attrs);
+            String digits = value.replaceAll("\\D+", "");
+
+            if (!StringUtils.hasLength(digits)) {
+                return "";
             }
 
             return '+' + digits;

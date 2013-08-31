@@ -1,7 +1,5 @@
 package grytsenko.contacts.app.data;
 
-import grytsenko.contacts.common.util.StringUtils;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -10,6 +8,7 @@ import java.net.URL;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.TextUtils;
 
 /**
  * Utilities for work with network resources.
@@ -29,7 +28,7 @@ public final class NetUtils {
      */
     public static Bitmap downloadBitmap(String url)
             throws NotAvailableException {
-        if (StringUtils.isNullOrEmpty(url)) {
+        if (TextUtils.isEmpty(url)) {
             throw new IllegalArgumentException("URL not defined.");
         }
 

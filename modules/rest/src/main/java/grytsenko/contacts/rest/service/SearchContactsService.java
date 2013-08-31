@@ -1,7 +1,6 @@
 package grytsenko.contacts.rest.service;
 
 import grytsenko.contacts.common.model.Contact;
-import grytsenko.contacts.common.util.StringUtils;
 import grytsenko.contacts.rest.repository.ContactsRepository;
 
 import java.util.List;
@@ -10,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /**
  * Searches a contacts.
@@ -29,7 +29,7 @@ public class SearchContactsService {
      * @return the found contact or <code>null</code> if contact was not found.
      */
     public Contact findByUser(String username) {
-        if (StringUtils.isNullOrEmpty(username)) {
+        if (!StringUtils.hasLength(username)) {
             throw new IllegalArgumentException("User not defined.");
         }
 
@@ -42,7 +42,7 @@ public class SearchContactsService {
      * @return the location of user.
      */
     public String findLocationOfUser(String username) {
-        if (StringUtils.isNullOrEmpty(username)) {
+        if (!StringUtils.hasLength(username)) {
             throw new IllegalArgumentException("User not defined.");
         }
 
@@ -59,7 +59,7 @@ public class SearchContactsService {
      * Finds contacts of people by location.
      */
     public List<Contact> findByLocation(String location) {
-        if (StringUtils.isNullOrEmpty(location)) {
+        if (!StringUtils.hasLength(location)) {
             throw new IllegalStateException("Location not defined.");
         }
 

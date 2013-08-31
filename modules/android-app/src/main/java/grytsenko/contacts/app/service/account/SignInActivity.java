@@ -5,7 +5,6 @@ import grytsenko.contacts.app.R;
 import grytsenko.contacts.app.data.NotAuthorizedException;
 import grytsenko.contacts.app.data.NotAvailableException;
 import grytsenko.contacts.app.data.RestClient;
-import grytsenko.contacts.common.util.StringUtils;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -15,6 +14,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -94,7 +94,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
          * Checks that user has entered name.
          */
         username = nameInput.getText().toString();
-        if (StringUtils.isNullOrEmpty(username)) {
+        if (TextUtils.isEmpty(username)) {
             showToast(R.string.accountNameEmpty);
             return;
         }
@@ -116,7 +116,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
          * Checks that user has entered password.
          */
         password = passwordInput.getText().toString();
-        if (StringUtils.isNullOrEmpty(password)) {
+        if (TextUtils.isEmpty(password)) {
             showToast(R.string.accountPasswordEmpty);
             return;
         }

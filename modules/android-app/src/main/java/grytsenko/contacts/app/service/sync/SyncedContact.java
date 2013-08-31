@@ -1,6 +1,6 @@
 package grytsenko.contacts.app.service.sync;
 
-import grytsenko.contacts.common.util.StringUtils;
+import android.text.TextUtils;
 
 /**
  * Information about contact, that is synchronized.
@@ -94,7 +94,7 @@ public class SyncedContact {
      *         otherwise.
      */
     public boolean isPhotoSynced() {
-        return StringUtils.isNullOrEmpty(unsyncedPhotoUrl);
+        return TextUtils.isEmpty(unsyncedPhotoUrl);
     }
 
 }

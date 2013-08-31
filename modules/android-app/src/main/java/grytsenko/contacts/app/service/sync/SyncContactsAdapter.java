@@ -8,7 +8,6 @@ import grytsenko.contacts.app.data.NotAuthorizedException;
 import grytsenko.contacts.app.data.NotAvailableException;
 import grytsenko.contacts.app.data.RestClient;
 import grytsenko.contacts.common.model.Contact;
-import grytsenko.contacts.common.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,6 +23,7 @@ import android.content.SyncResult;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -302,7 +302,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             throws SyncOperationException {
         String photoUrl = syncedContact.getUnsyncedPhotoUrl();
 
-        if (StringUtils.isNullOrEmpty(photoUrl)) {
+        if (TextUtils.isEmpty(photoUrl)) {
             throw new IllegalArgumentException("URL of photo not defined.");
         }
 
@@ -322,7 +322,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * @return the loaded photo.
      */
     private byte[] loadPhoto(String photoUrl) throws SyncOperationException {
-        if (StringUtils.isNullOrEmpty(photoUrl)) {
+        if (TextUtils.isEmpty(photoUrl)) {
             throw new IllegalArgumentException("URL is required.");
         }
 

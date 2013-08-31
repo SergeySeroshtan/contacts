@@ -1,11 +1,11 @@
 package grytsenko.contacts.app.settings;
 
 import grytsenko.contacts.app.R;
-import grytsenko.contacts.common.util.StringUtils;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceFragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -65,7 +65,7 @@ public class SyncSettingsFragment extends PreferenceFragment {
     }
 
     private boolean validateGroupTitle(Object newValue) {
-        boolean empty = StringUtils.isNullOrEmpty((String) newValue);
+        boolean empty = TextUtils.isEmpty((String) newValue);
         if (empty) {
             Log.d(TAG, "Name of group could not be empty.");
             showToast(R.string.groupTitleEmpty);
