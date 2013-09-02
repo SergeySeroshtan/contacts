@@ -21,7 +21,7 @@ To work with application in IDE, follow next steps:
 #### Install and Run
 
 1. Install application.
-1. Go to `Settings > Accounts > Add Account`.
+1. Go to `Settings > Accounts > Add Account` (or `Contacts -> Accounts -> Add Account`).
 1. Select `Corporate Contacts`.
 1. Enter your name and password.
 1. Press button `Sign In`.
