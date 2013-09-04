@@ -4,11 +4,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>contacts</groupId>
-    <artifactId>parent</artifactId>
+    <artifactId>contacts-parent</artifactId>
     <version>0.3.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>parent</name>
+    <name>contacts-parent</name>
     <description>Quick access to corporate contacts.</description>
     <url>https://github.com/grytsenko/contacts</url>
     <inceptionYear>2013</inceptionYear>
@@ -34,9 +34,9 @@
     </issueManagement>
 
     <modules>
-        <module>common</module>
-        <module>rest</module>
-        <module>android-app</module>
+        <module>contacts-api</module>
+        <module>contacts-web</module>
+        <module>contacts-android</module>
   </modules>
 
     <developers>

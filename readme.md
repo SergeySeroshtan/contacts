@@ -17,5 +17,5 @@ The second part is a native application for phone, that uses web application to 
 
 ## Modules
 
-1. [Web Application](https://github.com/grytsenko/contacts/blob/master/modules/rest) - REST-services to access contacts in directory service.
-1. [Android Application](https://github.com/grytsenko/contacts/blob/master/modules/android-app) - synchronizes contacts on Android.
+1. [Web Module](https://github.com/grytsenko/contacts/blob/master/modules/contacts-web) - provides data for applications.
+1. [Android Application](https://github.com/grytsenko/contacts/blob/master/modules/contacts-android) - contacts synchronization for Android.
