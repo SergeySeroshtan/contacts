@@ -1,8 +1,11 @@
 package grytsenko.contacts.rest.service;
 
+import static grytsenko.contacts.rest.service.ContactFactory.createContact;
 import grytsenko.contacts.common.model.Contact;
-import grytsenko.contacts.rest.repository.ContactsRepository;
+import grytsenko.contacts.rest.repository.DsContact;
+import grytsenko.contacts.rest.repository.DsContactsRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -21,23 +24,32 @@ public class SearchContactsService {
             .getLogger(SearchContactsService.class);
 
     @Autowired
-    ContactsRepository contactsRepository;
+    DsContactsRepository dsContactsRepository;
 
     /**
-     * Finds contact of single person.
+     * Finds contact of user.
      * 
-     * @return the found contact or <code>null</code> if contact was not found.
+     * @param username
+     *            the name of user.
+     * 
+     * @return the found contact or <code>null</code> if contact not found.
      */
-    public Contact findByUser(String username) {
+    public Contact findByUsername(String username) {
         if (!StringUtils.hasLength(username)) {
             throw new IllegalArgumentException("User not defined.");
         }
 
-        return contactsRepository.findByUsername(username);
+        LOGGER.debug("Search contact of {} in DS.", username);
+        DsContact dsContact = dsContactsRepository.findByUsername(username);
+
+        return createContact(dsContact);
     }
 
     /**
-     * Determines location of user.
+     * Determines location of person.
+     * 
+     * @param username
+     *            the name of user.
      * 
      * @return the location of user.
      */
@@ -46,24 +58,36 @@ public class SearchContactsService {
             throw new IllegalArgumentException("User not defined.");
         }
 
-        LOGGER.debug("Get location of user {}.", username);
-
-        Contact contact = findByUser(username);
+        LOGGER.debug("Search contact of {} in DS.", username);
+        DsContact contact = dsContactsRepository.findByUsername(username);
         String location = contact.getLocation();
-        LOGGER.debug("Location of user {} is {}.", username, location);
+        LOGGER.debug("Location of {} is {}.", username, location);
 
         return location;
     }
 
     /**
      * Finds contacts of people by location.
+     * 
+     * @param location
+     *            the name of location.
+     * 
+     * @return the list of found contacts.
      */
     public List<Contact> findByLocation(String location) {
         if (!StringUtils.hasLength(location)) {
             throw new IllegalStateException("Location not defined.");
         }
 
-        List<Contact> contacts = contactsRepository.findByLocation(location);
+        LOGGER.debug("Search contacts from {} in DS.", location);
+        List<DsContact> dsContacts = dsContactsRepository
+                .findByLocation(location);
+        LOGGER.debug("Found {} contacts in DS.", dsContacts.size());
+
+        List<Contact> contacts = new ArrayList<Contact>();
+        for (DsContact dsContact : dsContacts) {
+            contacts.add(createContact(dsContact));
+        }
 
         return contacts;
     }

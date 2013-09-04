@@ -1,7 +1,6 @@
 package grytsenko.contacts.rest.repository;
 
 import static java.text.MessageFormat.format;
-import grytsenko.contacts.common.model.Contact;
 
 import java.util.List;
 
@@ -22,9 +21,12 @@ import org.springframework.util.StringUtils;
 
 /**
  * Repository of contacts in directory service.
+ * 
+ * <p>
+ * This repository is the main data source.
  */
 @Repository
-public class DsContactsRepository implements ContactsRepository {
+public class DsContactsRepository {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(DsContactsRepository.class);
@@ -41,57 +43,65 @@ public class DsContactsRepository implements ContactsRepository {
     protected String filterByLocationTemplate;
 
     @Value("#{ldapProperties['ldap.user.username']}")
-    protected String usernameAttr;
+    protected String usernameAttrId;
     @Value("#{ldapProperties['ldap.user.firstname']}")
-    protected String firstnameAttr;
+    protected String firstnameAttrId;
     @Value("#{ldapProperties['ldap.user.lastname']}")
-    protected String lastnameAttr;
+    protected String lastnameAttrId;
     @Value("#{ldapProperties['ldap.user.photoUrl']}")
-    protected String photoUrlAttr;
+    protected String photoUrlAttrId;
     @Value("#{ldapProperties['ldap.user.mail']}")
-    protected String mailAttr;
+    protected String mailAttrId;
     @Value("#{ldapProperties['ldap.user.phone']}")
-    protected String phoneAttr;
+    protected String phoneAttrId;
     @Value("#{ldapProperties['ldap.user.location']}")
-    protected String locationAttr;
+    protected String locationAttrId;
+    @Value("#{ldapProperties['ldap.user.version']}")
+    protected String versionAttrId;
 
-    @Value("#{ldapProperties['ldap.user.updatedAt']}")
-    protected String updatedAtAttr;
-
-    @Override
-    public Contact findByUsername(String username) {
-        LOGGER.debug("Search contact for {}.", username);
+    /**
+     * Finds contact of user.
+     * 
+     * @param username
+     *            the name of user.
+     * 
+     * @return the found contact or <code>null</code> if contact not found.
+     */
+    public DsContact findByUsername(String username) {
+        LOGGER.debug("Search by username: {}.", username);
 
         String filter = format(filterByUsernameTemplate, username);
-        List<Contact> contacts = findUsingFilter(filter);
+        List<DsContact> contacts = findByFilter(filter);
 
-        if (contacts.isEmpty()) {
-            LOGGER.debug("Contact for {} was not found.", username);
-            return null;
-        }
-
-        return contacts.get(0);
+        return contacts.isEmpty() ? null : contacts.get(0);
     }
 
-    @Override
-    public List<Contact> findByLocation(String location) {
-        LOGGER.debug("Search contacts of people from {}.", location);
+    /**
+     * Finds contacts of all users in one location.
+     * 
+     * @param location
+     *            the name of location.
+     * 
+     * @return the list of found contacts.
+     */
+    public List<DsContact> findByLocation(String location) {
+        LOGGER.debug("Search by location: {}.", location);
 
         String filter = format(filterByLocationTemplate, location);
-        return findUsingFilter(filter);
+        return findByFilter(filter);
     }
 
-    private List<Contact> findUsingFilter(String filter) {
-        LOGGER.debug("Find contacts using filter '{}'.", filter);
+    private List<DsContact> findByFilter(String filter) {
+        LOGGER.debug("Search by filter: {}.", filter);
 
         LdapTemplate template = new LdapTemplate(ldapContextSource);
 
-        String[] attrs = new String[] { usernameAttr, firstnameAttr,
-                lastnameAttr, photoUrlAttr, mailAttr, phoneAttr, locationAttr,
-                updatedAtAttr };
+        String[] attrs = new String[] { usernameAttrId, firstnameAttrId,
+                lastnameAttrId, photoUrlAttrId, mailAttrId, phoneAttrId,
+                locationAttrId, versionAttrId };
         @SuppressWarnings("unchecked")
-        List<Contact> contacts = template.search(usersGroup, filter,
-                SearchControls.ONELEVEL_SCOPE, attrs, new ContactMapper());
+        List<DsContact> contacts = template.search(usersGroup, filter,
+                SearchControls.ONELEVEL_SCOPE, attrs, new DsContactMapper());
 
         LOGGER.debug("Found {} contacts.", contacts.size());
 
@@ -99,28 +109,28 @@ public class DsContactsRepository implements ContactsRepository {
     }
 
     /**
-     * Factory, that creates a contact using data from DS.
+     * Creates contact using data from DS.
      */
-    private class ContactMapper implements AttributesMapper {
+    private class DsContactMapper implements AttributesMapper {
 
         @Override
-        public Contact mapFromAttributes(Attributes attrs)
+        public DsContact mapFromAttributes(Attributes attrs)
                 throws NamingException {
-            Contact contact = new Contact();
+            DsContact contact = new DsContact();
 
-            contact.setUsername(asString(usernameAttr, attrs));
+            contact.setUsername(asString(usernameAttrId, attrs));
 
-            contact.setFirstName(asString(firstnameAttr, attrs));
-            contact.setLastName(asString(lastnameAttr, attrs));
+            contact.setFirstName(asString(firstnameAttrId, attrs));
+            contact.setLastName(asString(lastnameAttrId, attrs));
 
-            contact.setPhotoUrl(asString(photoUrlAttr, attrs));
+            contact.setPhotoUrl(asString(photoUrlAttrId, attrs));
 
-            contact.setMail(asString(mailAttr, attrs));
-            contact.setPhone(asPhone(phoneAttr, attrs));
+            contact.setMail(asString(mailAttrId, attrs));
+            contact.setPhone(asPhone(phoneAttrId, attrs));
 
-            contact.setLocation(asString(locationAttr, attrs));
+            contact.setLocation(asString(locationAttrId, attrs));
 
-            contact.setVersion(asString(updatedAtAttr, attrs));
+            contact.setVersion(asString(versionAttrId, attrs));
 
             return contact;
         }

@@ -33,10 +33,9 @@ public class SearchController {
     @ResponseBody
     public Contact my(Principal principal) {
         String username = principal.getName();
+        LOGGER.debug("Get contact of {}.", username);
 
-        LOGGER.debug("Search contact of {}.", username);
-
-        return searchContactsService.findByUser(username);
+        return searchContactsService.findByUsername(username);
     }
 
     /**
@@ -45,16 +44,14 @@ public class SearchController {
     @RequestMapping(value = "coworkers", method = RequestMethod.GET)
     @ResponseBody
     public List<Contact> coworkers(Principal principal) {
-        String userLocation = searchContactsService
-                .findLocationOfUser(principal.getName());
+        String username = principal.getName();
+        LOGGER.debug("Get coworkers of {}.", username);
 
-        LOGGER.debug("Search contacts for people from {}.", userLocation);
+        String location = searchContactsService.findLocationOfUser(username);
+        List<Contact> contacts = searchContactsService.findByLocation(location);
+        LOGGER.debug("Found {} coworkers.", contacts.size());
 
-        List<Contact> coworkersContacts = searchContactsService
-                .findByLocation(userLocation);
-        LOGGER.debug("Found {} contacts.", coworkersContacts.size());
-
-        return coworkersContacts;
+        return contacts;
     }
 
 }
