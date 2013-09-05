@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -45,14 +48,6 @@
             <name>Anthony Grytsenko</name>
             <email>anthony.grytsenko@gmail.com</email>
             <roles>
-                <role>owner</role>
-                <role>developer</role>
-            </roles>
-        </developer>
-        <developer>
-            <id>khanaev</id>
-            <name>Vladimir Khanaev</name>
-            <roles>
                 <role>developer</role>
             </roles>
         </developer>
@@ -60,7 +55,20 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <jackson.mapper.version>1.9.13</jackson.mapper.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- We use this library for JSON on both client and server sides. -->
+            <dependency>
+                <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                <version>${jackson.mapper.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement>

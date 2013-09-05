@@ -1,4 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -15,10 +18,10 @@
     <description>Application for contact synchronization.</description>
 
     <properties>
-        <platform.version>4.1.1.4</platform.version>
+        <android.platform.version>4.1.1.4</android.platform.version>
+        <android.api.level>16</android.api.level>
 
-        <spring-android-version>1.0.1.RELEASE</spring-android-version>
-        <jackson-version>1.9.13</jackson-version>
+        <spring.version>1.0.1.RELEASE</spring.version>
 
         <android.plugin.version>3.6.0</android.plugin.version>
     </properties>
@@ -30,22 +33,25 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>org.springframework.android</groupId>
-            <artifactId>spring-android-rest-template</artifactId>
-            <version>${spring-android-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-mapper-asl</artifactId>
-            <version>${jackson-version}</version>
-        </dependency>
-
+        <!-- Android -->
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-            <version>${platform.version}</version>
+            <version>${android.platform.version}</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- REST -->
+        <dependency>
+            <groupId>org.springframework.android</groupId>
+            <artifactId>spring-android-rest-template</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <!-- JSON -->
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
         </dependency>
     </dependencies>
 
@@ -60,7 +66,7 @@
                     <extensions>true</extensions>
                     <configuration>
                         <sdk>
-                            <platform>16</platform>
+                            <platform>${android.api.level}</platform>
                         </sdk>
                     </configuration>
                 </plugin>
