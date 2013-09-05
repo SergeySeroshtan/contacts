@@ -10,6 +10,7 @@ import java.util.Map;
 
 import android.accounts.Account;
 import android.content.ContentProviderOperation;
+import android.content.ContentProviderOperation.Builder;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -161,22 +162,13 @@ public class ContactsManager {
                 .withValue(RawContacts.SYNC2, version)
                 .withValue(RawContacts.SYNC3, unsyncedPhotoUrl).build());
 
-        ContentValues name = new ContentValues();
-        name.put(StructuredName.GIVEN_NAME, loadedContact.getFirstName());
-        name.put(StructuredName.FAMILY_NAME, loadedContact.getLastName());
+        ContentValues name = nameValues(loadedContact);
         batch.add(doInsert(StructuredName.CONTENT_ITEM_TYPE, name));
 
-        ContentValues email = new ContentValues();
-        email.put(Email.ADDRESS, loadedContact.getMail());
-        email.put(Email.TYPE, Email.TYPE_WORK);
+        ContentValues email = emailValues(loadedContact);
         batch.add(doInsert(Email.CONTENT_ITEM_TYPE, email));
 
-        ContentValues phone = new ContentValues();
-        phone.put(Phone.NUMBER, loadedContact.getPhone());
-        /*
-         * See https://github.com/grytsenko/contacts/issues/17
-         */
-        phone.put(Phone.TYPE, Phone.TYPE_WORK);
+        ContentValues phone = phoneValues(loadedContact);
         batch.add(doInsert(Phone.CONTENT_ITEM_TYPE, phone));
 
         batch.add(doInsert(Organization.CONTENT_ITEM_TYPE,
@@ -227,15 +219,14 @@ public class ContactsManager {
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
-        batch.add(doUpdate(id, StructuredName.CONTENT_ITEM_TYPE,
-                StructuredName.GIVEN_NAME, loadedContact.getFirstName()));
-        batch.add(doUpdate(id, StructuredName.CONTENT_ITEM_TYPE,
-                StructuredName.FAMILY_NAME, loadedContact.getLastName()));
+        ContentValues name = nameValues(loadedContact);
+        batch.add(doUpdate(id, StructuredName.CONTENT_ITEM_TYPE, name));
 
-        batch.add(doUpdate(id, Email.CONTENT_ITEM_TYPE, Email.ADDRESS,
-                loadedContact.getMail()));
-        batch.add(doUpdate(id, Phone.CONTENT_ITEM_TYPE, Phone.NUMBER,
-                loadedContact.getPhone()));
+        ContentValues email = emailValues(loadedContact);
+        batch.add(doUpdate(id, Email.CONTENT_ITEM_TYPE, email));
+
+        ContentValues phone = phoneValues(loadedContact);
+        batch.add(doUpdate(id, Phone.CONTENT_ITEM_TYPE, phone));
 
         batch.add(doUpdate(id, Organization.CONTENT_ITEM_TYPE,
                 Organization.OFFICE_LOCATION, loadedContact.getLocation()));
@@ -256,6 +247,27 @@ public class ContactsManager {
             throw new SyncOperationException("Could not update photo.",
                     exception);
         }
+    }
+
+    private static ContentValues nameValues(Contact contact) {
+        ContentValues name = new ContentValues();
+        name.put(StructuredName.GIVEN_NAME, contact.getFirstName());
+        name.put(StructuredName.FAMILY_NAME, contact.getLastName());
+        return name;
+    }
+
+    private static ContentValues emailValues(Contact contact) {
+        ContentValues email = new ContentValues();
+        email.put(Email.ADDRESS, contact.getMail());
+        email.put(Email.TYPE, Email.TYPE_WORK);
+        return email;
+    }
+
+    private static ContentValues phoneValues(Contact contact) {
+        ContentValues phone = new ContentValues();
+        phone.put(Phone.NUMBER, contact.getPhone());
+        phone.put(Phone.TYPE, Phone.TYPE_WORK);
+        return phone;
     }
 
     /**
@@ -331,29 +343,38 @@ public class ContactsManager {
         }
     }
 
+    private static Builder prepareInsert(String mime) {
+        return ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                .withValue(Data.MIMETYPE, mime)
+                .withValueBackReference(Data.RAW_CONTACT_ID, 0);
+    }
+
     private static <T> ContentProviderOperation doInsert(String mime,
             String key, T value) {
-        return ContentProviderOperation.newInsert(Data.CONTENT_URI)
-                .withValue(Data.MIMETYPE, mime).withValue(key, value)
-                .withValueBackReference(Data.RAW_CONTACT_ID, 0).build();
+        return prepareInsert(mime).withValue(key, value).build();
     }
 
     private static <T> ContentProviderOperation doInsert(String mime,
             ContentValues values) {
-        return ContentProviderOperation.newInsert(Data.CONTENT_URI)
-                .withValue(Data.MIMETYPE, mime).withValues(values)
-                .withValueBackReference(Data.RAW_CONTACT_ID, 0).build();
+        return prepareInsert(mime).withValues(values).build();
+    }
+
+    private static Builder prepareUpdate(long id, String mime) {
+        String selection = Data.RAW_CONTACT_ID + "=? and " + Data.MIMETYPE
+                + "=?";
+        return ContentProviderOperation.newUpdate(Data.CONTENT_URI)
+                .withSelection(selection,
+                        new String[] { Long.toString(id), mime });
     }
 
     private static <T> ContentProviderOperation doUpdate(long id, String mime,
             String key, T value) {
-        String selection = Data.RAW_CONTACT_ID + "=? and " + Data.MIMETYPE
-                + "=?";
-        return ContentProviderOperation
-                .newUpdate(Data.CONTENT_URI)
-                .withSelection(selection,
-                        new String[] { Long.toString(id), mime })
-                .withValue(key, value).build();
+        return prepareUpdate(id, mime).withValue(key, value).build();
+    }
+
+    private static ContentProviderOperation doUpdate(long id, String mime,
+            ContentValues values) {
+        return prepareUpdate(id, mime).withValues(values).build();
     }
 
 }
