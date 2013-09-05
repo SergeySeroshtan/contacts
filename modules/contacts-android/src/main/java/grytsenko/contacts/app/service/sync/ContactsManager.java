@@ -166,14 +166,16 @@ public class ContactsManager {
         name.put(StructuredName.FAMILY_NAME, loadedContact.getLastName());
         batch.add(doInsert(StructuredName.CONTENT_ITEM_TYPE, name));
 
-        batch.add(doInsert(Email.CONTENT_ITEM_TYPE, Email.ADDRESS,
-                loadedContact.getMail()));
+        ContentValues email = new ContentValues();
+        email.put(Email.ADDRESS, loadedContact.getMail());
+        email.put(Email.TYPE, Email.TYPE_WORK);
+        batch.add(doInsert(Email.CONTENT_ITEM_TYPE, email));
 
-        /*
-         * See issue #17: for HTC Phone.TYPE is mandatory.
-         */
         ContentValues phone = new ContentValues();
         phone.put(Phone.NUMBER, loadedContact.getPhone());
+        /*
+         * See https://github.com/grytsenko/contacts/issues/17
+         */
         phone.put(Phone.TYPE, Phone.TYPE_WORK);
         batch.add(doInsert(Phone.CONTENT_ITEM_TYPE, phone));
 
