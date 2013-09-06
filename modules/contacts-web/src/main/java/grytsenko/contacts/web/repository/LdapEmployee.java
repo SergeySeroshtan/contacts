@@ -3,9 +3,9 @@ package grytsenko.contacts.web.repository;
 import java.io.Serializable;
 
 /**
- * Contact information from directory service.
+ * Information about employee from directory service.
  */
-public final class DsContact implements Serializable {
+public final class LdapEmployee implements Serializable {
 
     private static final long serialVersionUID = -5048037776329416647L;
 
@@ -23,7 +23,7 @@ public final class DsContact implements Serializable {
 
     private String version;
 
-    public DsContact() {
+    public LdapEmployee() {
     }
 
     public String getUsername() {

@@ -20,78 +20,75 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 /**
- * Repository of contacts in directory service.
- * 
- * <p>
- * This repository is the main data source.
+ * Repository of employees, that uses directory service as data source.
  */
 @Repository
-public class DsContactsRepository {
+public class LdapEmployeesRepository {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(DsContactsRepository.class);
+            .getLogger(LdapEmployeesRepository.class);
 
     @Autowired
     LdapContextSource ldapContextSource;
 
-    @Value("#{ldapProperties['ldap.users']}")
+    @Value("#{ldapProperties['ldap.employees']}")
     String usersGroup;
 
-    @Value("#{ldapProperties['ldap.users.filter.username']}")
+    @Value("#{ldapProperties['ldap.employees.filter.username']}")
     String filterByUsernameTemplate;
-    @Value("#{ldapProperties['ldap.users.filter.location']}")
+    @Value("#{ldapProperties['ldap.employees.filter.location']}")
     String filterByLocationTemplate;
 
-    @Value("#{ldapProperties['ldap.user.username']}")
+    @Value("#{ldapProperties['ldap.employee.username']}")
     String usernameAttrId;
-    @Value("#{ldapProperties['ldap.user.firstname']}")
+    @Value("#{ldapProperties['ldap.employee.firstname']}")
     String firstnameAttrId;
-    @Value("#{ldapProperties['ldap.user.lastname']}")
+    @Value("#{ldapProperties['ldap.employee.lastname']}")
     String lastnameAttrId;
-    @Value("#{ldapProperties['ldap.user.photoUrl']}")
+    @Value("#{ldapProperties['ldap.employee.photoUrl']}")
     String photoUrlAttrId;
-    @Value("#{ldapProperties['ldap.user.mail']}")
+    @Value("#{ldapProperties['ldap.employee.mail']}")
     String mailAttrId;
-    @Value("#{ldapProperties['ldap.user.phone']}")
+    @Value("#{ldapProperties['ldap.employee.phone']}")
     String phoneAttrId;
-    @Value("#{ldapProperties['ldap.user.location']}")
+    @Value("#{ldapProperties['ldap.employee.location']}")
     String locationAttrId;
-    @Value("#{ldapProperties['ldap.user.version']}")
+    @Value("#{ldapProperties['ldap.employee.version']}")
     String versionAttrId;
 
     /**
-     * Finds contact of user.
+     * Finds employee.
      * 
      * @param username
-     *            the name of user.
+     *            the unique identifier of employee..
      * 
-     * @return the found contact or <code>null</code> if contact not found.
+     * @return the found employee or <code>null</code> if employee not found.
      */
-    public DsContact findByUsername(String username) {
+    public LdapEmployee findByUsername(String username) {
         LOGGER.debug("Search by username: {}.", username);
 
         String filter = format(filterByUsernameTemplate, username);
-        List<DsContact> contacts = findByFilter(filter);
+        List<LdapEmployee> contacts = findByFilter(filter);
 
         return contacts.isEmpty() ? null : contacts.get(0);
     }
 
     /**
-     * Finds contacts of all users in one location.
+     * Finds all employees from specified location.
      * 
      * @param location
      *            the name of location.
      * 
-     * @return the list of found contacts.
+     * @return the list of found employees.
      */
-    public List<DsContact> findByLocation(String location) {
+    public List<LdapEmployee> findByLocation(String location) {
         LOGGER.debug("Search by location: {}.", location);
 
         String filter = format(filterByLocationTemplate, location);
         return findByFilter(filter);
     }
 
-    private List<DsContact> findByFilter(String filter) {
+    private List<LdapEmployee> findByFilter(String filter) {
         LOGGER.debug("Search by filter: {}.", filter);
 
         LdapTemplate template = new LdapTemplate(ldapContextSource);
@@ -100,8 +97,8 @@ public class DsContactsRepository {
                 lastnameAttrId, photoUrlAttrId, mailAttrId, phoneAttrId,
                 locationAttrId, versionAttrId };
         @SuppressWarnings("unchecked")
-        List<DsContact> contacts = template.search(usersGroup, filter,
-                SearchControls.ONELEVEL_SCOPE, attrs, new DsContactMapper());
+        List<LdapEmployee> contacts = template.search(usersGroup, filter,
+                SearchControls.ONELEVEL_SCOPE, attrs, new EmployeeMapper());
 
         LOGGER.debug("Found {} contacts.", contacts.size());
 
@@ -109,30 +106,30 @@ public class DsContactsRepository {
     }
 
     /**
-     * Creates contact using data from DS.
+     * Creates employee from attributes.
      */
-    private class DsContactMapper implements AttributesMapper {
+    private class EmployeeMapper implements AttributesMapper {
 
         @Override
-        public DsContact mapFromAttributes(Attributes attrs)
+        public LdapEmployee mapFromAttributes(Attributes attrs)
                 throws NamingException {
-            DsContact contact = new DsContact();
+            LdapEmployee employee = new LdapEmployee();
 
-            contact.setUsername(asString(usernameAttrId, attrs));
+            employee.setUsername(asString(usernameAttrId, attrs));
 
-            contact.setFirstName(asString(firstnameAttrId, attrs));
-            contact.setLastName(asString(lastnameAttrId, attrs));
+            employee.setFirstName(asString(firstnameAttrId, attrs));
+            employee.setLastName(asString(lastnameAttrId, attrs));
 
-            contact.setPhotoUrl(asString(photoUrlAttrId, attrs));
+            employee.setPhotoUrl(asString(photoUrlAttrId, attrs));
 
-            contact.setMail(asString(mailAttrId, attrs));
-            contact.setPhone(asPhone(phoneAttrId, attrs));
+            employee.setMail(asString(mailAttrId, attrs));
+            employee.setPhone(asPhone(phoneAttrId, attrs));
 
-            contact.setLocation(asString(locationAttrId, attrs));
+            employee.setLocation(asString(locationAttrId, attrs));
 
-            contact.setVersion(asString(versionAttrId, attrs));
+            employee.setVersion(asString(versionAttrId, attrs));
 
-            return contact;
+            return employee;
         }
 
         /**

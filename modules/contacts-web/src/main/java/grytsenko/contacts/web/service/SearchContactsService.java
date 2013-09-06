@@ -2,8 +2,8 @@ package grytsenko.contacts.web.service;
 
 import static grytsenko.contacts.web.service.ContactFactory.createContact;
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.web.repository.DsContact;
-import grytsenko.contacts.web.repository.DsContactsRepository;
+import grytsenko.contacts.web.repository.LdapEmployee;
+import grytsenko.contacts.web.repository.LdapEmployeesRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class SearchContactsService {
             .getLogger(SearchContactsService.class);
 
     @Autowired
-    DsContactsRepository dsContactsRepository;
+    LdapEmployeesRepository ldapEmployeesRepository;
 
     /**
      * Finds contact of user.
@@ -39,10 +39,11 @@ public class SearchContactsService {
             throw new IllegalArgumentException("User not defined.");
         }
 
-        LOGGER.debug("Search contact of {} in DS.", username);
-        DsContact dsContact = dsContactsRepository.findByUsername(username);
+        LOGGER.debug("Search employee {} in DS.", username);
+        LdapEmployee employee = ldapEmployeesRepository
+                .findByUsername(username);
 
-        return createContact(dsContact);
+        return createContact(employee);
     }
 
     /**
@@ -58,9 +59,10 @@ public class SearchContactsService {
             throw new IllegalArgumentException("User not defined.");
         }
 
-        LOGGER.debug("Search contact of {} in DS.", username);
-        DsContact contact = dsContactsRepository.findByUsername(username);
-        String location = contact.getLocation();
+        LOGGER.debug("Search employee {} in DS.", username);
+        LdapEmployee employee = ldapEmployeesRepository
+                .findByUsername(username);
+        String location = employee.getLocation();
         LOGGER.debug("Location of {} is {}.", username, location);
 
         return location;
@@ -79,14 +81,14 @@ public class SearchContactsService {
             throw new IllegalStateException("Location not defined.");
         }
 
-        LOGGER.debug("Search contacts from {} in DS.", location);
-        List<DsContact> dsContacts = dsContactsRepository
+        LOGGER.debug("Search employees from {} in DS.", location);
+        List<LdapEmployee> employees = ldapEmployeesRepository
                 .findByLocation(location);
-        LOGGER.debug("Found {} contacts in DS.", dsContacts.size());
+        LOGGER.debug("Found {} employees in DS.", employees.size());
 
         List<Contact> contacts = new ArrayList<Contact>();
-        for (DsContact dsContact : dsContacts) {
-            contacts.add(createContact(dsContact));
+        for (LdapEmployee employee : employees) {
+            contacts.add(createContact(employee));
         }
 
         return contacts;

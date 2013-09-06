@@ -1,7 +1,7 @@
 package grytsenko.contacts.web.service;
 
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.web.repository.DsContact;
+import grytsenko.contacts.web.repository.LdapEmployee;
 
 /**
  * Provides facilities for creating contacts.
@@ -9,28 +9,28 @@ import grytsenko.contacts.web.repository.DsContact;
 public final class ContactFactory {
 
     /**
-     * Creates contact using data from DS.
+     * Creates contact for given employee.
      * 
-     * @param dsContact
-     *            the data from DS.
+     * @param employee
+     *            the information about employee.
      * 
      * @return the created contact.
      */
-    public static Contact createContact(DsContact dsContact) {
+    public static Contact createContact(LdapEmployee employee) {
         Contact contact = new Contact();
 
-        contact.setUsername(dsContact.getUsername());
+        contact.setUsername(employee.getUsername());
 
-        contact.setFirstName(dsContact.getFirstName());
-        contact.setLastName(dsContact.getLastName());
+        contact.setFirstName(employee.getFirstName());
+        contact.setLastName(employee.getLastName());
 
-        contact.setPhotoUrl(dsContact.getPhotoUrl());
+        contact.setPhotoUrl(employee.getPhotoUrl());
 
-        contact.setMail(dsContact.getMail());
-        contact.setPhone(dsContact.getPhone());
+        contact.setMail(employee.getMail());
+        contact.setPhone(employee.getPhone());
 
-        contact.setLocation(dsContact.getLocation());
-        contact.setVersion(dsContact.getVersion());
+        contact.setLocation(employee.getLocation());
+        contact.setVersion(employee.getVersion());
 
         return contact;
     }
