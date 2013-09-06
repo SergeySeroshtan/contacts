@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Contact information for person.
  */
-public class Contact implements Serializable {
+public final class Contact implements Serializable {
 
     private static final long serialVersionUID = 1393219047960946953L;
 

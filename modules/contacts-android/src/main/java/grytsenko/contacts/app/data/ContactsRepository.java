@@ -169,7 +169,8 @@ public final class ContactsRepository {
             return response.getBody();
         } catch (HttpClientErrorException exception) {
             if (exception.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-                throw new NotAuthorizedException("Invalid credentials.");
+                throw new NotAuthorizedException("Invalid credentials.",
+                        exception);
             }
 
             throw new NotAvailableException("Client Error.", exception);

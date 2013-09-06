@@ -32,32 +32,32 @@ public class DsContactsRepository {
             .getLogger(DsContactsRepository.class);
 
     @Autowired
-    protected LdapContextSource ldapContextSource;
+    LdapContextSource ldapContextSource;
 
     @Value("#{ldapProperties['ldap.users']}")
-    protected String usersGroup;
+    String usersGroup;
 
     @Value("#{ldapProperties['ldap.users.filter.username']}")
-    protected String filterByUsernameTemplate;
+    String filterByUsernameTemplate;
     @Value("#{ldapProperties['ldap.users.filter.location']}")
-    protected String filterByLocationTemplate;
+    String filterByLocationTemplate;
 
     @Value("#{ldapProperties['ldap.user.username']}")
-    protected String usernameAttrId;
+    String usernameAttrId;
     @Value("#{ldapProperties['ldap.user.firstname']}")
-    protected String firstnameAttrId;
+    String firstnameAttrId;
     @Value("#{ldapProperties['ldap.user.lastname']}")
-    protected String lastnameAttrId;
+    String lastnameAttrId;
     @Value("#{ldapProperties['ldap.user.photoUrl']}")
-    protected String photoUrlAttrId;
+    String photoUrlAttrId;
     @Value("#{ldapProperties['ldap.user.mail']}")
-    protected String mailAttrId;
+    String mailAttrId;
     @Value("#{ldapProperties['ldap.user.phone']}")
-    protected String phoneAttrId;
+    String phoneAttrId;
     @Value("#{ldapProperties['ldap.user.location']}")
-    protected String locationAttrId;
+    String locationAttrId;
     @Value("#{ldapProperties['ldap.user.version']}")
-    protected String versionAttrId;
+    String versionAttrId;
 
     /**
      * Finds contact of user.
