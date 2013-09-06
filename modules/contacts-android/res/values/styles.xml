@@ -11,20 +11,13 @@
 
     <style name="btn_primary">
         <item name="android:textColor">#ffffff</item>
-        <item name="android:paddingLeft">18dp</item>
-        <item name="android:paddingRight">18dp</item>
-        <item name="android:paddingTop">5dp</item>
-        <item name="android:paddingBottom">8dp</item>
+        <item name="android:gravity">center</item>
     </style>
 
     <style name="input">
         <item name="android:textColor">#212121</item>
         <item name="android:textSize">20sp</item>
-        <item name="android:background">#FFFFFF</item>
-        <item name="android:paddingLeft">12dp</item>
-        <item name="android:paddingRight">12dp</item>
-        <item name="android:paddingTop">6dp</item>
-        <item name="android:paddingBottom">6dp</item>
+        <item name="android:background">#ffffff</item>
     </style>
 
 </resources>

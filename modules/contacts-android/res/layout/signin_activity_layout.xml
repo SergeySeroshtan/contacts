@@ -31,9 +31,9 @@
 
     <Button
         android:id="@+id/signIn"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:layout_gravity="center"
         android:text="@string/accountSignInAction"
         android:background="@drawable/btn_primary"
