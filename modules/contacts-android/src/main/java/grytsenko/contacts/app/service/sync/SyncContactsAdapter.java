@@ -54,7 +54,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     public void onPerformSync(Account account, Bundle extras, String authority,
             ContentProviderClient provider, SyncResult syncResult) {
         if (!isSuitableNetwork()) {
-            Log.d(TAG, "Device is not connected to suitable network.");
+            Log.d(TAG, "Unsuitable network.");
             return;
         }
 
@@ -152,13 +152,18 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * @return the contacts of coworkers.
      */
     private Map<String, Contact> loadCoworkersContacts(Account account)
-            throws NotAuthorizedException, NotAvailableException {
+            throws NotAuthorizedException, NotAvailableException,
+            SyncCanceledException {
+        if (!isSuitableNetwork()) {
+            throw new SyncCanceledException("Unsuitable network.");
+        }
+
         String username = account.name;
         AccountManager accountManager = AccountManager.get(getContext());
         String password = accountManager.getPassword(account);
 
-        Contact[] contacts = contactsRepository
-                .getCoworkersContacts(username, password);
+        Contact[] contacts = contactsRepository.getCoworkersContacts(username,
+                password);
         Map<String, Contact> loadedContacts = new HashMap<String, Contact>();
         for (Contact contact : contacts) {
             loadedContacts.put(contact.getUsername(), contact);
@@ -299,7 +304,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * Updates photo of contact.
      */
     private void syncPhoto(Account account, SyncedContact syncedContact)
-            throws SyncOperationException {
+            throws SyncOperationException, SyncCanceledException {
         String photoUrl = syncedContact.getUnsyncedPhotoUrl();
 
         if (TextUtils.isEmpty(photoUrl)) {
@@ -321,9 +326,14 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * 
      * @return the loaded photo.
      */
-    private byte[] loadPhoto(String photoUrl) throws SyncOperationException {
+    private byte[] loadPhoto(String photoUrl) throws SyncOperationException,
+            SyncCanceledException {
         if (TextUtils.isEmpty(photoUrl)) {
             throw new IllegalArgumentException("URL is required.");
+        }
+
+        if (!isSuitableNetwork()) {
+            throw new SyncCanceledException("Unsuitable network.");
         }
 
         try {
@@ -365,7 +375,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     private void checkCanceled() throws SyncCanceledException {
         boolean canceled = currentThread().isInterrupted();
         if (canceled) {
-            throw new SyncCanceledException();
+            throw new SyncCanceledException("Sync interrupted.");
         }
     }
 
@@ -375,6 +385,10 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     private static class SyncCanceledException extends Exception {
 
         private static final long serialVersionUID = 1678007155060368790L;
+
+        public SyncCanceledException(String message) {
+            super(message);
+        }
 
     }
 
