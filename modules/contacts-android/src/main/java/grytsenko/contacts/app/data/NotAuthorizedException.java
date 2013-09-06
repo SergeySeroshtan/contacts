@@ -1,7 +1,7 @@
 package grytsenko.contacts.app.data;
 
 /**
- * Thrown if user is not authorized to use network resource.
+ * Thrown if user is not authorized to access data.
  */
 public class NotAuthorizedException extends Exception {
 

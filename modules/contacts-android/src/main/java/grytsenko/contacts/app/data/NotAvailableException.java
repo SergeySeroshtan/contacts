@@ -1,7 +1,7 @@
 package grytsenko.contacts.app.data;
 
 /**
- * Thrown if network resource is not available.
+ * Thrown if data is not available.
  */
 public class NotAvailableException extends Exception {
 

@@ -4,10 +4,9 @@ import static java.lang.Thread.currentThread;
 import static java.text.MessageFormat.format;
 import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.app.R;
-import grytsenko.contacts.app.data.NetUtils;
+import grytsenko.contacts.app.data.ContactsRepository;
 import grytsenko.contacts.app.data.NotAuthorizedException;
 import grytsenko.contacts.app.data.NotAvailableException;
-import grytsenko.contacts.app.data.RestClient;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -33,7 +32,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
     private static final String TAG = SyncContactsAdapter.class.getName();
 
-    private RestClient restClient;
+    private ContactsRepository contactsRepository;
 
     private GroupsManager groupsManager;
     private ContactsManager contactsManager;
@@ -43,7 +42,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     public SyncContactsAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
 
-        restClient = new RestClient(context);
+        contactsRepository = new ContactsRepository(context);
 
         groupsManager = new GroupsManager(context);
         contactsManager = new ContactsManager(context);
@@ -67,7 +66,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
              */
             SyncedGroup groupCoworkers;
             try {
-                groupCoworkers = syncGroupForCoworkers(account);
+                groupCoworkers = syncCoworkersGroup(account);
             } catch (SyncOperationException exception) {
                 Log.e(TAG, "Could not sync group for coworkers.", exception);
                 return;
@@ -80,7 +79,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
              */
             Map<String, Contact> loadedCoworkers;
             try {
-                loadedCoworkers = loadContactsOfCoworkers(account);
+                loadedCoworkers = loadCoworkersContacts(account);
             } catch (NotAuthorizedException exception) {
                 Log.e(TAG, "Could not access contacts of coworkers.", exception);
                 return;
@@ -127,7 +126,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * @throws SyncOperationException
      *             the group could not be synchronized.
      */
-    private SyncedGroup syncGroupForCoworkers(Account account)
+    private SyncedGroup syncCoworkersGroup(Account account)
             throws SyncOperationException {
         String name = getContext().getString(R.string.groupCoworkersName);
         String title = settingsManager.getCoworkersTitle();
@@ -152,13 +151,14 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * 
      * @return the contacts of coworkers.
      */
-    private Map<String, Contact> loadContactsOfCoworkers(Account account)
+    private Map<String, Contact> loadCoworkersContacts(Account account)
             throws NotAuthorizedException, NotAvailableException {
         String username = account.name;
         AccountManager accountManager = AccountManager.get(getContext());
         String password = accountManager.getPassword(account);
 
-        Contact[] contacts = restClient.getCoworkers(username, password);
+        Contact[] contacts = contactsRepository
+                .getCoworkersContacts(username, password);
         Map<String, Contact> loadedContacts = new HashMap<String, Contact>();
         for (Contact contact : contacts) {
             loadedContacts.put(contact.getUsername(), contact);
@@ -327,7 +327,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         }
 
         try {
-            Bitmap photo = NetUtils.downloadBitmap(photoUrl);
+            Bitmap photo = contactsRepository.getPhoto(photoUrl);
             ByteArrayOutputStream compressStream = new ByteArrayOutputStream();
 
             try {

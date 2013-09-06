@@ -2,9 +2,9 @@ package grytsenko.contacts.app.service.account;
 
 import static java.text.MessageFormat.format;
 import grytsenko.contacts.app.R;
+import grytsenko.contacts.app.data.ContactsRepository;
 import grytsenko.contacts.app.data.NotAuthorizedException;
 import grytsenko.contacts.app.data.NotAvailableException;
-import grytsenko.contacts.app.data.RestClient;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -29,7 +29,7 @@ import android.widget.Toast;
  * In this activity we set the default settings for synchronization.
  * 
  * <p>
- * We use {@link RestClient#getMy(String, String)} to check credentials.
+ * We use {@link ContactsRepository#getMyContact(String, String)} to check credentials.
  */
 public class SignInActivity extends AccountAuthenticatorActivity {
 
@@ -178,8 +178,9 @@ public class SignInActivity extends AccountAuthenticatorActivity {
         @Override
         protected Boolean doInBackground(Void... args) {
             try {
-                RestClient restClient = new RestClient(SignInActivity.this);
-                restClient.getMy(username, password);
+                ContactsRepository contactsRepository = new ContactsRepository(
+                        SignInActivity.this);
+                contactsRepository.getMyContact(username, password);
                 return true;
             } catch (NotAvailableException exception) {
                 Log.d(TAG, "Not available.", exception);
