@@ -145,7 +145,7 @@ public class DsContactsRepository {
                 throws NamingException {
             Attribute attr = attrs.get(attrId);
             if (attr == null) {
-                return "";
+                return null;
             }
 
             return (String) attr.get();
@@ -160,10 +160,13 @@ public class DsContactsRepository {
         private String asPhone(String attrId, Attributes attrs)
                 throws NamingException {
             String value = asString(attrId, attrs);
-            String digits = value.replaceAll("\\D+", "");
+            if (!StringUtils.hasLength(value)) {
+                return null;
+            }
 
+            String digits = value.replaceAll("\\D+", "");
             if (!StringUtils.hasLength(digits)) {
-                return "";
+                return null;
             }
 
             return '+' + digits;

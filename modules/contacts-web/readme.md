@@ -20,10 +20,7 @@ To run application locally, follow next steps:
 
 ## REST API
 
-Notes:
-
-1. If value of some property is not known, then the empty string is returned.
-1. Each object has version - string that uniquely identifies this object. Versions can be compared for equality only.
+Each object has version. Versions can be compared for equality only.
 
 ### GET my.json
 
