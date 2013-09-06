@@ -266,7 +266,7 @@ public class ContactsManager {
     private static ContentValues phoneValues(Contact contact) {
         ContentValues phone = new ContentValues();
         phone.put(Phone.NUMBER, contact.getPhone());
-        phone.put(Phone.TYPE, Phone.TYPE_WORK);
+        phone.put(Phone.TYPE, Phone.TYPE_MOBILE);
         return phone;
     }
 
