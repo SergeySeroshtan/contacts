@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.accounts.Account;
+import android.annotation.TargetApi;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderOperation.Builder;
 import android.content.ContentProviderResult;
@@ -18,6 +19,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
@@ -268,6 +270,7 @@ public class ContactsManager {
         return name;
     }
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static ContentValues emailValues(Contact contact) {
         ContentValues email = new ContentValues();
         email.put(Email.ADDRESS, contact.getMail());
