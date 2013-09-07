@@ -270,7 +270,7 @@ public class ContactsManager {
 
     private static ContentValues emailValues(Contact contact) {
         ContentValues email = new ContentValues();
-        email.put(Email.ADDRESS, contact.getMail());
+        email.put(Email.DATA, contact.getMail());
         email.put(Email.TYPE, Email.TYPE_WORK);
         return email;
     }
