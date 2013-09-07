@@ -183,8 +183,9 @@ public class ContactsManager {
         ContentValues phone = phoneValues(loadedContact);
         batch.add(doInsert(Phone.CONTENT_ITEM_TYPE, phone));
 
-        batch.add(doInsert(Organization.CONTENT_ITEM_TYPE,
-                Organization.OFFICE_LOCATION, loadedContact.getLocation()));
+        ContentValues organization = organizationValues(loadedContact);
+        batch.add(doInsert(Organization.CONTENT_ITEM_TYPE, organization));
+
         batch.add(doInsert(GroupMembership.CONTENT_ITEM_TYPE,
                 GroupMembership.GROUP_ROW_ID, group.getId()));
 
@@ -240,8 +241,8 @@ public class ContactsManager {
         ContentValues phone = phoneValues(loadedContact);
         batch.add(doUpdate(id, Phone.CONTENT_ITEM_TYPE, phone));
 
-        batch.add(doUpdate(id, Organization.CONTENT_ITEM_TYPE,
-                Organization.OFFICE_LOCATION, loadedContact.getLocation()));
+        ContentValues organization = organizationValues(loadedContact);
+        batch.add(doUpdate(id, Organization.CONTENT_ITEM_TYPE, organization));
 
         Uri contactUri = ContentUris
                 .withAppendedId(RawContacts.CONTENT_URI, id);
@@ -280,6 +281,13 @@ public class ContactsManager {
         phone.put(Phone.NUMBER, contact.getPhone());
         phone.put(Phone.TYPE, Phone.TYPE_MOBILE);
         return phone;
+    }
+
+    private static ContentValues organizationValues(Contact contact) {
+        ContentValues organization = new ContentValues();
+        organization.put(Organization.OFFICE_LOCATION, contact.getLocation());
+        organization.put(Organization.TYPE, Organization.TYPE_WORK);
+        return organization;
     }
 
     /**
