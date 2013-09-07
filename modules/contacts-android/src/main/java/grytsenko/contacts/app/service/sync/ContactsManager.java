@@ -61,6 +61,9 @@ public class ContactsManager {
      * @return the found contacts.
      */
     public Map<String, SyncedContact> allFromGroup(SyncedGroup group) {
+        String groupName = group.getName();
+        Log.d(TAG, format("Search contacts in group {0}.", groupName));
+
         String[] projection = new String[] { GroupMembership.RAW_CONTACT_ID };
         String selection = GroupMembership.GROUP_ROW_ID + "=? and "
                 + GroupMembership.MIMETYPE + "=?";
@@ -70,13 +73,14 @@ public class ContactsManager {
 
         try {
             int contactsNum = cursor.getCount();
-            Log.d(TAG,
-                    format("Found {0} contacts in group {1}.", contactsNum,
-                            group.getName()));
             if (!cursor.moveToFirst()) {
+                Log.d(TAG, format("Group {0} is empty.", groupName));
                 return Collections.emptyMap();
             }
 
+            Log.d(TAG,
+                    format("Group {0} contains {1} contacts.", groupName,
+                            contactsNum));
             Map<String, SyncedContact> contacts = new HashMap<String, SyncedContact>(
                     contactsNum);
             do {
@@ -84,6 +88,7 @@ public class ContactsManager {
                         .getColumnIndexOrThrow(GroupMembership.RAW_CONTACT_ID));
                 SyncedContact contact = findContact(contactId);
                 if (contact == null) {
+                    Log.d(TAG, format("Contact {0} is skipped.", contactId));
                     continue;
                 }
                 contacts.put(contact.getUsername(), contact);
@@ -104,6 +109,8 @@ public class ContactsManager {
      * @return the found contact or <code>null</code> if contact was not found.
      */
     public SyncedContact findContact(long id) {
+        Log.d(TAG, format("Search contact {0}.", id));
+
         String[] projection = new String[] { RawContacts.SYNC1,
                 RawContacts.SYNC2, RawContacts.SYNC3 };
         Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, id);
@@ -112,6 +119,7 @@ public class ContactsManager {
 
         try {
             if (!cursor.moveToFirst()) {
+                Log.w(TAG, format("Contact {0} not found.", id));
                 return null;
             }
 
@@ -121,6 +129,10 @@ public class ContactsManager {
                     .getColumnIndexOrThrow(RawContacts.SYNC2));
             String unsyncedPhotoUrl = cursor.getString(cursor
                     .getColumnIndexOrThrow(RawContacts.SYNC3));
+
+            Log.d(TAG,
+                    format("Contact {0} for {1} has version {2}.", id,
+                            username, version));
 
             return SyncedContact
                     .create(id, username, version, unsyncedPhotoUrl);

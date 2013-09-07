@@ -61,47 +61,48 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         Log.d(TAG, "Sync started.");
 
         try {
-            /*
-             * Synchronize group, which contains contacts of coworkers.
-             */
+            Log.d(TAG, "Sync contacts of coworkers.");
+
+            Log.d(TAG, "Sync group.");
             SyncedGroup groupCoworkers;
             try {
                 groupCoworkers = syncCoworkersGroup(account);
             } catch (SyncOperationException exception) {
-                Log.e(TAG, "Could not sync group for coworkers.", exception);
+                Log.e(TAG, "Could not sync group.", exception);
                 return;
             }
 
             checkCanceled();
 
-            /*
-             * Load actual contacts of coworkers.
-             */
+            Log.d(TAG, "Load contacts.");
             Map<String, Contact> loadedCoworkers;
             try {
                 loadedCoworkers = loadCoworkersContacts(account);
+                Log.d(TAG,
+                        format("Loaded {0} contacts.", loadedCoworkers.size()));
             } catch (NotAuthorizedException exception) {
-                Log.e(TAG, "Could not access contacts of coworkers.", exception);
+                Log.e(TAG, "Access denied.", exception);
                 return;
             } catch (NotAvailableException exception) {
-                Log.e(TAG, "Could not get contacts of coworkers.", exception);
+                Log.e(TAG, "Contacts not available.", exception);
                 return;
             }
 
             checkCanceled();
 
-            /*
-             * Synchronize contacts of coworkers.
-             */
+            Log.d(TAG, "Search contacts in address book.");
             Map<String, SyncedContact> syncedCoworkers = contactsManager
                     .allFromGroup(groupCoworkers);
+            Log.d(TAG, format("Found {0} contacts.", syncedCoworkers.size()));
 
+            Log.d(TAG, "Sync contacts.");
             Map<String, SyncedContact> createdCoworkers = syncCreatedContacts(
                     account, groupCoworkers, loadedCoworkers, syncedCoworkers);
             Map<String, SyncedContact> updatedCoworkers = syncUpdatedContacts(
                     account, loadedCoworkers, syncedCoworkers);
             syncRemovedContacts(account, loadedCoworkers, syncedCoworkers);
 
+            Log.d(TAG, "Sync photos.");
             syncedCoworkers = new HashMap<String, SyncedContact>(
                     syncedCoworkers);
             syncedCoworkers.putAll(createdCoworkers);
@@ -168,9 +169,6 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         for (Contact contact : contacts) {
             loadedContacts.put(contact.getUsername(), contact);
         }
-        Log.d(TAG,
-                format("Loaded {0} contacts of coworkers.",
-                        loadedContacts.size()));
         return loadedContacts;
     }
 
@@ -254,6 +252,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             Map<String, Contact> loadedContacts,
             Map<String, SyncedContact> syncedContacts)
             throws SyncCanceledException {
+        int removedContactsNum = 0;
+
         for (SyncedContact syncedContact : syncedContacts.values()) {
             String username = syncedContact.getUsername();
             if (loadedContacts.containsKey(username)) {
@@ -264,12 +264,15 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             try {
                 contactsManager.removeContact(account, syncedContact);
+                ++removedContactsNum;
             } catch (SyncOperationException exception) {
                 Log.w(TAG,
                         format("Contact for {0} was not removed.", username),
                         exception);
             }
         }
+
+        Log.d(TAG, format("Removed {0} contacts.", removedContactsNum));
     }
 
     /**
