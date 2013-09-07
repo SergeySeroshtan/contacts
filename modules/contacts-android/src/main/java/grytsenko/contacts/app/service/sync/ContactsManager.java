@@ -189,8 +189,6 @@ public class ContactsManager {
         batch.add(doInsert(GroupMembership.CONTENT_ITEM_TYPE,
                 GroupMembership.GROUP_ROW_ID, group.getId()));
 
-        batch.add(doInsert(Photo.CONTENT_ITEM_TYPE, Photo.PHOTO, null));
-
         try {
             ContentProviderResult[] results = contentResolver.applyBatch(
                     ContactsContract.AUTHORITY, batch);
@@ -363,36 +361,52 @@ public class ContactsManager {
         }
     }
 
-    private static Builder prepareInsert(String mime) {
+    private Builder prepareInsert(String mime) {
         return ContentProviderOperation.newInsert(Data.CONTENT_URI)
                 .withValue(Data.MIMETYPE, mime)
                 .withValueBackReference(Data.RAW_CONTACT_ID, 0);
     }
 
-    private static <T> ContentProviderOperation doInsert(String mime,
-            String key, T value) {
+    private <T> ContentProviderOperation doInsert(String mime, String key,
+            T value) {
         return prepareInsert(mime).withValue(key, value).build();
     }
 
-    private static <T> ContentProviderOperation doInsert(String mime,
+    private <T> ContentProviderOperation doInsert(String mime,
             ContentValues values) {
         return prepareInsert(mime).withValues(values).build();
     }
 
-    private static Builder prepareUpdate(long id, String mime) {
+    private Builder prepareUpdate(long id, String mime) {
         String selection = Data.RAW_CONTACT_ID + "=? and " + Data.MIMETYPE
                 + "=?";
-        return ContentProviderOperation.newUpdate(Data.CONTENT_URI)
-                .withSelection(selection,
-                        new String[] { Long.toString(id), mime });
+        String[] selectionArgs = new String[] { Long.toString(id), mime };
+
+        Cursor cursor = contentResolver.query(Data.CONTENT_URI, null,
+                selection, selectionArgs, null);
+
+        try {
+            if (cursor.moveToFirst()) {
+                Log.d(TAG, format("Update {0} for contact {1}", mime, id));
+                return ContentProviderOperation.newUpdate(Data.CONTENT_URI)
+                        .withSelection(selection, selectionArgs);
+            } else {
+                Log.d(TAG, format("Insert {0} for contact {1}", mime, id));
+                return ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                        .withValue(Data.MIMETYPE, mime)
+                        .withValue(Data.RAW_CONTACT_ID, id);
+            }
+        } finally {
+            cursor.close();
+        }
     }
 
-    private static <T> ContentProviderOperation doUpdate(long id, String mime,
+    private <T> ContentProviderOperation doUpdate(long id, String mime,
             String key, T value) {
         return prepareUpdate(id, mime).withValue(key, value).build();
     }
 
-    private static ContentProviderOperation doUpdate(long id, String mime,
+    private ContentProviderOperation doUpdate(long id, String mime,
             ContentValues values) {
         return prepareUpdate(id, mime).withValues(values).build();
     }
