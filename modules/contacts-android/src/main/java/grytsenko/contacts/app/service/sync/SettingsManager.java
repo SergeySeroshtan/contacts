@@ -15,12 +15,11 @@ public class SettingsManager {
 
     private static final String TAG = SettingsManager.class.getName();
 
-    private final String syncPhotosKey;
-    private final String syncAnywhereKey;
+    private final String syncPhotos;
+    private final String syncAnywhere;
+    private final String syncTimestamp;
 
-    private final String syncTimestampKey;
-
-    private final String groupCoworkersKey;
+    private final String groupCoworkers;
     private final String groupCoworkersDefault;
 
     private SharedPreferences preferences;
@@ -36,12 +35,12 @@ public class SettingsManager {
             throw new IllegalArgumentException("Context not defined.");
         }
 
-        syncPhotosKey = context.getString(R.string.syncPhotosKey);
-        syncAnywhereKey = context.getString(R.string.syncAnywhereKey);
+        syncPhotos = context.getString(R.string.syncPhotos);
+        syncAnywhere = context.getString(R.string.syncAnywhere);
 
-        syncTimestampKey = context.getString(R.string.syncTimestampKey);
+        syncTimestamp = context.getString(R.string.syncTimestamp);
 
-        groupCoworkersKey = context.getString(R.string.groupCoworkersKey);
+        groupCoworkers = context.getString(R.string.groupCoworkers);
         groupCoworkersDefault = context
                 .getString(R.string.groupCoworkersDefault);
 
@@ -55,7 +54,7 @@ public class SettingsManager {
      *         otherwise.
      */
     public boolean isSyncPhotos() {
-        return preferences.getBoolean(syncPhotosKey, false);
+        return preferences.getBoolean(syncPhotos, false);
     }
 
     /**
@@ -65,7 +64,7 @@ public class SettingsManager {
      *         otherwise.
      */
     public boolean isSyncAnywhere() {
-        return preferences.getBoolean(syncAnywhereKey, false);
+        return preferences.getBoolean(syncAnywhere, false);
     }
 
     /**
@@ -74,14 +73,14 @@ public class SettingsManager {
      * @return the group title.
      */
     public String getCoworkersTitle() {
-        return preferences.getString(groupCoworkersKey, groupCoworkersDefault);
+        return preferences.getString(groupCoworkers, groupCoworkersDefault);
     }
 
     /**
      * Returns the timestamp of last sync.
      */
     public long getLastSyncTimestamp() {
-        return preferences.getLong(syncTimestampKey, 0);
+        return preferences.getLong(syncTimestamp, 0);
     }
 
     /**
@@ -90,7 +89,7 @@ public class SettingsManager {
     public void updateLastSyncTimestamp() {
         Editor editor = preferences.edit();
         long timestamp = System.currentTimeMillis();
-        editor.putLong(syncTimestampKey, timestamp);
+        editor.putLong(syncTimestamp, timestamp);
         editor.commit();
 
         Log.d(TAG,

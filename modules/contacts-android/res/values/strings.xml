@@ -23,24 +23,19 @@
     <string name="syncSettingsTitle">Sync Settings</string>
     <string name="syncSettingsSummary">Customize sync of contacts.</string>
 
-    <string name="syncPhotosKey">sync_photos</string>
     <string name="syncPhotosTitle">Load Photos</string>
     <string name="syncPhotosSummary">Permit download of photos.</string>
     <string name="syncPhotosWarning">This will increase network usage.</string>
 
-    <string name="syncAnywhereKey">sync_anywhere</string>
     <string name="syncAnywhereTitle">Use Mobile Networks</string>
     <string name="syncAnywhereSummary">Permit usage of mobile networks.</string>
     <string name="syncAnywhereWarning">This may increase your expenses.</string>
 
-    <string name="groupCoworkersKey">coworkers_custom_name</string>
     <string name="groupCoworkersTitle">Group for Coworkers</string>
     <string name="groupCoworkersSummary">Set the custom name of group.</string>
     <string name="groupCoworkersDefault">Coworkers</string>
 
-    <string name="syncTimestampKey">sync_timestamp</string>
-
-    <string name="groupCoworkersName">coworkers</string>
+    <string name="groupCoworkersUid">coworkers</string>
 
     <string name="groupTitleEmpty">The title of group could not be empty.</string>
 

@@ -30,7 +30,16 @@ import android.provider.ContactsContract.RawContacts;
 import android.util.Log;
 
 /**
- * Helps manage contacts.
+ * Manages the synchronized contacts.
+ * 
+ * <p>
+ * SYNC columns contains next data:
+ * 
+ * <ul>
+ * <li>SYNC1 - the unique username ({@link SyncedContact#getUsername()}).</li>
+ * <li>SYNC2 - the version of contact ({@link SyncedContact#getVersion()}).</li>
+ * <li>SYNC3 - the URL of photo ({@link SyncedContact#getUnsyncedPhotoUrl()} ).</li>
+ * </ul>
  */
 public class ContactsManager {
 
@@ -61,8 +70,8 @@ public class ContactsManager {
      * @return the found contacts.
      */
     public Map<String, SyncedContact> allFromGroup(SyncedGroup group) {
-        String groupName = group.getName();
-        Log.d(TAG, format("Search contacts in group {0}.", groupName));
+        String groupUid = group.getUid();
+        Log.d(TAG, format("Search contacts in group {0}.", groupUid));
 
         String[] projection = new String[] { GroupMembership.RAW_CONTACT_ID };
         String selection = GroupMembership.GROUP_ROW_ID + "=? and "
@@ -74,12 +83,12 @@ public class ContactsManager {
         try {
             int contactsNum = cursor.getCount();
             if (!cursor.moveToFirst()) {
-                Log.d(TAG, format("Group {0} is empty.", groupName));
+                Log.d(TAG, format("Group {0} is empty.", groupUid));
                 return Collections.emptyMap();
             }
 
             Log.d(TAG,
-                    format("Group {0} contains {1} contacts.", groupName,
+                    format("Group {0} contains {1} contacts.", groupUid,
                             contactsNum));
             Map<String, SyncedContact> contacts = new HashMap<String, SyncedContact>(
                     contactsNum);
@@ -164,7 +173,7 @@ public class ContactsManager {
 
         Log.d(TAG,
                 format("Create contact for {0} in group {1}.", username,
-                        group.getName()));
+                        group.getUid()));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
         batch.add(ContentProviderOperation.newInsert(RawContacts.CONTENT_URI)

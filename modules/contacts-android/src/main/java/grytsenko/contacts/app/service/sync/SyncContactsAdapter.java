@@ -132,19 +132,19 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      */
     private SyncedGroup syncCoworkersGroup(Account account)
             throws SyncOperationException {
-        String name = getContext().getString(R.string.groupCoworkersName);
+        String uid = getContext().getString(R.string.groupCoworkersUid);
         String title = settingsManager.getCoworkersTitle();
 
-        SyncedGroup group = groupsManager.findGroup(account, name);
-        if (group != null) {
-            if (!title.equals(group.getTitle())) {
-                return groupsManager.updateTitle(group, title);
-            }
-
-            return group;
+        SyncedGroup group = groupsManager.findGroup(account, uid);
+        if (group == null) {
+            return groupsManager.createGroup(account, uid, title);
         }
 
-        return groupsManager.createGroup(account, name, title);
+        if (!title.equals(group.getTitle())) {
+            return groupsManager.updateTitle(group, title);
+        }
+
+        return group;
     }
 
     /**

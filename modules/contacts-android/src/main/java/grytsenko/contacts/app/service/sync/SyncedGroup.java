@@ -8,18 +8,18 @@ public class SyncedGroup {
     /**
      * Creates a group with given properties.
      */
-    public static SyncedGroup create(long id, String name, String title) {
+    public static SyncedGroup create(long id, String uid, String title) {
         SyncedGroup group = new SyncedGroup();
 
         group.id = id;
-        group.name = name;
+        group.uid = uid;
         group.title = title;
 
         return group;
     }
 
     private long id;
-    private String name;
+    private String uid;
     private String title;
 
     public SyncedGroup() {
@@ -40,17 +40,20 @@ public class SyncedGroup {
     }
 
     /**
-     * Returns the unique name.
+     * Returns the unique identifier.
+     * 
+     * <p>
+     * We use unique identifier in order to distinguish the groups.
      */
-    public String getName() {
-        return name;
+    public String getUid() {
+        return uid;
     }
 
     /**
-     * Sets the unique name.
+     * Sets the unique identifier
      */
-    public void setName(String name) {
-        this.name = name;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     /**

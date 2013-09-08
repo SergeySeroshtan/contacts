@@ -23,7 +23,7 @@ public class SyncSettingsActivity extends PreferenceActivity {
 
         addPreferencesFromResource(R.xml.sync_settings);
 
-        Preference syncPhotos = findPreference(getString(R.string.syncPhotosKey));
+        Preference syncPhotos = findPreference(getString(R.string.syncPhotos));
         syncPhotos
                 .setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
@@ -37,7 +37,7 @@ public class SyncSettingsActivity extends PreferenceActivity {
                     }
                 });
 
-        Preference syncAnywhere = findPreference(getString(R.string.syncAnywhereKey));
+        Preference syncAnywhere = findPreference(getString(R.string.syncAnywhere));
         syncAnywhere
                 .setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
@@ -52,7 +52,7 @@ public class SyncSettingsActivity extends PreferenceActivity {
 
                 });
 
-        Preference coworkers = findPreference(getString(R.string.groupCoworkersKey));
+        Preference coworkers = findPreference(getString(R.string.groupCoworkers));
         coworkers
                 .setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 

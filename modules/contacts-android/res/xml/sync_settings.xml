@@ -2,17 +2,17 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <CheckBoxPreference
-        android:key="@string/syncPhotosKey"
+        android:key="@string/syncPhotos"
         android:title="@string/syncPhotosTitle"
         android:summary="@string/syncPhotosSummary"
         android:defaultValue="false" />
     <CheckBoxPreference
-        android:key="@string/syncAnywhereKey"
+        android:key="@string/syncAnywhere"
         android:title="@string/syncAnywhereTitle"
         android:summary="@string/syncAnywhereSummary"
         android:defaultValue="false" />
     <EditTextPreference
-        android:key="@string/groupCoworkersKey"
+        android:key="@string/groupCoworkers"
         android:title="@string/groupCoworkersTitle"
         android:summary="@string/groupCoworkersSummary"
         android:defaultValue="@string/groupCoworkersDefault" />
