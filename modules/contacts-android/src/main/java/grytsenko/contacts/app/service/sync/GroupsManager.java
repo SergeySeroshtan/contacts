@@ -50,6 +50,8 @@ public class GroupsManager {
      * @return the found group or <code>null</code> if group not found.
      */
     public SyncedGroup findGroup(Account account, String uid) {
+        Log.d(TAG, format("Search group {0}.", uid));
+
         String[] projection = new String[] { Groups._ID, Groups.TITLE };
         String selection = Groups.SYNC1 + "=? and " + Groups.ACCOUNT_NAME
                 + "=? and " + Groups.ACCOUNT_TYPE + "=?";
@@ -69,7 +71,7 @@ public class GroupsManager {
             int titleColumn = cursor.getColumnIndexOrThrow(Groups.TITLE);
             String title = cursor.getString(titleColumn);
 
-            Log.d(TAG, format("Found group {0} with title {1}", id, title));
+            Log.d(TAG, format("Found group {0} - {1}", id, title));
 
             return SyncedGroup.create(id, uid, title);
         } finally {

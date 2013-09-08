@@ -112,7 +112,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             settingsManager.updateLastSyncTime();
 
-            Log.d(TAG, "Sync finished.");
+            Log.d(TAG, "Sync completed.");
         } catch (SyncCanceledException exception) {
             Log.w(TAG, "Sync canceled.", exception);
         }
@@ -297,36 +297,38 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         }
 
         for (SyncedContact syncedContact : syncedContacts.values()) {
-            if (syncedContact.isPhotoSynced()) {
-                continue;
-            }
-
             checkCanceled();
 
             try {
                 syncPhoto(account, syncedContact);
             } catch (SyncOperationException exception) {
                 Log.w(TAG,
-                        format("Photo for {0} was not updated.",
+                        format("Photo for {0} was not synced.",
                                 syncedContact.getUsername()), exception);
             }
         }
     }
 
     /**
-     * Updates photo of contact.
+     * Synchronizes photo of contact.
      */
     private void syncPhoto(Account account, SyncedContact syncedContact)
             throws SyncOperationException, SyncCanceledException {
-        String photoUrl = syncedContact.getUnsyncedPhotoUrl();
+        String username = syncedContact.getUsername();
+        String photoUrl = syncedContact.getPhotoUrl();
 
-        if (TextUtils.isEmpty(photoUrl)) {
-            throw new IllegalArgumentException("URL of photo not defined.");
+        if (syncedContact.isPhotoSynced()) {
+            Log.d(TAG, format("Photo for {0} is up to date.", username));
+            return;
         }
 
-        Log.d(TAG,
-                format("Download photo for {0} from {1}.",
-                        syncedContact.getUsername(), photoUrl));
+        if (TextUtils.isEmpty(photoUrl)) {
+            Log.d(TAG, format("Remove photo for {0}.", username));
+            contactsManager.updatePhoto(account, syncedContact, null);
+            return;
+        }
+
+        Log.d(TAG, format("Load photo for {0}.", username));
         byte[] photo = loadPhoto(photoUrl);
         contactsManager.updatePhoto(account, syncedContact, photo);
     }

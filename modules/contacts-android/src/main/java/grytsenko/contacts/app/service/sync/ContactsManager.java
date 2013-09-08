@@ -27,19 +27,11 @@ import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
  * Manages the synchronized contacts.
- * 
- * <p>
- * SYNC columns contains next data:
- * 
- * <ul>
- * <li>SYNC1 - the unique username ({@link SyncedContact#getUsername()}).</li>
- * <li>SYNC2 - the version of contact ({@link SyncedContact#getVersion()}).</li>
- * <li>SYNC3 - the URL of photo ({@link SyncedContact#getUnsyncedPhotoUrl()} ).</li>
- * </ul>
  */
 public class ContactsManager {
 
@@ -121,7 +113,7 @@ public class ContactsManager {
         Log.d(TAG, format("Search contact {0}.", id));
 
         String[] projection = new String[] { RawContacts.SYNC1,
-                RawContacts.SYNC2, RawContacts.SYNC3 };
+                RawContacts.SYNC2, RawContacts.SYNC3, RawContacts.SYNC4 };
         Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, id);
         Cursor cursor = contentResolver
                 .query(uri, projection, null, null, null);
@@ -136,13 +128,15 @@ public class ContactsManager {
                     .getColumnIndexOrThrow(RawContacts.SYNC1));
             String version = cursor.getString(cursor
                     .getColumnIndexOrThrow(RawContacts.SYNC2));
-            String unsyncedPhotoUrl = cursor.getString(cursor
+            String photoUrl = cursor.getString(cursor
                     .getColumnIndexOrThrow(RawContacts.SYNC3));
+            boolean photoSynced = Boolean.parseBoolean(cursor.getString(cursor
+                    .getColumnIndexOrThrow(RawContacts.SYNC4)));
 
-            Log.d(TAG, format("Contact {0} for {1} was found.", id, username));
+            Log.d(TAG, format("Found contact {0} for {1}.", id, username));
 
-            return SyncedContact
-                    .create(id, username, version, unsyncedPhotoUrl);
+            return SyncedContact.create(id, username, version, photoUrl,
+                    photoSynced);
         } finally {
             cursor.close();
         }
@@ -167,7 +161,8 @@ public class ContactsManager {
             Contact loadedContact) throws SyncOperationException {
         String username = loadedContact.getUsername();
         String version = loadedContact.getVersion();
-        String unsyncedPhotoUrl = loadedContact.getPhotoUrl();
+        String photoUrl = loadedContact.getPhotoUrl();
+        boolean photoSynced = TextUtils.isEmpty(photoUrl);
 
         Log.d(TAG,
                 format("Create contact for {0} in group {1}.", username,
@@ -179,7 +174,9 @@ public class ContactsManager {
                 .withValue(RawContacts.ACCOUNT_TYPE, account.type)
                 .withValue(RawContacts.SYNC1, username)
                 .withValue(RawContacts.SYNC2, version)
-                .withValue(RawContacts.SYNC3, unsyncedPhotoUrl).build());
+                .withValue(RawContacts.SYNC3, photoUrl)
+                .withValue(RawContacts.SYNC4, Boolean.toString(photoSynced))
+                .build());
 
         ContentValues name = nameValues(loadedContact);
         batch.add(doInsert(StructuredName.CONTENT_ITEM_TYPE, name));
@@ -202,8 +199,8 @@ public class ContactsManager {
             long id = ContentUris.parseId(results[0].uri);
 
             Log.d(TAG, format("Contact for {0} was created.", username));
-            return SyncedContact
-                    .create(id, username, version, unsyncedPhotoUrl);
+            return SyncedContact.create(id, username, version, photoUrl,
+                    photoSynced);
         } catch (Exception exception) {
             throw new SyncOperationException("Could not create contact.",
                     exception);
@@ -231,7 +228,14 @@ public class ContactsManager {
         long id = syncedContact.getId();
         String username = syncedContact.getUsername();
         String version = loadedContact.getVersion();
-        String unsyncedPhotoUrl = loadedContact.getPhotoUrl();
+
+        String loadedPhotoUrl = loadedContact.getPhotoUrl();
+        String syncedPhotoUrl = syncedContact.getPhotoUrl();
+        boolean photoUpdated = !TextUtils
+                .equals(loadedPhotoUrl, syncedPhotoUrl);
+        String photoUrl = photoUpdated ? loadedPhotoUrl : syncedPhotoUrl;
+        boolean photoSynced = photoUpdated ? false : syncedContact
+                .isPhotoSynced();
 
         Log.d(TAG, format("Update contact for {0}.", username));
 
@@ -253,14 +257,16 @@ public class ContactsManager {
                 .withAppendedId(RawContacts.CONTENT_URI, id);
         batch.add(ContentProviderOperation.newUpdate(contactUri)
                 .withValue(RawContacts.SYNC2, version)
-                .withValue(RawContacts.SYNC3, unsyncedPhotoUrl).build());
+                .withValue(RawContacts.SYNC3, photoUrl)
+                .withValue(RawContacts.SYNC4, Boolean.toString(photoSynced))
+                .build());
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
             Log.d(TAG, format("Contact for {0} was updated.", username));
 
-            return SyncedContact
-                    .create(id, username, version, unsyncedPhotoUrl);
+            return SyncedContact.create(id, username, version, photoUrl,
+                    photoSynced);
         } catch (Exception exception) {
             throw new SyncOperationException("Could not update photo.",
                     exception);
@@ -319,7 +325,7 @@ public class ContactsManager {
         Uri contactUri = ContentUris
                 .withAppendedId(RawContacts.CONTENT_URI, id);
         batch.add(ContentProviderOperation.newUpdate(contactUri)
-                .withValue(RawContacts.SYNC3, null).build());
+                .withValue(RawContacts.SYNC4, Boolean.toString(true)).build());
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);

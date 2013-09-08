@@ -96,7 +96,7 @@ public final class ContactsRepository {
      */
     public Contact[] getCoworkersContacts(String username, String password)
             throws NotAvailableException, NotAuthorizedException {
-        Log.d(TAG, format("Find coworkers of {0}.", username));
+        Log.d(TAG, format("Get coworkers of {0}.", username));
 
         URI url = buildUrl(context.getString(R.string.restPathCoworkers));
         return doGet(url, username, password, Contact[].class);
