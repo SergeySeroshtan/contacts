@@ -1,4 +1,4 @@
-package grytsenko.contacts.app.service.sync;
+package grytsenko.contacts.app.sync;
 
 import static java.text.MessageFormat.format;
 import grytsenko.contacts.app.R;
@@ -12,7 +12,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 /**
- * Helps manage settings.
+ * Manages settings of application.
  */
 public class SettingsManager {
 

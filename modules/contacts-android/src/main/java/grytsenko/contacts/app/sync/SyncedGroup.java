@@ -1,4 +1,4 @@
-package grytsenko.contacts.app.service.sync;
+package grytsenko.contacts.app.sync;
 
 /**
  * Information about group, that is synchronized.

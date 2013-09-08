@@ -1,4 +1,4 @@
-package grytsenko.contacts.app.service.sync;
+package grytsenko.contacts.app.sync;
 
 import static java.text.MessageFormat.format;
 
@@ -17,7 +17,7 @@ import android.provider.ContactsContract.Groups;
 import android.util.Log;
 
 /**
- * Helps manage groups.
+ * Manages sync of groups.
  */
 public class GroupsManager {
 

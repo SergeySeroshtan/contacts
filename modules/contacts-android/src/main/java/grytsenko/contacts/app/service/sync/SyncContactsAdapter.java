@@ -7,6 +7,13 @@ import grytsenko.contacts.app.R;
 import grytsenko.contacts.app.data.ContactsRepository;
 import grytsenko.contacts.app.data.NotAuthorizedException;
 import grytsenko.contacts.app.data.NotAvailableException;
+import grytsenko.contacts.app.sync.ContactsManager;
+import grytsenko.contacts.app.sync.GroupsManager;
+import grytsenko.contacts.app.sync.NetworkManager;
+import grytsenko.contacts.app.sync.SettingsManager;
+import grytsenko.contacts.app.sync.SyncOperationException;
+import grytsenko.contacts.app.sync.SyncedContact;
+import grytsenko.contacts.app.sync.SyncedGroup;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

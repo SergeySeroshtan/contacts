@@ -1,4 +1,4 @@
-package grytsenko.contacts.app.service.sync;
+package grytsenko.contacts.app.sync;
 
 import static java.text.MessageFormat.format;
 import grytsenko.contacts.api.Contact;
@@ -31,7 +31,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 /**
- * Manages the synchronized contacts.
+ * Manages sync of contacts.
  */
 public class ContactsManager {
 
