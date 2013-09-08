@@ -139,9 +139,7 @@ public class ContactsManager {
             String unsyncedPhotoUrl = cursor.getString(cursor
                     .getColumnIndexOrThrow(RawContacts.SYNC3));
 
-            Log.d(TAG,
-                    format("Contact {0} for {1} has version {2}.", id,
-                            username, version));
+            Log.d(TAG, format("Contact {0} for {1} was found.", id, username));
 
             return SyncedContact
                     .create(id, username, version, unsyncedPhotoUrl);
@@ -396,11 +394,9 @@ public class ContactsManager {
 
         try {
             if (cursor.moveToFirst()) {
-                Log.d(TAG, format("Update {0} for contact {1}", mime, id));
                 return ContentProviderOperation.newUpdate(Data.CONTENT_URI)
                         .withSelection(selection, selectionArgs);
             } else {
-                Log.d(TAG, format("Insert {0} for contact {1}", mime, id));
                 return ContentProviderOperation.newInsert(Data.CONTENT_URI)
                         .withValue(Data.MIMETYPE, mime)
                         .withValue(Data.RAW_CONTACT_ID, id);

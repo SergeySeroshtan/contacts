@@ -5,6 +5,9 @@ import grytsenko.contacts.app.R;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -17,12 +20,13 @@ public class SettingsManager {
 
     private final String syncPhotos;
     private final String syncAnywhere;
-    private final String syncTimestamp;
+    private final String lastSyncTime;
 
     private final String groupCoworkers;
     private final String groupCoworkersDefault;
 
     private SharedPreferences preferences;
+    private PackageInfo packageInfo;
 
     /**
      * Creates manager in the specified context.
@@ -38,13 +42,25 @@ public class SettingsManager {
         syncPhotos = context.getString(R.string.syncPhotos);
         syncAnywhere = context.getString(R.string.syncAnywhere);
 
-        syncTimestamp = context.getString(R.string.syncTimestamp);
+        lastSyncTime = context.getString(R.string.lastSyncTime);
 
         groupCoworkers = context.getString(R.string.groupCoworkers);
         groupCoworkersDefault = context
                 .getString(R.string.groupCoworkersDefault);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        packageInfo = getPackageInfo(context);
+    }
+
+    private static PackageInfo getPackageInfo(Context context) {
+        try {
+            String name = context.getPackageName();
+            PackageManager manager = context.getPackageManager();
+            return manager.getPackageInfo(name, 0);
+        } catch (NameNotFoundException exception) {
+            throw new IllegalStateException("Could not get package info.",
+                    exception);
+        }
     }
 
     /**
@@ -77,24 +93,35 @@ public class SettingsManager {
     }
 
     /**
-     * Returns the timestamp of last sync.
+     * Returns the time of last sync.
      */
-    public long getLastSyncTimestamp() {
-        return preferences.getLong(syncTimestamp, 0);
+    public long getLastSyncTime() {
+        return preferences.getLong(lastSyncTime, 0);
     }
 
     /**
-     * Sets the timestamp of last sync to the current system time.
+     * Sets the time of last sync to the current system time.
      */
-    public void updateLastSyncTimestamp() {
+    public void updateLastSyncTime() {
         Editor editor = preferences.edit();
-        long timestamp = System.currentTimeMillis();
-        editor.putLong(syncTimestamp, timestamp);
+        long time = System.currentTimeMillis();
+        editor.putLong(lastSyncTime, time);
         editor.commit();
 
         Log.d(TAG,
-                format("Timestamp of last sync is {0}.",
-                        Long.toString(timestamp)));
+                format("Time of last sync is {0}.", Long.toString(time)));
+    }
+
+    /**
+     * Checks that application was updated since the last sync.
+     * 
+     * @return <code>true</code> if application was updated and
+     *         <code>false</code> otherwise.
+     */
+    public boolean isAppUpdated() {
+        long lastSyncTime = getLastSyncTime();
+
+        return lastSyncTime < packageInfo.lastUpdateTime;
     }
 
 }

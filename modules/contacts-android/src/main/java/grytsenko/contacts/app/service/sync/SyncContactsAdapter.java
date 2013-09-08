@@ -110,8 +110,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             syncPhotos(account, syncedCoworkers);
 
-            Log.d(TAG, "Update timestamp.");
-            settingsManager.updateLastSyncTimestamp();
+            settingsManager.updateLastSyncTime();
 
             Log.d(TAG, "Sync finished.");
         } catch (SyncCanceledException exception) {
@@ -218,6 +217,11 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             throws SyncCanceledException {
         Map<String, SyncedContact> updatedContacts = new HashMap<String, SyncedContact>();
 
+        boolean appUpdated = settingsManager.isAppUpdated();
+        if (appUpdated) {
+            Log.d(TAG, "App was updated since the last sync.");
+        }
+
         for (Contact loadedContact : loadedContacts.values()) {
             String username = loadedContact.getUsername();
             if (!syncedContacts.containsKey(username)) {
@@ -227,7 +231,10 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             checkCanceled();
 
-            if (loadedContact.getVersion().equals(syncedContact.getVersion())) {
+            String loadedVersion = loadedContact.getVersion();
+            String syncedVersion = syncedContact.getVersion();
+            boolean versionChanged = !loadedVersion.equals(syncedVersion);
+            if (!appUpdated && !versionChanged) {
                 Log.d(TAG, format("Contact for {0} is up to date.", username));
                 continue;
             }
