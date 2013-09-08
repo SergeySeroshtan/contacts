@@ -174,10 +174,11 @@ public final class ContactsRepository {
                         exception);
             }
 
-            throw new NotAvailableException("Client Error.", exception);
+            throw new NotAvailableException("HTTP Error.", exception);
         } catch (RestClientException exception) {
-            throw new NotAvailableException("REST-service is not available.",
-                    exception);
+            throw new NotAvailableException("REST Error.", exception);
+        } catch (Exception exception) {
+            throw new NotAvailableException("Unknown error.", exception);
         }
     }
 
