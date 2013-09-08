@@ -110,6 +110,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             syncPhotos(account, syncedCoworkers);
 
+            Log.d(TAG, "Update timestamp.");
+            settingsManager.updateLastSyncTimestamp();
+
             Log.d(TAG, "Sync finished.");
         } catch (SyncCanceledException exception) {
             Log.w(TAG, "Sync canceled.", exception);

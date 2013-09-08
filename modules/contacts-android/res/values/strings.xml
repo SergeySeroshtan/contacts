@@ -38,6 +38,8 @@
     <string name="groupCoworkersSummary">Set the custom name of group.</string>
     <string name="groupCoworkersDefault">Coworkers</string>
 
+    <string name="syncTimestampKey">sync_timestamp</string>
+
     <string name="groupCoworkersName">coworkers</string>
 
     <string name="groupTitleEmpty">The title of group could not be empty.</string>
