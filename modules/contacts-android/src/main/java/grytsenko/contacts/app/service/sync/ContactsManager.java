@@ -210,8 +210,6 @@ public class ContactsManager {
     /**
      * Updates existing contact.
      * 
-     * @param account
-     *            the account of user, who performs operation.
      * @param syncedContact
      *            the synchronized contact.
      * @param loadedContact
@@ -222,9 +220,8 @@ public class ContactsManager {
      * @throws SyncOperationException
      *             if contact could not be updated.
      */
-    public SyncedContact updateContact(Account account,
-            SyncedContact syncedContact, Contact loadedContact)
-            throws SyncOperationException {
+    public SyncedContact updateContact(SyncedContact syncedContact,
+            Contact loadedContact) throws SyncOperationException {
         long id = syncedContact.getId();
         String username = syncedContact.getUsername();
         String version = loadedContact.getVersion();
@@ -304,8 +301,6 @@ public class ContactsManager {
     /**
      * Updates photo of existing contact.
      * 
-     * @param account
-     *            the account of user, who performs operation.
      * @param syncedContact
      *            the updated contact.
      * @param photo
@@ -314,8 +309,8 @@ public class ContactsManager {
      * @throws SyncOperationException
      *             if contact could not be updated.
      */
-    public void updatePhoto(Account account, SyncedContact syncedContact,
-            byte[] photo) throws SyncOperationException {
+    public void updatePhoto(SyncedContact syncedContact, byte[] photo)
+            throws SyncOperationException {
         long id = syncedContact.getId();
         Log.d(TAG, format("Update photo for {0}.", syncedContact.getUsername()));
 
@@ -341,15 +336,13 @@ public class ContactsManager {
     /**
      * Removes existing contact.
      * 
-     * @param account
-     *            the account of user, who performs operation.
      * @param syncedContact
      *            the removed contact.
      * 
      * @throws SyncOperationException
      *             if contact could not be removed.
      */
-    public void removeContact(Account account, SyncedContact syncedContact)
+    public void removeContact(SyncedContact syncedContact)
             throws SyncOperationException {
         long id = syncedContact.getId();
         Log.d(TAG,

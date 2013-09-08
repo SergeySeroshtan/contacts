@@ -118,6 +118,7 @@ public final class ContactsRepository {
             throw new IllegalArgumentException("URL not defined.");
         }
 
+        Log.d(TAG, format("Load photo from {0}.", url));
         try {
             URL validUrl = new URL(url);
             HttpURLConnection connection = (HttpURLConnection) validUrl

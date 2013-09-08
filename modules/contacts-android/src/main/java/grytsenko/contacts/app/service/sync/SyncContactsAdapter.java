@@ -241,7 +241,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             try {
                 SyncedContact updatedContact = contactsManager.updateContact(
-                        account, syncedContact, loadedContact);
+                        syncedContact, loadedContact);
                 updatedContacts.put(updatedContact.getUsername(),
                         updatedContact);
             } catch (SyncOperationException exception) {
@@ -273,7 +273,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             checkCanceled();
 
             try {
-                contactsManager.removeContact(account, syncedContact);
+                contactsManager.removeContact(syncedContact);
                 ++removedContactsNum;
             } catch (SyncOperationException exception) {
                 Log.w(TAG,
@@ -324,13 +324,13 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
         if (TextUtils.isEmpty(photoUrl)) {
             Log.d(TAG, format("Remove photo for {0}.", username));
-            contactsManager.updatePhoto(account, syncedContact, null);
+            contactsManager.updatePhoto(syncedContact, null);
             return;
         }
 
         Log.d(TAG, format("Load photo for {0}.", username));
         byte[] photo = loadPhoto(photoUrl);
-        contactsManager.updatePhoto(account, syncedContact, photo);
+        contactsManager.updatePhoto(syncedContact, photo);
     }
 
     /**
