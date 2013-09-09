@@ -1,4 +1,4 @@
-package grytsenko.contacts.app.service.sync;
+package grytsenko.contacts.app.sync;
 
 import static java.text.MessageFormat.format;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 /**
- * Helps manage network.
+ * Manages network.
  */
 public class NetworkManager {
 

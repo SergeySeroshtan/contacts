@@ -7,6 +7,13 @@ import grytsenko.contacts.app.R;
 import grytsenko.contacts.app.data.ContactsRepository;
 import grytsenko.contacts.app.data.NotAuthorizedException;
 import grytsenko.contacts.app.data.NotAvailableException;
+import grytsenko.contacts.app.sync.ContactsManager;
+import grytsenko.contacts.app.sync.GroupsManager;
+import grytsenko.contacts.app.sync.NetworkManager;
+import grytsenko.contacts.app.sync.SettingsManager;
+import grytsenko.contacts.app.sync.SyncOperationException;
+import grytsenko.contacts.app.sync.SyncedContact;
+import grytsenko.contacts.app.sync.SyncedGroup;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -110,7 +117,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             syncPhotos(account, syncedCoworkers);
 
-            Log.d(TAG, "Sync finished.");
+            settingsManager.updateLastSyncTime();
+
+            Log.d(TAG, "Sync completed.");
         } catch (SyncCanceledException exception) {
             Log.w(TAG, "Sync canceled.", exception);
         }
@@ -129,19 +138,19 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      */
     private SyncedGroup syncCoworkersGroup(Account account)
             throws SyncOperationException {
-        String name = getContext().getString(R.string.groupCoworkersName);
+        String uid = getContext().getString(R.string.groupCoworkersUid);
         String title = settingsManager.getCoworkersTitle();
 
-        SyncedGroup group = groupsManager.findGroup(account, name);
-        if (group != null) {
-            if (!title.equals(group.getTitle())) {
-                return groupsManager.updateTitle(group, title);
-            }
-
-            return group;
+        SyncedGroup group = groupsManager.findGroup(account, uid);
+        if (group == null) {
+            return groupsManager.createGroup(account, uid, title);
         }
 
-        return groupsManager.createGroup(account, name, title);
+        if (!title.equals(group.getTitle())) {
+            return groupsManager.updateTitle(group, title);
+        }
+
+        return group;
     }
 
     /**
@@ -215,6 +224,11 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             throws SyncCanceledException {
         Map<String, SyncedContact> updatedContacts = new HashMap<String, SyncedContact>();
 
+        boolean appUpdated = settingsManager.isAppUpdated();
+        if (appUpdated) {
+            Log.d(TAG, "App was updated since the last sync.");
+        }
+
         for (Contact loadedContact : loadedContacts.values()) {
             String username = loadedContact.getUsername();
             if (!syncedContacts.containsKey(username)) {
@@ -224,14 +238,17 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             checkCanceled();
 
-            if (loadedContact.getVersion().equals(syncedContact.getVersion())) {
+            String loadedVersion = loadedContact.getVersion();
+            String syncedVersion = syncedContact.getVersion();
+            boolean versionChanged = !loadedVersion.equals(syncedVersion);
+            if (!appUpdated && !versionChanged) {
                 Log.d(TAG, format("Contact for {0} is up to date.", username));
                 continue;
             }
 
             try {
                 SyncedContact updatedContact = contactsManager.updateContact(
-                        account, syncedContact, loadedContact);
+                        syncedContact, loadedContact);
                 updatedContacts.put(updatedContact.getUsername(),
                         updatedContact);
             } catch (SyncOperationException exception) {
@@ -263,7 +280,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             checkCanceled();
 
             try {
-                contactsManager.removeContact(account, syncedContact);
+                contactsManager.removeContact(syncedContact);
                 ++removedContactsNum;
             } catch (SyncOperationException exception) {
                 Log.w(TAG,
@@ -287,38 +304,40 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         }
 
         for (SyncedContact syncedContact : syncedContacts.values()) {
-            if (syncedContact.isPhotoSynced()) {
-                continue;
-            }
-
             checkCanceled();
 
             try {
                 syncPhoto(account, syncedContact);
             } catch (SyncOperationException exception) {
                 Log.w(TAG,
-                        format("Photo for {0} was not updated.",
+                        format("Photo for {0} was not synced.",
                                 syncedContact.getUsername()), exception);
             }
         }
     }
 
     /**
-     * Updates photo of contact.
+     * Synchronizes photo of contact.
      */
     private void syncPhoto(Account account, SyncedContact syncedContact)
             throws SyncOperationException, SyncCanceledException {
-        String photoUrl = syncedContact.getUnsyncedPhotoUrl();
+        String username = syncedContact.getUsername();
+        String photoUrl = syncedContact.getPhotoUrl();
 
-        if (TextUtils.isEmpty(photoUrl)) {
-            throw new IllegalArgumentException("URL of photo not defined.");
+        if (syncedContact.isPhotoSynced()) {
+            Log.d(TAG, format("Photo for {0} is up to date.", username));
+            return;
         }
 
-        Log.d(TAG,
-                format("Download photo for {0} from {1}.",
-                        syncedContact.getUsername(), photoUrl));
+        if (TextUtils.isEmpty(photoUrl)) {
+            Log.d(TAG, format("Remove photo for {0}.", username));
+            contactsManager.updatePhoto(syncedContact, null);
+            return;
+        }
+
+        Log.d(TAG, format("Load photo for {0}.", username));
         byte[] photo = loadPhoto(photoUrl);
-        contactsManager.updatePhoto(account, syncedContact, photo);
+        contactsManager.updatePhoto(syncedContact, photo);
     }
 
     /**

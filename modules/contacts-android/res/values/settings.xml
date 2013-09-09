@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="syncPhotos">sync_photos</string>
+    <string name="syncAnywhere">sync_anywhere</string>
+
+    <string name="lastSyncTime">last_sync_time</string>
+
+    <string name="groupCoworkers">coworkers_custom_name</string>
+
+</resources>

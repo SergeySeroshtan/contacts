@@ -1,4 +1,4 @@
-package grytsenko.contacts.app.service.sync;
+package grytsenko.contacts.app.sync;
 
 import static java.text.MessageFormat.format;
 
@@ -17,7 +17,7 @@ import android.provider.ContactsContract.Groups;
 import android.util.Log;
 
 /**
- * Helps manage groups.
+ * Manages sync of groups.
  */
 public class GroupsManager {
 
@@ -44,22 +44,24 @@ public class GroupsManager {
      * 
      * @param account
      *            the account of user, who performs operation.
-     * @param name
-     *            the unique name of group.
+     * @param uid
+     *            the unique identifier of group.
      * 
      * @return the found group or <code>null</code> if group not found.
      */
-    public SyncedGroup findGroup(Account account, String name) {
+    public SyncedGroup findGroup(Account account, String uid) {
+        Log.d(TAG, format("Search group {0}.", uid));
+
         String[] projection = new String[] { Groups._ID, Groups.TITLE };
         String selection = Groups.SYNC1 + "=? and " + Groups.ACCOUNT_NAME
                 + "=? and " + Groups.ACCOUNT_TYPE + "=?";
         Cursor cursor = contentResolver.query(Groups.CONTENT_URI, projection,
-                selection, new String[] { name, account.name, account.type },
+                selection, new String[] { uid, account.name, account.type },
                 null);
 
         try {
             if (!cursor.moveToFirst()) {
-                Log.d(TAG, format("Group {0} not found.", name));
+                Log.d(TAG, format("Group {0} not found.", uid));
                 return null;
             }
 
@@ -69,9 +71,9 @@ public class GroupsManager {
             int titleColumn = cursor.getColumnIndexOrThrow(Groups.TITLE);
             String title = cursor.getString(titleColumn);
 
-            Log.d(TAG, format("Found group {0} with title {1}", id, title));
+            Log.d(TAG, format("Found group {0} - {1}", id, title));
 
-            return SyncedGroup.create(id, name, title);
+            return SyncedGroup.create(id, uid, title);
         } finally {
             cursor.close();
         }
@@ -82,8 +84,8 @@ public class GroupsManager {
      * 
      * @param account
      *            the account of user, who performs operation.
-     * @param name
-     *            the name of group.
+     * @param uid
+     *            the unique identifier of group.
      * @param title
      *            the title of group.
      * 
@@ -92,14 +94,14 @@ public class GroupsManager {
      * @throws SyncOperationException
      *             if group could not be created.
      */
-    public SyncedGroup createGroup(Account account, String name, String title)
+    public SyncedGroup createGroup(Account account, String uid, String title)
             throws SyncOperationException {
-        Log.d(TAG, format("Create group {0}.", name));
+        Log.d(TAG, format("Create group {0}.", uid));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
         batch.add(ContentProviderOperation.newInsert(Groups.CONTENT_URI)
-                .withValue(Groups.SYNC1, name).withValue(Groups.TITLE, title)
+                .withValue(Groups.SYNC1, uid).withValue(Groups.TITLE, title)
                 .withValue(Groups.ACCOUNT_NAME, account.name)
                 .withValue(Groups.ACCOUNT_TYPE, account.type)
                 .withValue(Groups.GROUP_VISIBLE, 1).build());
@@ -109,11 +111,11 @@ public class GroupsManager {
                     ContactsContract.AUTHORITY, batch);
             long id = ContentUris.parseId(results[0].uri);
 
-            Log.d(TAG, format("Group {0} was created.", name));
-            return SyncedGroup.create(id, name, title);
+            Log.d(TAG, format("Group {0} was created.", uid));
+            return SyncedGroup.create(id, uid, title);
         } catch (Exception exception) {
             throw new SyncOperationException(format(
-                    "Could not create group {0}.", name), exception);
+                    "Could not create group {0}.", uid), exception);
         }
     }
 
@@ -133,8 +135,8 @@ public class GroupsManager {
     public SyncedGroup updateTitle(SyncedGroup syncedGroup, String title)
             throws SyncOperationException {
         long id = syncedGroup.getId();
-        String name = syncedGroup.getName();
-        Log.d(TAG, format("Update title of group {0} to {1}.", name, title));
+        String uid = syncedGroup.getUid();
+        Log.d(TAG, format("Update title of group {0} to {1}.", uid, title));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
@@ -144,9 +146,9 @@ public class GroupsManager {
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
-            Log.d(TAG, format("Title for {0} was updated.", name));
+            Log.d(TAG, format("Title of group {0} was updated.", uid));
 
-            return SyncedGroup.create(id, name, title);
+            return SyncedGroup.create(id, uid, title);
         } catch (Exception exception) {
             throw new SyncOperationException("Could not update photo.",
                     exception);

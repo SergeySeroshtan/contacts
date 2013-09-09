@@ -1,4 +1,4 @@
-package grytsenko.contacts.app.service.sync;
+package grytsenko.contacts.app.sync;
 
 /**
  * Thrown if operation, that is required for synchronization, could not be

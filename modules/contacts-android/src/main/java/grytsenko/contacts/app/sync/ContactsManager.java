@@ -1,4 +1,4 @@
-package grytsenko.contacts.app.service.sync;
+package grytsenko.contacts.app.sync;
 
 import static java.text.MessageFormat.format;
 import grytsenko.contacts.api.Contact;
@@ -29,10 +29,11 @@ import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
- * Helps manage contacts.
+ * Manages sync of contacts.
  */
 public class ContactsManager {
 
@@ -63,8 +64,8 @@ public class ContactsManager {
      * @return the found contacts.
      */
     public Map<String, SyncedContact> allFromGroup(SyncedGroup group) {
-        String groupName = group.getName();
-        Log.d(TAG, format("Search contacts in group {0}.", groupName));
+        String groupUid = group.getUid();
+        Log.d(TAG, format("Search contacts in group {0}.", groupUid));
 
         String[] projection = new String[] { GroupMembership.RAW_CONTACT_ID };
         String selection = GroupMembership.GROUP_ROW_ID + "=? and "
@@ -76,12 +77,12 @@ public class ContactsManager {
         try {
             int contactsNum = cursor.getCount();
             if (!cursor.moveToFirst()) {
-                Log.d(TAG, format("Group {0} is empty.", groupName));
+                Log.d(TAG, format("Group {0} is empty.", groupUid));
                 return Collections.emptyMap();
             }
 
             Log.d(TAG,
-                    format("Group {0} contains {1} contacts.", groupName,
+                    format("Group {0} contains {1} contacts.", groupUid,
                             contactsNum));
             Map<String, SyncedContact> contacts = new HashMap<String, SyncedContact>(
                     contactsNum);
@@ -114,7 +115,7 @@ public class ContactsManager {
         Log.d(TAG, format("Search contact {0}.", id));
 
         String[] projection = new String[] { RawContacts.SYNC1,
-                RawContacts.SYNC2, RawContacts.SYNC3 };
+                RawContacts.SYNC2, RawContacts.SYNC3, RawContacts.SYNC4 };
         Uri uri = ContentUris.withAppendedId(RawContacts.CONTENT_URI, id);
         Cursor cursor = contentResolver
                 .query(uri, projection, null, null, null);
@@ -129,15 +130,15 @@ public class ContactsManager {
                     .getColumnIndexOrThrow(RawContacts.SYNC1));
             String version = cursor.getString(cursor
                     .getColumnIndexOrThrow(RawContacts.SYNC2));
-            String unsyncedPhotoUrl = cursor.getString(cursor
+            String photoUrl = cursor.getString(cursor
                     .getColumnIndexOrThrow(RawContacts.SYNC3));
+            boolean photoSynced = Boolean.parseBoolean(cursor.getString(cursor
+                    .getColumnIndexOrThrow(RawContacts.SYNC4)));
 
-            Log.d(TAG,
-                    format("Contact {0} for {1} has version {2}.", id,
-                            username, version));
+            Log.d(TAG, format("Found contact {0} for {1}.", id, username));
 
-            return SyncedContact
-                    .create(id, username, version, unsyncedPhotoUrl);
+            return SyncedContact.create(id, username, version, photoUrl,
+                    photoSynced);
         } finally {
             cursor.close();
         }
@@ -162,11 +163,12 @@ public class ContactsManager {
             Contact loadedContact) throws SyncOperationException {
         String username = loadedContact.getUsername();
         String version = loadedContact.getVersion();
-        String unsyncedPhotoUrl = loadedContact.getPhotoUrl();
+        String photoUrl = loadedContact.getPhotoUrl();
+        boolean photoSynced = TextUtils.isEmpty(photoUrl);
 
         Log.d(TAG,
                 format("Create contact for {0} in group {1}.", username,
-                        group.getName()));
+                        group.getUid()));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
         batch.add(ContentProviderOperation.newInsert(RawContacts.CONTENT_URI)
@@ -174,7 +176,9 @@ public class ContactsManager {
                 .withValue(RawContacts.ACCOUNT_TYPE, account.type)
                 .withValue(RawContacts.SYNC1, username)
                 .withValue(RawContacts.SYNC2, version)
-                .withValue(RawContacts.SYNC3, unsyncedPhotoUrl).build());
+                .withValue(RawContacts.SYNC3, photoUrl)
+                .withValue(RawContacts.SYNC4, Boolean.toString(photoSynced))
+                .build());
 
         ContentValues name = nameValues(loadedContact);
         batch.add(doInsert(StructuredName.CONTENT_ITEM_TYPE, name));
@@ -185,12 +189,11 @@ public class ContactsManager {
         ContentValues phone = phoneValues(loadedContact);
         batch.add(doInsert(Phone.CONTENT_ITEM_TYPE, phone));
 
-        batch.add(doInsert(Organization.CONTENT_ITEM_TYPE,
-                Organization.OFFICE_LOCATION, loadedContact.getLocation()));
+        ContentValues organization = organizationValues(loadedContact);
+        batch.add(doInsert(Organization.CONTENT_ITEM_TYPE, organization));
+
         batch.add(doInsert(GroupMembership.CONTENT_ITEM_TYPE,
                 GroupMembership.GROUP_ROW_ID, group.getId()));
-
-        batch.add(doInsert(Photo.CONTENT_ITEM_TYPE, Photo.PHOTO, null));
 
         try {
             ContentProviderResult[] results = contentResolver.applyBatch(
@@ -198,8 +201,8 @@ public class ContactsManager {
             long id = ContentUris.parseId(results[0].uri);
 
             Log.d(TAG, format("Contact for {0} was created.", username));
-            return SyncedContact
-                    .create(id, username, version, unsyncedPhotoUrl);
+            return SyncedContact.create(id, username, version, photoUrl,
+                    photoSynced);
         } catch (Exception exception) {
             throw new SyncOperationException("Could not create contact.",
                     exception);
@@ -209,8 +212,6 @@ public class ContactsManager {
     /**
      * Updates existing contact.
      * 
-     * @param account
-     *            the account of user, who performs operation.
      * @param syncedContact
      *            the synchronized contact.
      * @param loadedContact
@@ -221,13 +222,19 @@ public class ContactsManager {
      * @throws SyncOperationException
      *             if contact could not be updated.
      */
-    public SyncedContact updateContact(Account account,
-            SyncedContact syncedContact, Contact loadedContact)
-            throws SyncOperationException {
+    public SyncedContact updateContact(SyncedContact syncedContact,
+            Contact loadedContact) throws SyncOperationException {
         long id = syncedContact.getId();
         String username = syncedContact.getUsername();
         String version = loadedContact.getVersion();
-        String unsyncedPhotoUrl = loadedContact.getPhotoUrl();
+
+        String loadedPhotoUrl = loadedContact.getPhotoUrl();
+        String syncedPhotoUrl = syncedContact.getPhotoUrl();
+        boolean photoUpdated = !TextUtils
+                .equals(loadedPhotoUrl, syncedPhotoUrl);
+        String photoUrl = photoUpdated ? loadedPhotoUrl : syncedPhotoUrl;
+        boolean photoSynced = photoUpdated ? false : syncedContact
+                .isPhotoSynced();
 
         Log.d(TAG, format("Update contact for {0}.", username));
 
@@ -242,21 +249,23 @@ public class ContactsManager {
         ContentValues phone = phoneValues(loadedContact);
         batch.add(doUpdate(id, Phone.CONTENT_ITEM_TYPE, phone));
 
-        batch.add(doUpdate(id, Organization.CONTENT_ITEM_TYPE,
-                Organization.OFFICE_LOCATION, loadedContact.getLocation()));
+        ContentValues organization = organizationValues(loadedContact);
+        batch.add(doUpdate(id, Organization.CONTENT_ITEM_TYPE, organization));
 
         Uri contactUri = ContentUris
                 .withAppendedId(RawContacts.CONTENT_URI, id);
         batch.add(ContentProviderOperation.newUpdate(contactUri)
                 .withValue(RawContacts.SYNC2, version)
-                .withValue(RawContacts.SYNC3, unsyncedPhotoUrl).build());
+                .withValue(RawContacts.SYNC3, photoUrl)
+                .withValue(RawContacts.SYNC4, Boolean.toString(photoSynced))
+                .build());
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
             Log.d(TAG, format("Contact for {0} was updated.", username));
 
-            return SyncedContact
-                    .create(id, username, version, unsyncedPhotoUrl);
+            return SyncedContact.create(id, username, version, photoUrl,
+                    photoSynced);
         } catch (Exception exception) {
             throw new SyncOperationException("Could not update photo.",
                     exception);
@@ -273,7 +282,7 @@ public class ContactsManager {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static ContentValues emailValues(Contact contact) {
         ContentValues email = new ContentValues();
-        email.put(Email.ADDRESS, contact.getMail());
+        email.put(Email.DATA, contact.getMail());
         email.put(Email.TYPE, Email.TYPE_WORK);
         return email;
     }
@@ -285,11 +294,16 @@ public class ContactsManager {
         return phone;
     }
 
+    private static ContentValues organizationValues(Contact contact) {
+        ContentValues organization = new ContentValues();
+        organization.put(Organization.OFFICE_LOCATION, contact.getLocation());
+        organization.put(Organization.TYPE, Organization.TYPE_WORK);
+        return organization;
+    }
+
     /**
      * Updates photo of existing contact.
      * 
-     * @param account
-     *            the account of user, who performs operation.
      * @param syncedContact
      *            the updated contact.
      * @param photo
@@ -298,8 +312,8 @@ public class ContactsManager {
      * @throws SyncOperationException
      *             if contact could not be updated.
      */
-    public void updatePhoto(Account account, SyncedContact syncedContact,
-            byte[] photo) throws SyncOperationException {
+    public void updatePhoto(SyncedContact syncedContact, byte[] photo)
+            throws SyncOperationException {
         long id = syncedContact.getId();
         Log.d(TAG, format("Update photo for {0}.", syncedContact.getUsername()));
 
@@ -309,7 +323,7 @@ public class ContactsManager {
         Uri contactUri = ContentUris
                 .withAppendedId(RawContacts.CONTENT_URI, id);
         batch.add(ContentProviderOperation.newUpdate(contactUri)
-                .withValue(RawContacts.SYNC3, null).build());
+                .withValue(RawContacts.SYNC4, Boolean.toString(true)).build());
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
@@ -325,15 +339,13 @@ public class ContactsManager {
     /**
      * Removes existing contact.
      * 
-     * @param account
-     *            the account of user, who performs operation.
      * @param syncedContact
      *            the removed contact.
      * 
      * @throws SyncOperationException
      *             if contact could not be removed.
      */
-    public void removeContact(Account account, SyncedContact syncedContact)
+    public void removeContact(SyncedContact syncedContact)
             throws SyncOperationException {
         long id = syncedContact.getId();
         Log.d(TAG,
@@ -358,36 +370,50 @@ public class ContactsManager {
         }
     }
 
-    private static Builder prepareInsert(String mime) {
+    private Builder prepareInsert(String mime) {
         return ContentProviderOperation.newInsert(Data.CONTENT_URI)
                 .withValue(Data.MIMETYPE, mime)
                 .withValueBackReference(Data.RAW_CONTACT_ID, 0);
     }
 
-    private static <T> ContentProviderOperation doInsert(String mime,
-            String key, T value) {
+    private <T> ContentProviderOperation doInsert(String mime, String key,
+            T value) {
         return prepareInsert(mime).withValue(key, value).build();
     }
 
-    private static <T> ContentProviderOperation doInsert(String mime,
+    private <T> ContentProviderOperation doInsert(String mime,
             ContentValues values) {
         return prepareInsert(mime).withValues(values).build();
     }
 
-    private static Builder prepareUpdate(long id, String mime) {
+    private Builder prepareUpdate(long id, String mime) {
         String selection = Data.RAW_CONTACT_ID + "=? and " + Data.MIMETYPE
                 + "=?";
-        return ContentProviderOperation.newUpdate(Data.CONTENT_URI)
-                .withSelection(selection,
-                        new String[] { Long.toString(id), mime });
+        String[] selectionArgs = new String[] { Long.toString(id), mime };
+
+        Cursor cursor = contentResolver.query(Data.CONTENT_URI, null,
+                selection, selectionArgs, null);
+
+        try {
+            if (cursor.moveToFirst()) {
+                return ContentProviderOperation.newUpdate(Data.CONTENT_URI)
+                        .withSelection(selection, selectionArgs);
+            } else {
+                return ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                        .withValue(Data.MIMETYPE, mime)
+                        .withValue(Data.RAW_CONTACT_ID, id);
+            }
+        } finally {
+            cursor.close();
+        }
     }
 
-    private static <T> ContentProviderOperation doUpdate(long id, String mime,
+    private <T> ContentProviderOperation doUpdate(long id, String mime,
             String key, T value) {
         return prepareUpdate(id, mime).withValue(key, value).build();
     }
 
-    private static ContentProviderOperation doUpdate(long id, String mime,
+    private ContentProviderOperation doUpdate(long id, String mime,
             ContentValues values) {
         return prepareUpdate(id, mime).withValues(values).build();
     }
