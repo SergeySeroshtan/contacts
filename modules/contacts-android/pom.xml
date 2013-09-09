@@ -18,12 +18,11 @@
     <description>Application for contact synchronization.</description>
 
     <properties>
-        <android.platform.version>4.1.1.4</android.platform.version>
+        <android.platform>4.1.1.4</android.platform>
         <android.api.level>16</android.api.level>
+        <android.plugin>3.6.0</android.plugin>
 
-        <spring.version>1.0.1.RELEASE</spring.version>
-
-        <android.plugin.version>3.6.0</android.plugin.version>
+        <spring>1.0.1.RELEASE</spring>
     </properties>
 
     <dependencies>
@@ -37,7 +36,7 @@
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>android</artifactId>
-            <version>${android.platform.version}</version>
+            <version>${android.platform}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -45,7 +44,7 @@
         <dependency>
             <groupId>org.springframework.android</groupId>
             <artifactId>spring-android-rest-template</artifactId>
-            <version>${spring.version}</version>
+            <version>${spring}</version>
         </dependency>
 
         <!-- JSON -->
@@ -62,7 +61,7 @@
                 <plugin>
                     <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                     <artifactId>android-maven-plugin</artifactId>
-                    <version>${android.plugin.version}</version>
+                    <version>${android.plugin}</version>
                     <extensions>true</extensions>
                     <configuration>
                         <sdk>

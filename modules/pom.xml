@@ -56,7 +56,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <jackson.mapper.version>1.9.13</jackson.mapper.version>
+        <jackson>1.9.13</jackson>
     </properties>
 
     <dependencyManagement>
@@ -65,7 +65,7 @@
             <dependency>
                 <groupId>org.codehaus.jackson</groupId>
                 <artifactId>jackson-mapper-asl</artifactId>
-                <version>${jackson.mapper.version}</version>
+                <version>${jackson}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

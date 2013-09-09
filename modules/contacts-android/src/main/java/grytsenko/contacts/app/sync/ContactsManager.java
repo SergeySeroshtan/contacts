@@ -21,6 +21,7 @@ import android.net.Uri;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
+import android.provider.ContactsContract.CommonDataKinds.Im;
 import android.provider.ContactsContract.CommonDataKinds.Organization;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
@@ -187,6 +188,9 @@ public class ContactsManager {
         ContentValues phone = phoneValues(loadedContact);
         batch.add(doInsert(Phone.CONTENT_ITEM_TYPE, phone));
 
+        ContentValues skype = skypeValues(loadedContact);
+        batch.add(doInsert(Im.CONTENT_ITEM_TYPE, skype));
+
         ContentValues organization = organizationValues(loadedContact);
         batch.add(doInsert(Organization.CONTENT_ITEM_TYPE, organization));
 
@@ -247,6 +251,9 @@ public class ContactsManager {
         ContentValues phone = phoneValues(loadedContact);
         batch.add(doUpdate(id, Phone.CONTENT_ITEM_TYPE, phone));
 
+        ContentValues skype = skypeValues(loadedContact);
+        batch.add(doUpdate(id, Im.CONTENT_ITEM_TYPE, skype));
+
         ContentValues organization = organizationValues(loadedContact);
         batch.add(doUpdate(id, Organization.CONTENT_ITEM_TYPE, organization));
 
@@ -291,10 +298,19 @@ public class ContactsManager {
         return phone;
     }
 
+    private static ContentValues skypeValues(Contact contact) {
+        ContentValues skype = new ContentValues();
+        skype.put(Im.DATA, contact.getSkype());
+        skype.put(Im.TYPE, Im.TYPE_WORK);
+        skype.put(Im.PROTOCOL, Im.PROTOCOL_SKYPE);
+        return skype;
+    }
+
     private static ContentValues organizationValues(Contact contact) {
         ContentValues organization = new ContentValues();
         organization.put(Organization.OFFICE_LOCATION, contact.getLocation());
         organization.put(Organization.TYPE, Organization.TYPE_WORK);
+        organization.put(Organization.TITLE, contact.getPosition());
         return organization;
     }
 

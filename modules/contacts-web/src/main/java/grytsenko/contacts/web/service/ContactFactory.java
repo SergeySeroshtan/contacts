@@ -2,6 +2,7 @@ package grytsenko.contacts.web.service;
 
 import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.web.data.Employee;
+import grytsenko.contacts.web.data.Extras;
 
 /**
  * Provides facilities for creating contacts.
@@ -13,10 +14,12 @@ public final class ContactFactory {
      * 
      * @param employee
      *            the information about employee.
+     * @param extras
+     *            the extra information (can be <code>null</code>).
      * 
      * @return the created contact.
      */
-    public static Contact createContact(Employee employee) {
+    public static Contact createContact(Employee employee, Extras extras) {
         Contact contact = new Contact();
 
         contact.setUsername(employee.getUsername());
@@ -31,6 +34,11 @@ public final class ContactFactory {
 
         contact.setLocation(employee.getLocation());
         contact.setVersion(employee.getVersion());
+
+        if (extras != null) {
+            contact.setSkype(extras.getSkype());
+            contact.setPosition(extras.getPosition());
+        }
 
         return contact;
     }

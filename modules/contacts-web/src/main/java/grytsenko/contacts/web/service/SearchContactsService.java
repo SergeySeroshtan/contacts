@@ -4,6 +4,8 @@ import static grytsenko.contacts.web.service.ContactFactory.createContact;
 import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.web.data.Employee;
 import grytsenko.contacts.web.data.EmployeesRepository;
+import grytsenko.contacts.web.data.Extras;
+import grytsenko.contacts.web.data.ExtrasRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,8 @@ public class SearchContactsService {
 
     @Autowired
     EmployeesRepository employeesRepository;
+    @Autowired
+    ExtrasRepository extrasRepository;
 
     /**
      * Finds contact of user.
@@ -41,8 +45,9 @@ public class SearchContactsService {
 
         LOGGER.debug("Search employee {} in DS.", username);
         Employee employee = employeesRepository.findByUsername(username);
+        Extras extras = extrasRepository.findByUsername(username);
 
-        return createContact(employee);
+        return createContact(employee, extras);
     }
 
     /**
@@ -85,7 +90,9 @@ public class SearchContactsService {
 
         List<Contact> contacts = new ArrayList<Contact>();
         for (Employee employee : employees) {
-            contacts.add(createContact(employee));
+            String username = employee.getUsername();
+            Extras extras = extrasRepository.findByUsername(username);
+            contacts.add(createContact(employee, extras));
         }
 
         return contacts;

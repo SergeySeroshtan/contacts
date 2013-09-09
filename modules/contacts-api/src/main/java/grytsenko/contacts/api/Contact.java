@@ -18,7 +18,9 @@ public final class Contact implements Serializable {
 
     private String mail;
     private String phone;
+    private String skype;
 
+    private String position;
     private String location;
 
     private String version;
@@ -108,6 +110,34 @@ public final class Contact implements Serializable {
      */
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    /**
+     * Returns the Skype name.
+     */
+    public String getSkype() {
+        return skype;
+    }
+
+    /**
+     * Sets the Skype name.
+     */
+    public void setSkype(String skype) {
+        this.skype = skype;
+    }
+
+    /**
+     * Returns the position in company.
+     */
+    public String getPosition() {
+        return position;
+    }
+
+    /**
+     * Sets the position in company.
+     */
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     /**
