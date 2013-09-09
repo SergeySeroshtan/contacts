@@ -127,7 +127,7 @@ public class EmployeesRepository {
 
             employee.setLocation(asString(locationAttrId, attrs));
 
-            employee.setVersion(asString(versionAttrId, attrs));
+            employee.setVersion(asDigits(versionAttrId, attrs));
 
             return employee;
         }
@@ -149,19 +149,24 @@ public class EmployeesRepository {
         }
 
         /**
-         * Considers that attribute contains phone number.
-         * 
-         * <p>
-         * Parses and returns this phone number.
+         * Considers that attribute is the set of digits.
          */
-        private String asPhone(String attrId, Attributes attrs)
+        private String asDigits(String attrId, Attributes attrs)
                 throws NamingException {
             String value = asString(attrId, attrs);
             if (!StringUtils.hasLength(value)) {
                 return null;
             }
 
-            String digits = value.replaceAll("\\D+", "");
+            return value.replaceAll("\\D+", "");
+        }
+
+        /**
+         * Considers that attribute contains phone number.
+         */
+        private String asPhone(String attrId, Attributes attrs)
+                throws NamingException {
+            String digits = asDigits(attrId, attrs);
             if (!StringUtils.hasLength(digits)) {
                 return null;
             }

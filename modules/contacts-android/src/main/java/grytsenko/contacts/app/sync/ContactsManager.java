@@ -301,16 +301,16 @@ public class ContactsManager {
     private static ContentValues skypeValues(Contact contact) {
         ContentValues skype = new ContentValues();
         skype.put(Im.DATA, contact.getSkype());
-        skype.put(Im.TYPE, Im.TYPE_WORK);
         skype.put(Im.PROTOCOL, Im.PROTOCOL_SKYPE);
+        skype.put(Im.TYPE, Im.TYPE_OTHER);
         return skype;
     }
 
     private static ContentValues organizationValues(Contact contact) {
         ContentValues organization = new ContentValues();
         organization.put(Organization.OFFICE_LOCATION, contact.getLocation());
-        organization.put(Organization.TYPE, Organization.TYPE_WORK);
         organization.put(Organization.TITLE, contact.getPosition());
+        organization.put(Organization.TYPE, Organization.TYPE_WORK);
         return organization;
     }
 

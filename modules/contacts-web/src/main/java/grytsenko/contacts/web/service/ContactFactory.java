@@ -33,14 +33,22 @@ public final class ContactFactory {
         contact.setPhone(employee.getPhone());
 
         contact.setLocation(employee.getLocation());
-        contact.setVersion(employee.getVersion());
 
         if (extras != null) {
             contact.setSkype(extras.getSkype());
             contact.setPosition(extras.getPosition());
         }
 
+        contact.setVersion(getVersion(employee, extras));
+
         return contact;
+    }
+
+    private static String getVersion(Employee employee, Extras extras) {
+        String major = employee.getVersion();
+        String minor = extras != null ? extras.getVersion() : "";
+
+        return major + minor;
     }
 
     private ContactFactory() {

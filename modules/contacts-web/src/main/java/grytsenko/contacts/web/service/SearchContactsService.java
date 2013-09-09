@@ -45,7 +45,7 @@ public class SearchContactsService {
 
         LOGGER.debug("Search employee {} in DS.", username);
         Employee employee = employeesRepository.findByUsername(username);
-        Extras extras = extrasRepository.findByUsername(username);
+        Extras extras = extrasRepository.findOne(username);
 
         return createContact(employee, extras);
     }
@@ -91,7 +91,7 @@ public class SearchContactsService {
         List<Contact> contacts = new ArrayList<Contact>();
         for (Employee employee : employees) {
             String username = employee.getUsername();
-            Extras extras = extrasRepository.findByUsername(username);
+            Extras extras = extrasRepository.findOne(username);
             contacts.add(createContact(employee, extras));
         }
 

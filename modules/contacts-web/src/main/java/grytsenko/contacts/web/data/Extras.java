@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Version;
@@ -24,9 +22,6 @@ public final class Extras implements Serializable {
     private static final int POSITION_LENGTH_MAX = 50;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-
     @Column(name = "username", length = USERNAME_LENGTH_MAX)
     private String username;
 
@@ -66,8 +61,8 @@ public final class Extras implements Serializable {
     /**
      * Returns the version of data.
      */
-    public Integer getVersion() {
-        return version;
+    public String getVersion() {
+        return version == null ? "" : Integer.toString(version);
     }
 
 }

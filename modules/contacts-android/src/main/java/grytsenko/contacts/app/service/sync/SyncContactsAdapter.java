@@ -106,8 +106,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             Map<String, SyncedContact> createdCoworkers = syncCreatedContacts(
                     account, groupCoworkers, loadedCoworkers, syncedCoworkers);
             Map<String, SyncedContact> updatedCoworkers = syncUpdatedContacts(
-                    account, loadedCoworkers, syncedCoworkers);
-            syncRemovedContacts(account, loadedCoworkers, syncedCoworkers);
+                    loadedCoworkers, syncedCoworkers);
+            syncRemovedContacts(loadedCoworkers, syncedCoworkers);
 
             Log.d(TAG, "Sync photos.");
             syncedCoworkers = new HashMap<String, SyncedContact>(
@@ -115,7 +115,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             syncedCoworkers.putAll(createdCoworkers);
             syncedCoworkers.putAll(updatedCoworkers);
 
-            syncPhotos(account, syncedCoworkers);
+            syncPhotos(syncedCoworkers);
 
             settingsManager.updateLastSyncTime();
 
@@ -218,7 +218,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * Updates existing contacts, if their version differ from synchronized
      * contacts.
      */
-    private Map<String, SyncedContact> syncUpdatedContacts(Account account,
+    private Map<String, SyncedContact> syncUpdatedContacts(
             Map<String, Contact> loadedContacts,
             Map<String, SyncedContact> syncedContacts)
             throws SyncCanceledException {
@@ -265,8 +265,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Removes obsolete contacts.
      */
-    private void syncRemovedContacts(Account account,
-            Map<String, Contact> loadedContacts,
+    private void syncRemovedContacts(Map<String, Contact> loadedContacts,
             Map<String, SyncedContact> syncedContacts)
             throws SyncCanceledException {
         int removedContactsNum = 0;
@@ -295,8 +294,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Synchronizes photos.
      */
-    private void syncPhotos(Account account,
-            Map<String, SyncedContact> syncedContacts)
+    private void syncPhotos(Map<String, SyncedContact> syncedContacts)
             throws SyncCanceledException {
         if (!settingsManager.isSyncPhotos()) {
             Log.d(TAG, "Sync of photos is disabled.");
@@ -307,7 +305,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             checkCanceled();
 
             try {
-                syncPhoto(account, syncedContact);
+                syncPhoto(syncedContact);
             } catch (SyncOperationException exception) {
                 Log.w(TAG,
                         format("Photo for {0} was not synced.",
@@ -319,7 +317,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Synchronizes photo of contact.
      */
-    private void syncPhoto(Account account, SyncedContact syncedContact)
+    private void syncPhoto(SyncedContact syncedContact)
             throws SyncOperationException, SyncCanceledException {
         String username = syncedContact.getUsername();
         String photoUrl = syncedContact.getPhotoUrl();
