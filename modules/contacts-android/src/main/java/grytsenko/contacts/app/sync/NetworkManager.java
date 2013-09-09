@@ -7,7 +7,7 @@ import android.net.NetworkInfo;
 import android.util.Log;
 
 /**
- * Manages network.
+ * Manages status of network.
  */
 public class NetworkManager {
 

@@ -99,7 +99,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             Log.d(TAG, "Search contacts in address book.");
             Map<String, SyncedContact> syncedCoworkers = contactsManager
-                    .allFromGroup(groupCoworkers);
+                    .findAll(groupCoworkers);
             Log.d(TAG, format("Found {0} contacts.", syncedCoworkers.size()));
 
             Log.d(TAG, "Sync contacts.");

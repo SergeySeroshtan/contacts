@@ -1,12 +1,12 @@
 package grytsenko.contacts.app.sync;
 
 /**
- * Information about group, that is synchronized.
+ * Information about group.
  */
 public class SyncedGroup {
 
     /**
-     * Creates a group with given properties.
+     * Creates a group.
      */
     public static SyncedGroup create(long id, String uid, String title) {
         SyncedGroup group = new SyncedGroup();
@@ -26,48 +26,24 @@ public class SyncedGroup {
     }
 
     /**
-     * Returns the internal identifier.
+     * Returns the internal identifier, assigned by Android.
      */
     public long getId() {
         return id;
     }
 
     /**
-     * Sets the internal identifier.
-     */
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    /**
-     * Returns the unique identifier.
-     * 
-     * <p>
-     * We use unique identifier in order to distinguish the groups.
+     * Returns the unique identifier, that is used to distinguish groups.
      */
     public String getUid() {
         return uid;
     }
 
     /**
-     * Sets the unique identifier
-     */
-    public void setUid(String uid) {
-        this.uid = uid;
-    }
-
-    /**
-     * Returns the readable title.
+     * Returns the title, which can be customized by user.
      */
     public String getTitle() {
         return title;
-    }
-
-    /**
-     * Sets the readable title.
-     */
-    public void setTitle(String title) {
-        this.title = title;
     }
 
 }

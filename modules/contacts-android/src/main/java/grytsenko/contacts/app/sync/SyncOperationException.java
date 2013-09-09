@@ -2,7 +2,7 @@ package grytsenko.contacts.app.sync;
 
 /**
  * Thrown if operation, that is required for synchronization, could not be
- * performed.
+ * completed.
  */
 public class SyncOperationException extends Exception {
 

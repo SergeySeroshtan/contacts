@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.accounts.Account;
-import android.annotation.TargetApi;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderOperation.Builder;
 import android.content.ContentProviderResult;
@@ -19,7 +18,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.GroupMembership;
@@ -56,14 +54,14 @@ public class ContactsManager {
     }
 
     /**
-     * Returns all contacts from specified group.
+     * Finds all contacts from specified group.
      * 
      * @param group
      *            the group where contacts are searched.
      * 
      * @return the found contacts.
      */
-    public Map<String, SyncedContact> allFromGroup(SyncedGroup group) {
+    public Map<String, SyncedContact> findAll(SyncedGroup group) {
         String groupUid = group.getUid();
         Log.d(TAG, format("Search contacts in group {0}.", groupUid));
 
@@ -279,7 +277,6 @@ public class ContactsManager {
         return name;
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     private static ContentValues emailValues(Contact contact) {
         ContentValues email = new ContentValues();
         email.put(Email.DATA, contact.getMail());
@@ -307,7 +304,7 @@ public class ContactsManager {
      * @param syncedContact
      *            the updated contact.
      * @param photo
-     *            the new photo for contact.
+     *            the new photo for contact (can be <code>null</code>).
      * 
      * @throws SyncOperationException
      *             if contact could not be updated.

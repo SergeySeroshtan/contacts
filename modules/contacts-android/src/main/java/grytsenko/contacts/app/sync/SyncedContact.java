@@ -1,12 +1,12 @@
 package grytsenko.contacts.app.sync;
 
 /**
- * Information about contact, that is synchronized.
+ * Information about contact.
  */
 public class SyncedContact {
 
     /**
-     * Creates a contact with given properties.
+     * Creates a contact.
      */
     public static SyncedContact create(long id, String username,
             String version, String photoUrl, boolean photoSynced) {
@@ -31,73 +31,38 @@ public class SyncedContact {
     }
 
     /**
-     * Returns the internal identifier.
+     * Returns the internal identifier, assigned by Android.
      */
     public long getId() {
         return id;
     }
 
     /**
-     * Sets the internal identifier.
-     */
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    /**
-     * Returns the unique name of user.
+     * Returns the unique name of user, that is used to distinguish contacts.
      */
     public String getUsername() {
         return username;
     }
 
     /**
-     * Sets the unique name of user.
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
-     * Returns the current version.
+     * Returns the version of data.
      */
     public String getVersion() {
         return version;
     }
 
     /**
-     * Sets the current version.
-     */
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    /**
-     * Returns the URL of photo.
+     * Returns the URL of photo for contact.
      */
     public String getPhotoUrl() {
         return photoUrl;
     }
 
     /**
-     * Sets the URL of photo.
-     */
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
-
-    /**
-     * Returns the flag, which shows that photo is synced.
+     * Returns the flag, which shows that photo is synchronized or not.
      */
     public boolean isPhotoSynced() {
         return photoSynced;
-    }
-
-    /**
-     * Sets the flag, which shows that photo is synced.
-     */
-    public void setPhotoSynced(boolean photoSynced) {
-        this.photoSynced = photoSynced;
     }
 
 }

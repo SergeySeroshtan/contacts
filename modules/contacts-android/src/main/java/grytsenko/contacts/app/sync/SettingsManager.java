@@ -23,7 +23,7 @@ public class SettingsManager {
     private final String lastSyncTime;
 
     private final String groupCoworkers;
-    private final String groupCoworkersDefault;
+    private final String groupCoworkersDefaultValue;
 
     private SharedPreferences preferences;
     private PackageInfo packageInfo;
@@ -45,8 +45,8 @@ public class SettingsManager {
         lastSyncTime = context.getString(R.string.lastSyncTime);
 
         groupCoworkers = context.getString(R.string.groupCoworkers);
-        groupCoworkersDefault = context
-                .getString(R.string.groupCoworkersDefault);
+        groupCoworkersDefaultValue = context
+                .getString(R.string.groupCoworkersDefaultValue);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         packageInfo = getPackageInfo(context);
@@ -89,7 +89,8 @@ public class SettingsManager {
      * @return the group title.
      */
     public String getCoworkersTitle() {
-        return preferences.getString(groupCoworkers, groupCoworkersDefault);
+        return preferences
+                .getString(groupCoworkers, groupCoworkersDefaultValue);
     }
 
     /**
@@ -108,8 +109,7 @@ public class SettingsManager {
         editor.putLong(lastSyncTime, time);
         editor.commit();
 
-        Log.d(TAG,
-                format("Time of last sync is {0}.", Long.toString(time)));
+        Log.d(TAG, format("Time of last sync is {0}.", Long.toString(time)));
     }
 
     /**

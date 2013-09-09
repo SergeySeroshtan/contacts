@@ -33,7 +33,7 @@
 
     <string name="groupCoworkersTitle">Group for Coworkers</string>
     <string name="groupCoworkersSummary">Set the custom name of group.</string>
-    <string name="groupCoworkersDefault">Coworkers</string>
+    <string name="groupCoworkersDefaultValue">Coworkers</string>
 
     <string name="groupCoworkersUid">coworkers</string>
 
