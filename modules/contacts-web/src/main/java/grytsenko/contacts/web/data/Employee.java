@@ -1,11 +1,11 @@
-package grytsenko.contacts.web.repository;
+package grytsenko.contacts.web.data;
 
 import java.io.Serializable;
 
 /**
- * Information about employee from directory service.
+ * Primary information about employee.
  */
-public final class LdapEmployee implements Serializable {
+public final class Employee implements Serializable {
 
     private static final long serialVersionUID = -5048037776329416647L;
 
@@ -23,7 +23,7 @@ public final class LdapEmployee implements Serializable {
 
     private String version;
 
-    public LdapEmployee() {
+    public Employee() {
     }
 
     public String getUsername() {

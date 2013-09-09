@@ -1,4 +1,4 @@
-package grytsenko.contacts.web.repository;
+package grytsenko.contacts.web.data;
 
 import static java.text.MessageFormat.format;
 
@@ -23,10 +23,10 @@ import org.springframework.util.StringUtils;
  * Repository of employees, that uses directory service as data source.
  */
 @Repository
-public class LdapEmployeesRepository {
+public class EmployeesRepository {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(LdapEmployeesRepository.class);
+            .getLogger(EmployeesRepository.class);
 
     @Autowired
     LdapContextSource ldapContextSource;
@@ -64,11 +64,11 @@ public class LdapEmployeesRepository {
      * 
      * @return the found employee or <code>null</code> if employee not found.
      */
-    public LdapEmployee findByUsername(String username) {
+    public Employee findByUsername(String username) {
         LOGGER.debug("Search by username: {}.", username);
 
         String filter = format(filterByUsernameTemplate, username);
-        List<LdapEmployee> contacts = findByFilter(filter);
+        List<Employee> contacts = findByFilter(filter);
 
         return contacts.isEmpty() ? null : contacts.get(0);
     }
@@ -81,14 +81,14 @@ public class LdapEmployeesRepository {
      * 
      * @return the list of found employees.
      */
-    public List<LdapEmployee> findByLocation(String location) {
+    public List<Employee> findByLocation(String location) {
         LOGGER.debug("Search by location: {}.", location);
 
         String filter = format(filterByLocationTemplate, location);
         return findByFilter(filter);
     }
 
-    private List<LdapEmployee> findByFilter(String filter) {
+    private List<Employee> findByFilter(String filter) {
         LOGGER.debug("Search by filter: {}.", filter);
 
         LdapTemplate template = new LdapTemplate(ldapContextSource);
@@ -97,7 +97,7 @@ public class LdapEmployeesRepository {
                 lastnameAttrId, photoUrlAttrId, mailAttrId, phoneAttrId,
                 locationAttrId, versionAttrId };
         @SuppressWarnings("unchecked")
-        List<LdapEmployee> contacts = template.search(usersGroup, filter,
+        List<Employee> contacts = template.search(usersGroup, filter,
                 SearchControls.ONELEVEL_SCOPE, attrs, new EmployeeMapper());
 
         LOGGER.debug("Found {} contacts.", contacts.size());
@@ -111,9 +111,9 @@ public class LdapEmployeesRepository {
     private class EmployeeMapper implements AttributesMapper {
 
         @Override
-        public LdapEmployee mapFromAttributes(Attributes attrs)
+        public Employee mapFromAttributes(Attributes attrs)
                 throws NamingException {
-            LdapEmployee employee = new LdapEmployee();
+            Employee employee = new Employee();
 
             employee.setUsername(asString(usernameAttrId, attrs));
 

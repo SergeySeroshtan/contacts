@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
- * Processes requests to search contacts.
+ * Processes requests to REST API.
  */
 @Controller
-public class SearchController {
+public class RestController {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(SearchController.class);
+            .getLogger(RestController.class);
 
     @Autowired
     SearchContactsService searchContactsService;

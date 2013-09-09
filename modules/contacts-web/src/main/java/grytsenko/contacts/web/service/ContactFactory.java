@@ -1,7 +1,7 @@
 package grytsenko.contacts.web.service;
 
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.web.repository.LdapEmployee;
+import grytsenko.contacts.web.data.Employee;
 
 /**
  * Provides facilities for creating contacts.
@@ -16,7 +16,7 @@ public final class ContactFactory {
      * 
      * @return the created contact.
      */
-    public static Contact createContact(LdapEmployee employee) {
+    public static Contact createContact(Employee employee) {
         Contact contact = new Contact();
 
         contact.setUsername(employee.getUsername());

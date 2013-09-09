@@ -2,8 +2,8 @@ package grytsenko.contacts.web.service;
 
 import static grytsenko.contacts.web.service.ContactFactory.createContact;
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.web.repository.LdapEmployee;
-import grytsenko.contacts.web.repository.LdapEmployeesRepository;
+import grytsenko.contacts.web.data.Employee;
+import grytsenko.contacts.web.data.EmployeesRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +24,7 @@ public class SearchContactsService {
             .getLogger(SearchContactsService.class);
 
     @Autowired
-    LdapEmployeesRepository ldapEmployeesRepository;
+    EmployeesRepository employeesRepository;
 
     /**
      * Finds contact of user.
@@ -40,8 +40,7 @@ public class SearchContactsService {
         }
 
         LOGGER.debug("Search employee {} in DS.", username);
-        LdapEmployee employee = ldapEmployeesRepository
-                .findByUsername(username);
+        Employee employee = employeesRepository.findByUsername(username);
 
         return createContact(employee);
     }
@@ -60,8 +59,7 @@ public class SearchContactsService {
         }
 
         LOGGER.debug("Search employee {} in DS.", username);
-        LdapEmployee employee = ldapEmployeesRepository
-                .findByUsername(username);
+        Employee employee = employeesRepository.findByUsername(username);
         String location = employee.getLocation();
         LOGGER.debug("Location of {} is {}.", username, location);
 
@@ -82,12 +80,11 @@ public class SearchContactsService {
         }
 
         LOGGER.debug("Search employees from {} in DS.", location);
-        List<LdapEmployee> employees = ldapEmployeesRepository
-                .findByLocation(location);
+        List<Employee> employees = employeesRepository.findByLocation(location);
         LOGGER.debug("Found {} employees in DS.", employees.size());
 
         List<Contact> contacts = new ArrayList<Contact>();
-        for (LdapEmployee employee : employees) {
+        for (Employee employee : employees) {
             contacts.add(createContact(employee));
         }
 
