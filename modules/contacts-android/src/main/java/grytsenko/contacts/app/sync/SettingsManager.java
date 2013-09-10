@@ -18,6 +18,16 @@ public class SettingsManager {
 
     private static final String TAG = SettingsManager.class.getName();
 
+    /**
+     * Sets the default values for settings.
+     * 
+     * @param contet
+     *            the context, where manager is used.
+     */
+    public static void setDefaultValues(Context contet) {
+        PreferenceManager.setDefaultValues(contet, R.xml.sync_settings, false);
+    }
+
     private final String syncPhotosKey;
     private final String syncAnywhereKey;
     private final String lastSyncTimeKey;

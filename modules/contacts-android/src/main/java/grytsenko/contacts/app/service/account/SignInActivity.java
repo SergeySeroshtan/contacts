@@ -5,6 +5,7 @@ import grytsenko.contacts.app.R;
 import grytsenko.contacts.app.data.ContactsRepository;
 import grytsenko.contacts.app.data.NotAuthorizedException;
 import grytsenko.contacts.app.data.NotAvailableException;
+import grytsenko.contacts.app.sync.SettingsManager;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorActivity;
 import android.accounts.AccountManager;
@@ -13,7 +14,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -29,7 +29,8 @@ import android.widget.Toast;
  * In this activity we set the default settings for synchronization.
  * 
  * <p>
- * We use {@link ContactsRepository#getMyContact(String, String)} to check credentials.
+ * We use {@link ContactsRepository#getMyContact(String, String)} to check
+ * credentials.
  */
 public class SignInActivity extends AccountAuthenticatorActivity {
 
@@ -50,7 +51,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setDefaultSyncSettings();
+        SettingsManager.setDefaultValues(this);
 
         setContentView(R.layout.signin_activity_layout);
 
@@ -77,10 +78,6 @@ public class SignInActivity extends AccountAuthenticatorActivity {
             }
 
         });
-    }
-
-    private void setDefaultSyncSettings() {
-        PreferenceManager.setDefaultValues(this, R.xml.sync_settings, false);
     }
 
     /**
