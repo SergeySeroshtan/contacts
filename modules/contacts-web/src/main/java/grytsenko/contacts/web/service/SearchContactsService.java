@@ -1,6 +1,6 @@
 package grytsenko.contacts.web.service;
 
-import static grytsenko.contacts.web.service.ContactFactory.createContact;
+import static grytsenko.contacts.web.data.mapper.ContactsMapper.asContact;
 import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.web.data.Employee;
 import grytsenko.contacts.web.data.EmployeesRepository;
@@ -47,7 +47,7 @@ public class SearchContactsService {
         Employee employee = employeesRepository.findByUid(employeeUid);
         Extras extras = extrasRepository.findOne(employeeUid);
 
-        return createContact(employee, extras);
+        return asContact(employee, extras);
     }
 
     /**
@@ -80,7 +80,7 @@ public class SearchContactsService {
             }
 
             Extras extras = extrasRepository.findOne(coworkerUid);
-            contacts.add(createContact(coworker, extras));
+            contacts.add(asContact(coworker, extras));
         }
 
         return contacts;

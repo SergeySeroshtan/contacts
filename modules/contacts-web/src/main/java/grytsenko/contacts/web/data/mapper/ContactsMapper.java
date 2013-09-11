@@ -1,16 +1,16 @@
-package grytsenko.contacts.web.service;
+package grytsenko.contacts.web.data.mapper;
 
 import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.web.data.Employee;
 import grytsenko.contacts.web.data.Extras;
 
 /**
- * Provides facilities for creating contacts.
+ * Provides facilities for mapping data from repositories to contacts.
  */
-public final class ContactFactory {
+public final class ContactsMapper {
 
     /**
-     * Creates contact for given employee.
+     * Represents information about employee as contact.
      * 
      * @param employee
      *            the information about employee.
@@ -19,7 +19,7 @@ public final class ContactFactory {
      * 
      * @return the created contact.
      */
-    public static Contact createContact(Employee employee, Extras extras) {
+    public static Contact asContact(Employee employee, Extras extras) {
         Contact contact = new Contact();
 
         contact.setUid(employee.getUid());
@@ -46,11 +46,11 @@ public final class ContactFactory {
 
     private static String getVersion(Employee employee, Extras extras) {
         String major = employee.getVersion();
-        String minor = extras != null ? extras.getVersion() : "";
+        String minor = extras != null ? "." + extras.getVersion() : "";
         return major + minor;
     }
 
-    private ContactFactory() {
+    private ContactsMapper() {
     }
 
 }

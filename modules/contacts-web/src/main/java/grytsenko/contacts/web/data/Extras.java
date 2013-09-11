@@ -17,18 +17,14 @@ public final class Extras implements Serializable {
 
     private static final long serialVersionUID = 7942426620723987505L;
 
-    private static final int UID_LENGTH_MAX = 50;
-    public static final int SKYPE_LENGTH_MAP = 32;
-    private static final int POSITION_LENGTH_MAX = 50;
-
     @Id
-    @Column(name = "uid", length = UID_LENGTH_MAX)
+    @Column(name = "uid")
     private String uid;
 
-    @Column(name = "skype", length = SKYPE_LENGTH_MAP)
+    @Column(name = "skype")
     private String skype;
 
-    @Column(name = "position", length = POSITION_LENGTH_MAX)
+    @Column(name = "position")
     private String position;
 
     @Version
@@ -61,8 +57,8 @@ public final class Extras implements Serializable {
     /**
      * Returns the version of data.
      */
-    public String getVersion() {
-        return version == null ? "" : Integer.toString(version);
+    public Integer getVersion() {
+        return version;
     }
 
 }
