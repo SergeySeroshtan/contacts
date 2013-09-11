@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head">
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<title th:text="#{app.title}"></title>
+
+<link rel="stylesheet"
+    href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" />
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css"
+    rel="stylesheet" />
+<link rel="stylesheet" th:href="@{/static/css/contacts.css}" />
+
+</head>
+
+<body>
+
+    <div th:fragment="navbar">
+        <div class="navbar navbar-fixed-top navbar-inverse">
+            <div class="container">
+                <div class="navbar-header">
+                    <a class="navbar-brand" th:href="@{/coworkers}"
+                        th:text="#{app.title}"></a>
+                </div>
+                <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                        <li>
+                            <a th:href="@{/coworkers}">
+                                <span th:text="#{page.coworkers}"></span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="pull-right">
+                        <ul class="nav navbar-nav">
+                            <li class="divider-vertical"></li>
+                            <li>
+                                <a th:href="@{/logout}">
+                                    <span class="glyphicon glyphicon-off"></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:fragment="scripts">
+        <script src="//code.jquery.com/jquery-latest.min.js"></script>
+        <script
+            src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    </div>
+
+</body>
+
+</html>

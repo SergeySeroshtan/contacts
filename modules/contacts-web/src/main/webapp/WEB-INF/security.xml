@@ -17,6 +17,20 @@
         <security:http-basic />
     </security:http>
 
+    <!-- Security for Web Application -->
+    <security:http pattern="/login" security="none" />
+    <security:http pattern="/static/**" security="none" />
+
+    <security:http use-expressions="true">
+        <security:intercept-url pattern="/**"
+            access="isAuthenticated()" />
+
+        <security:form-login login-page="/login"
+            username-parameter="username" password-parameter="password"
+            authentication-failure-url="/login?retry" />
+        <security:logout logout-success-url="/" logout-url="/logout" />
+    </security:http>
+
     <!-- LDAP -->
     <util:properties id="ldapProperties" location="classpath:ldap.properties" />
 

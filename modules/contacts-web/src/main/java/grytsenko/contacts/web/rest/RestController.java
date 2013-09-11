@@ -39,7 +39,7 @@ public class RestController {
     }
 
     /**
-     * Returns contacts of all coworkers, i.e. people from the same office.
+     * Finds contacts of coworkers of current user.
      */
     @RequestMapping(value = "coworkers", method = RequestMethod.GET)
     @ResponseBody
