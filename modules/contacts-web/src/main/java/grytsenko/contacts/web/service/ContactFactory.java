@@ -22,7 +22,7 @@ public final class ContactFactory {
     public static Contact createContact(Employee employee, Extras extras) {
         Contact contact = new Contact();
 
-        contact.setUsername(employee.getUsername());
+        contact.setUid(employee.getUid());
 
         contact.setFirstName(employee.getFirstName());
         contact.setLastName(employee.getLastName());

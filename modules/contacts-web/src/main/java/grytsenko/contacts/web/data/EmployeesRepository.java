@@ -32,15 +32,15 @@ public class EmployeesRepository {
     LdapContextSource ldapContextSource;
 
     @Value("#{ldapProperties['ldap.employees']}")
-    String usersGroup;
+    String employeesBase;
 
-    @Value("#{ldapProperties['ldap.employees.filter.username']}")
-    String filterByUsernameTemplate;
+    @Value("#{ldapProperties['ldap.employees.filter.uid']}")
+    String filterByUidTemplate;
     @Value("#{ldapProperties['ldap.employees.filter.location']}")
     String filterByLocationTemplate;
 
-    @Value("#{ldapProperties['ldap.employee.username']}")
-    String usernameAttrId;
+    @Value("#{ldapProperties['ldap.employee.uid']}")
+    String uidAttrId;
     @Value("#{ldapProperties['ldap.employee.firstname']}")
     String firstnameAttrId;
     @Value("#{ldapProperties['ldap.employee.lastname']}")
@@ -59,15 +59,15 @@ public class EmployeesRepository {
     /**
      * Finds employee.
      * 
-     * @param username
+     * @param uid
      *            the unique identifier of employee..
      * 
      * @return the found employee or <code>null</code> if employee not found.
      */
-    public Employee findByUsername(String username) {
-        LOGGER.debug("Search by username: {}.", username);
+    public Employee findByUid(String uid) {
+        LOGGER.debug("Search by uid: {}.", uid);
 
-        String filter = format(filterByUsernameTemplate, username);
+        String filter = format(filterByUidTemplate, uid);
         List<Employee> contacts = findByFilter(filter);
 
         return contacts.isEmpty() ? null : contacts.get(0);
@@ -93,11 +93,11 @@ public class EmployeesRepository {
 
         LdapTemplate template = new LdapTemplate(ldapContextSource);
 
-        String[] attrs = new String[] { usernameAttrId, firstnameAttrId,
+        String[] attrs = new String[] { uidAttrId, firstnameAttrId,
                 lastnameAttrId, photoUrlAttrId, mailAttrId, phoneAttrId,
                 locationAttrId, versionAttrId };
         @SuppressWarnings("unchecked")
-        List<Employee> contacts = template.search(usersGroup, filter,
+        List<Employee> contacts = template.search(employeesBase, filter,
                 SearchControls.ONELEVEL_SCOPE, attrs, new EmployeeMapper());
 
         LOGGER.debug("Found {} contacts.", contacts.size());
@@ -115,7 +115,7 @@ public class EmployeesRepository {
                 throws NamingException {
             Employee employee = new Employee();
 
-            employee.setUsername(asString(usernameAttrId, attrs));
+            employee.setUid(asString(uidAttrId, attrs));
 
             employee.setFirstName(asString(firstnameAttrId, attrs));
             employee.setLastName(asString(lastnameAttrId, attrs));

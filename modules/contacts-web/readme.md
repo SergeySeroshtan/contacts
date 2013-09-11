@@ -29,7 +29,7 @@ Returns contact of user.
 ##### JSON
 
 ```json
-{"username":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"3800000004","location":"Donetsk","version":"20130722110100Z"}
+{"uid":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"3800000004","location":"Donetsk","version":"20130722110100Z"}
 ```
 
 ### GET coworkers.json
@@ -39,11 +39,11 @@ Returns contacts of people from one location with user.
 ##### JSON
 
 ```json
-[{"username":"ivanov","firstName":"Ivan","lastName":"Ivanov","photoUrl":"","mail":"ivanov@test.com","phone":"+3800000000","location":"Donetsk","version":"20130722110100Z"},
-{"username":"petrov","firstName":"Petr","lastName":"Petrov","photoUrl":"","mail":"petrov@test.ua.com","phone":"+3800000001","location":"Donetsk","version":"20130722110100Z"},
-{"username":"kuznetsov","firstName":"Kuzma","lastName":"Kuznetsov","photoUrl":"","mail":"kuznetsov@test.com","phone":"+3800000002","location":"Donetsk","version":"20130722110100Z"},
-{"username":"popov","firstName":"Pavel","lastName":"Popov","photoUrl":"","mail":"popov@test.com","phone":"","location":"Donetsk","version":"20130722110100Z"},
-{"username":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"+3800000004","location":"Donetsk","version":"20130722110100Z"}]
+[{"uid":"ivanov","firstName":"Ivan","lastName":"Ivanov","photoUrl":"","mail":"ivanov@test.com","phone":"+3800000000","location":"Donetsk","version":"20130722110100Z"},
+{"uid":"petrov","firstName":"Petr","lastName":"Petrov","photoUrl":"","mail":"petrov@test.ua.com","phone":"+3800000001","location":"Donetsk","version":"20130722110100Z"},
+{"uid":"kuznetsov","firstName":"Kuzma","lastName":"Kuznetsov","photoUrl":"","mail":"kuznetsov@test.com","phone":"+3800000002","location":"Donetsk","version":"20130722110100Z"},
+{"uid":"popov","firstName":"Pavel","lastName":"Popov","photoUrl":"","mail":"popov@test.com","phone":"","location":"Donetsk","version":"20130722110100Z"},
+{"uid":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"+3800000004","location":"Donetsk","version":"20130722110100Z"}]
 ```
 
 [framework:spring]: http://www.springsource.org/

@@ -172,11 +172,11 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         AccountManager accountManager = AccountManager.get(getContext());
         String password = accountManager.getPassword(account);
 
-        Contact[] contacts = contactsRepository.getCoworkersContacts(username,
+        Contact[] contacts = contactsRepository.getMyCoworkers(username,
                 password);
         Map<String, Contact> loadedContacts = new HashMap<String, Contact>();
         for (Contact contact : contacts) {
-            loadedContacts.put(contact.getUsername(), contact);
+            loadedContacts.put(contact.getUid(), contact);
         }
         return loadedContacts;
     }
@@ -191,8 +191,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         Map<String, SyncedContact> createdContacts = new HashMap<String, SyncedContact>();
 
         for (Contact loadedContact : loadedContacts.values()) {
-            String username = loadedContact.getUsername();
-            if (syncedContacts.containsKey(username)) {
+            String uid = loadedContact.getUid();
+            if (syncedContacts.containsKey(uid)) {
                 continue;
             }
 
@@ -201,11 +201,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             try {
                 SyncedContact createdContact = contactsManager.createContact(
                         account, group, loadedContact);
-                createdContacts.put(createdContact.getUsername(),
-                        createdContact);
+                createdContacts.put(uid, createdContact);
             } catch (SyncOperationException exception) {
-                Log.w(TAG,
-                        format("Contact for {0} was not created.", username),
+                Log.w(TAG, format("Contact {0} was not created.", uid),
                         exception);
             }
         }
@@ -230,11 +228,11 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         }
 
         for (Contact loadedContact : loadedContacts.values()) {
-            String username = loadedContact.getUsername();
-            if (!syncedContacts.containsKey(username)) {
+            String uid = loadedContact.getUid();
+            if (!syncedContacts.containsKey(uid)) {
                 continue;
             }
-            SyncedContact syncedContact = syncedContacts.get(username);
+            SyncedContact syncedContact = syncedContacts.get(uid);
 
             checkCanceled();
 
@@ -242,18 +240,16 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             String syncedVersion = syncedContact.getVersion();
             boolean versionChanged = !loadedVersion.equals(syncedVersion);
             if (!appUpdated && !versionChanged) {
-                Log.d(TAG, format("Contact for {0} is up to date.", username));
+                Log.d(TAG, format("Contact {0} is up to date.", uid));
                 continue;
             }
 
             try {
                 SyncedContact updatedContact = contactsManager.updateContact(
                         syncedContact, loadedContact);
-                updatedContacts.put(updatedContact.getUsername(),
-                        updatedContact);
+                updatedContacts.put(uid, updatedContact);
             } catch (SyncOperationException exception) {
-                Log.w(TAG,
-                        format("Contact for {0} was not updated.", username),
+                Log.w(TAG, format("Contact {0} was not updated.", uid),
                         exception);
             }
         }
@@ -271,8 +267,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         int removedContactsNum = 0;
 
         for (SyncedContact syncedContact : syncedContacts.values()) {
-            String username = syncedContact.getUsername();
-            if (loadedContacts.containsKey(username)) {
+            String uid = syncedContact.getUid();
+            if (loadedContacts.containsKey(uid)) {
                 continue;
             }
 
@@ -282,8 +278,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
                 contactsManager.removeContact(syncedContact);
                 ++removedContactsNum;
             } catch (SyncOperationException exception) {
-                Log.w(TAG,
-                        format("Contact for {0} was not removed.", username),
+                Log.w(TAG, format("Contact {0} was not removed.", uid),
                         exception);
             }
         }
@@ -309,7 +304,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             } catch (SyncOperationException exception) {
                 Log.w(TAG,
                         format("Photo for {0} was not synced.",
-                                syncedContact.getUsername()), exception);
+                                syncedContact.getUid()), exception);
             }
         }
     }
@@ -319,21 +314,21 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      */
     private void syncPhoto(SyncedContact syncedContact)
             throws SyncOperationException, SyncCanceledException {
-        String username = syncedContact.getUsername();
+        String uid = syncedContact.getUid();
         String photoUrl = syncedContact.getPhotoUrl();
 
         if (syncedContact.isPhotoSynced()) {
-            Log.d(TAG, format("Photo for {0} is up to date.", username));
+            Log.d(TAG, format("Photo for contact {0} is up to date.", uid));
             return;
         }
 
         if (TextUtils.isEmpty(photoUrl)) {
-            Log.d(TAG, format("Remove photo for {0}.", username));
+            Log.d(TAG, format("Remove photo for contact {0}.", uid));
             contactsManager.updatePhoto(syncedContact, null);
             return;
         }
 
-        Log.d(TAG, format("Load photo for {0}.", username));
+        Log.d(TAG, format("Load photo for contact {0}.", uid));
         byte[] photo = loadPhoto(photoUrl);
         contactsManager.updatePhoto(syncedContact, photo);
     }

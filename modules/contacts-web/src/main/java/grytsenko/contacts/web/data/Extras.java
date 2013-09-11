@@ -17,13 +17,13 @@ public final class Extras implements Serializable {
 
     private static final long serialVersionUID = 7942426620723987505L;
 
-    private static final int USERNAME_LENGTH_MAX = 50;
+    private static final int UID_LENGTH_MAX = 50;
     public static final int SKYPE_LENGTH_MAP = 32;
     private static final int POSITION_LENGTH_MAX = 50;
 
     @Id
-    @Column(name = "username", length = USERNAME_LENGTH_MAX)
-    private String username;
+    @Column(name = "uid", length = UID_LENGTH_MAX)
+    private String uid;
 
     @Column(name = "skype", length = SKYPE_LENGTH_MAP)
     private String skype;
@@ -38,10 +38,10 @@ public final class Extras implements Serializable {
     }
 
     /**
-     * Returns the unique username, that identifies employee.
+     * Returns the unique identifier of employee.
      */
-    public String getUsername() {
-        return username;
+    public String getUid() {
+        return uid;
     }
 
     /**

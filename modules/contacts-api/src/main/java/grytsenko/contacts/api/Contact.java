@@ -9,7 +9,7 @@ public final class Contact implements Serializable {
 
     private static final long serialVersionUID = 1393219047960946953L;
 
-    private String username;
+    private String uid;
 
     private String firstName;
     private String lastName;
@@ -29,17 +29,17 @@ public final class Contact implements Serializable {
     }
 
     /**
-     * Returns the unique name, which can be used to distinguish contacts.
+     * Returns the unique identifier of user.
      */
-    public String getUsername() {
-        return username;
+    public String getUid() {
+        return uid;
     }
 
     /**
-     * Sets the unique name.
+     * Sets the unique identifier of user.
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     /**

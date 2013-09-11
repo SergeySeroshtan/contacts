@@ -26,7 +26,7 @@
     <security:authentication-manager>
         <security:ldap-authentication-provider
             user-search-base="#{ldapProperties['ldap.employees']}"
-            user-search-filter="#{ldapProperties['ldap.employees.filter.username']}" />
+            user-search-filter="#{ldapProperties['ldap.employees.filter.uid']}" />
     </security:authentication-manager>
 
 </beans>

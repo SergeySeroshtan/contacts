@@ -9,7 +9,7 @@ public final class Employee implements Serializable {
 
     private static final long serialVersionUID = -5048037776329416647L;
 
-    private String username;
+    private String uid;
 
     private String firstName;
     private String lastName;
@@ -26,12 +26,12 @@ public final class Employee implements Serializable {
     public Employee() {
     }
 
-    public String getUsername() {
-        return username;
+    public String getUid() {
+        return uid;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 
     public String getFirstName() {

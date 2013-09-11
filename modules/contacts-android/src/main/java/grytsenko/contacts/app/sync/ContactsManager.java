@@ -93,7 +93,7 @@ public class ContactsManager {
                     Log.d(TAG, format("Contact {0} is skipped.", contactId));
                     continue;
                 }
-                contacts.put(contact.getUsername(), contact);
+                contacts.put(contact.getUid(), contact);
             } while (cursor.moveToNext());
 
             return contacts;
@@ -125,7 +125,7 @@ public class ContactsManager {
                 return null;
             }
 
-            String username = cursor.getString(cursor
+            String uid = cursor.getString(cursor
                     .getColumnIndexOrThrow(RawContacts.SYNC1));
             String version = cursor.getString(cursor
                     .getColumnIndexOrThrow(RawContacts.SYNC2));
@@ -134,10 +134,10 @@ public class ContactsManager {
             boolean photoSynced = Boolean.parseBoolean(cursor.getString(cursor
                     .getColumnIndexOrThrow(RawContacts.SYNC4)));
 
-            Log.d(TAG, format("Found contact {0} for {1}.", id, username));
+            Log.d(TAG, format("Found contact {0}.", uid));
 
-            return SyncedContact.create(id, username, version, photoUrl,
-                    photoSynced);
+            return SyncedContact
+                    .create(id, uid, version, photoUrl, photoSynced);
         } finally {
             cursor.close();
         }
@@ -160,20 +160,19 @@ public class ContactsManager {
      */
     public SyncedContact createContact(Account account, SyncedGroup group,
             Contact loadedContact) throws SyncOperationException {
-        String username = loadedContact.getUsername();
+        String uid = loadedContact.getUid();
         String version = loadedContact.getVersion();
         String photoUrl = loadedContact.getPhotoUrl();
         boolean photoSynced = TextUtils.isEmpty(photoUrl);
 
         Log.d(TAG,
-                format("Create contact for {0} in group {1}.", username,
-                        group.getUid()));
+                format("Create contact {0} in group {1}.", uid, group.getUid()));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
         batch.add(ContentProviderOperation.newInsert(RawContacts.CONTENT_URI)
                 .withValue(RawContacts.ACCOUNT_NAME, account.name)
                 .withValue(RawContacts.ACCOUNT_TYPE, account.type)
-                .withValue(RawContacts.SYNC1, username)
+                .withValue(RawContacts.SYNC1, uid)
                 .withValue(RawContacts.SYNC2, version)
                 .withValue(RawContacts.SYNC3, photoUrl)
                 .withValue(RawContacts.SYNC4, Boolean.toString(photoSynced))
@@ -202,9 +201,9 @@ public class ContactsManager {
                     ContactsContract.AUTHORITY, batch);
             long id = ContentUris.parseId(results[0].uri);
 
-            Log.d(TAG, format("Contact for {0} was created.", username));
-            return SyncedContact.create(id, username, version, photoUrl,
-                    photoSynced);
+            Log.d(TAG, format("Contact {0} was created.", uid));
+            return SyncedContact
+                    .create(id, uid, version, photoUrl, photoSynced);
         } catch (Exception exception) {
             throw new SyncOperationException("Could not create contact.",
                     exception);
@@ -227,7 +226,7 @@ public class ContactsManager {
     public SyncedContact updateContact(SyncedContact syncedContact,
             Contact loadedContact) throws SyncOperationException {
         long id = syncedContact.getId();
-        String username = syncedContact.getUsername();
+        String uid = syncedContact.getUid();
         String version = loadedContact.getVersion();
 
         String loadedPhotoUrl = loadedContact.getPhotoUrl();
@@ -238,7 +237,7 @@ public class ContactsManager {
         boolean photoSynced = photoUpdated ? false : syncedContact
                 .isPhotoSynced();
 
-        Log.d(TAG, format("Update contact for {0}.", username));
+        Log.d(TAG, format("Update contact {0}.", uid));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
 
@@ -267,10 +266,10 @@ public class ContactsManager {
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
-            Log.d(TAG, format("Contact for {0} was updated.", username));
+            Log.d(TAG, format("Contact {0} was updated.", uid));
 
-            return SyncedContact.create(id, username, version, photoUrl,
-                    photoSynced);
+            return SyncedContact
+                    .create(id, uid, version, photoUrl, photoSynced);
         } catch (Exception exception) {
             throw new SyncOperationException("Could not update photo.",
                     exception);
@@ -328,7 +327,8 @@ public class ContactsManager {
     public void updatePhoto(SyncedContact syncedContact, byte[] photo)
             throws SyncOperationException {
         long id = syncedContact.getId();
-        Log.d(TAG, format("Update photo for {0}.", syncedContact.getUsername()));
+        String uid = syncedContact.getUid();
+        Log.d(TAG, format("Update photo of contact {0}.", uid));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
         batch.add(doUpdate(id, Photo.CONTENT_ITEM_TYPE, Photo.PHOTO, photo));
@@ -340,9 +340,7 @@ public class ContactsManager {
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
-            Log.d(TAG,
-                    format("Photo for {0} was updated.",
-                            syncedContact.getUsername()));
+            Log.d(TAG, format("Photo of contact {0} was updated.", uid));
         } catch (Exception exception) {
             throw new SyncOperationException("Could not update photo.",
                     exception);
@@ -361,8 +359,8 @@ public class ContactsManager {
     public void removeContact(SyncedContact syncedContact)
             throws SyncOperationException {
         long id = syncedContact.getId();
-        Log.d(TAG,
-                format("Remove contact for {0}.", syncedContact.getUsername()));
+        String uid = syncedContact.getUid();
+        Log.d(TAG, format("Remove contact {0}.", uid));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
         Uri contactUri = ContentUris
@@ -374,9 +372,7 @@ public class ContactsManager {
 
         try {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
-            Log.d(TAG,
-                    format("Photo for {0} was removed.",
-                            syncedContact.getUsername()));
+            Log.d(TAG, format("Contact {0} was removed.", uid));
         } catch (Exception exception) {
             throw new SyncOperationException("Could not remove contact.",
                     exception);

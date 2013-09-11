@@ -73,7 +73,7 @@ public final class ContactsRepository {
      */
     public Contact getMyContact(String username, String password)
             throws NotAvailableException, NotAuthorizedException {
-        Log.d(TAG, format("Get contact for {0}.", username));
+        Log.d(TAG, format("Get contact {0}.", username));
 
         URI url = buildUrl(context.getString(R.string.restPathMy));
         return doGet(url, username, password, Contact.class);
@@ -94,7 +94,7 @@ public final class ContactsRepository {
      * @throws NotAuthorizedException
      *             if user is not authorized to use repository.
      */
-    public Contact[] getCoworkersContacts(String username, String password)
+    public Contact[] getMyCoworkers(String username, String password)
             throws NotAvailableException, NotAuthorizedException {
         Log.d(TAG, format("Get coworkers of {0}.", username));
 

@@ -8,12 +8,12 @@ public class SyncedContact {
     /**
      * Creates a contact.
      */
-    public static SyncedContact create(long id, String username,
-            String version, String photoUrl, boolean photoSynced) {
+    public static SyncedContact create(long id, String uid, String version,
+            String photoUrl, boolean photoSynced) {
         SyncedContact contact = new SyncedContact();
 
         contact.id = id;
-        contact.username = username;
+        contact.uid = uid;
         contact.version = version;
         contact.photoUrl = photoUrl;
         contact.photoSynced = photoSynced;
@@ -22,7 +22,7 @@ public class SyncedContact {
     }
 
     private long id;
-    private String username;
+    private String uid;
     private String version;
     private String photoUrl;
     private boolean photoSynced;
@@ -38,10 +38,10 @@ public class SyncedContact {
     }
 
     /**
-     * Returns the unique name of user, that is used to distinguish contacts.
+     * Returns the unique identifier, that is used to distinguish contacts.
      */
-    public String getUsername() {
-        return username;
+    public String getUid() {
+        return uid;
     }
 
     /**

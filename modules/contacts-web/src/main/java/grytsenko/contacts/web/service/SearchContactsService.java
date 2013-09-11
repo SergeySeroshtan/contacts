@@ -31,68 +31,52 @@ public class SearchContactsService {
     ExtrasRepository extrasRepository;
 
     /**
-     * Finds contact of user.
+     * Finds contact of employee.
      * 
-     * @param username
-     *            the name of user.
+     * @param employeeUid
+     *            the unique identifier of employee.
      * 
      * @return the found contact or <code>null</code> if contact not found.
      */
-    public Contact findByUsername(String username) {
-        if (!StringUtils.hasLength(username)) {
+    public Contact findByUid(String employeeUid) {
+        if (!StringUtils.hasLength(employeeUid)) {
             throw new IllegalArgumentException("User not defined.");
         }
 
-        LOGGER.debug("Search employee {} in DS.", username);
-        Employee employee = employeesRepository.findByUsername(username);
-        Extras extras = extrasRepository.findOne(username);
+        LOGGER.debug("Search employee {}.", employeeUid);
+        Employee employee = employeesRepository.findByUid(employeeUid);
+        Extras extras = extrasRepository.findOne(employeeUid);
 
         return createContact(employee, extras);
     }
 
     /**
-     * Determines location of person.
+     * Finds contacts of coworkers.
      * 
-     * @param username
-     *            the name of user.
-     * 
-     * @return the location of user.
-     */
-    public String findLocationOfUser(String username) {
-        if (!StringUtils.hasLength(username)) {
-            throw new IllegalArgumentException("User not defined.");
-        }
-
-        LOGGER.debug("Search employee {} in DS.", username);
-        Employee employee = employeesRepository.findByUsername(username);
-        String location = employee.getLocation();
-        LOGGER.debug("Location of {} is {}.", username, location);
-
-        return location;
-    }
-
-    /**
-     * Finds contacts of people by location.
-     * 
-     * @param location
-     *            the name of location.
+     * @param employeeUid
+     *            the unique identifier of employee.
      * 
      * @return the list of found contacts.
      */
-    public List<Contact> findByLocation(String location) {
-        if (!StringUtils.hasLength(location)) {
-            throw new IllegalStateException("Location not defined.");
+    public List<Contact> findCoworkers(String employeeUid) {
+        if (!StringUtils.hasLength(employeeUid)) {
+            throw new IllegalArgumentException("UID not defined.");
         }
 
-        LOGGER.debug("Search employees from {} in DS.", location);
-        List<Employee> employees = employeesRepository.findByLocation(location);
-        LOGGER.debug("Found {} employees in DS.", employees.size());
+        LOGGER.debug("Search employee {}.", employeeUid);
+        Employee employee = employeesRepository.findByUid(employeeUid);
+        String location = employee.getLocation();
+        LOGGER.debug("Location of {} is {}.", employeeUid, location);
+
+        LOGGER.debug("Search employees from {}.", location);
+        List<Employee> coworkers = employeesRepository.findByLocation(location);
+        LOGGER.debug("Found {} employees.", coworkers.size());
 
         List<Contact> contacts = new ArrayList<Contact>();
-        for (Employee employee : employees) {
-            String username = employee.getUsername();
-            Extras extras = extrasRepository.findOne(username);
-            contacts.add(createContact(employee, extras));
+        for (Employee coworker : coworkers) {
+            String coworkerUid = coworker.getUid();
+            Extras extras = extrasRepository.findOne(coworkerUid);
+            contacts.add(createContact(coworker, extras));
         }
 
         return contacts;
