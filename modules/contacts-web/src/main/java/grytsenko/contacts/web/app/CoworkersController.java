@@ -2,9 +2,11 @@ package grytsenko.contacts.web.app;
 
 import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.web.rest.RestController;
+import grytsenko.contacts.web.service.FullNameComparator;
 import grytsenko.contacts.web.service.SearchContactsService;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -33,8 +35,9 @@ public class CoworkersController {
         String username = principal.getName();
         LOGGER.debug("Get coworkers of {}.", username);
 
-        List<Contact> coworkers = searchContactsService.findCoworkers(username);
-        model.addAttribute("contacts", coworkers);
+        List<Contact> contacts = searchContactsService.findCoworkers(username);
+        Collections.sort(contacts, new FullNameComparator());
+        model.addAttribute("contacts", contacts);
 
         return "/coworkers";
     }
