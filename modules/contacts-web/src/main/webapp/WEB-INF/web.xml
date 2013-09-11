@@ -14,9 +14,9 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            /WEB-INF/app-context.xml,
-            /WEB-INF/data-context.xml,
-            /WEB-INF/ldap-context.xml
+            /WEB-INF/common.xml,
+            /WEB-INF/database.xml,
+            /WEB-INF/security.xml
         </param-value>
     </context-param>
 
