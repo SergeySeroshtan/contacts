@@ -11,7 +11,7 @@
     <!-- Security for REST API -->
     <security:http pattern="/rest/**" create-session="stateless"
         use-expressions="true">
-        <security:intercept-url pattern="/*.json/**"
+        <security:intercept-url pattern="/rest/**"
             access="isAuthenticated()" />
 
         <security:http-basic />

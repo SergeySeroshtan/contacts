@@ -20,7 +20,7 @@
         p:characterEncoding="UTF-8" p:contentType="text/html; charset=UTF-8"
         p:templateEngine-ref="templateEngine" />
 
-    <bean id="exceptionResolver" class="grytsenko.contacts.web.app.servlet.LoggingExceptionResolver"
+    <bean id="exceptionResolver" class="grytsenko.contacts.web.servlet.LoggingExceptionResolver"
         p:defaultErrorView="error" />
 
     <mvc:annotation-driven />

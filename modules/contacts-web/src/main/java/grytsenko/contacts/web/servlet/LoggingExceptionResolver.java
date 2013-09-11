@@ -1,4 +1,4 @@
-package grytsenko.contacts.web.app.servlet;
+package grytsenko.contacts.web.servlet;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

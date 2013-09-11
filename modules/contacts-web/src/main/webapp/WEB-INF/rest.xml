@@ -22,9 +22,7 @@
         </property>
     </bean>
 
-    <bean id="exceptionResolver"
-        class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver"
-        p:defaultErrorView="error" />
+    <bean id="exceptionResolver" class="grytsenko.contacts.web.servlet.LoggingExceptionResolver" />
 
     <mvc:annotation-driven />
 
