@@ -35,3 +35,13 @@ body {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+
+.row-contact {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid lightgray;
+}
+
+.row-contact:hover {
+    background-color: #f5f5f5;
+}
