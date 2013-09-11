@@ -38,7 +38,7 @@ public class SearchContactsService {
      * 
      * @return the found contact or <code>null</code> if contact not found.
      */
-    public Contact findByUid(String employeeUid) {
+    public Contact findEmployee(String employeeUid) {
         if (!StringUtils.hasLength(employeeUid)) {
             throw new IllegalArgumentException("User not defined.");
         }
@@ -51,7 +51,7 @@ public class SearchContactsService {
     }
 
     /**
-     * Finds contacts of coworkers.
+     * Finds contacts of coworkers of employee.
      * 
      * @param employeeUid
      *            the unique identifier of employee.

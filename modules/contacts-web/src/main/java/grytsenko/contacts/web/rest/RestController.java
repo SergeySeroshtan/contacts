@@ -32,10 +32,10 @@ public class RestController {
     @RequestMapping(value = "my", method = RequestMethod.GET)
     @ResponseBody
     public Contact my(Principal principal) {
-        String uid = principal.getName();
-        LOGGER.debug("Get contact of {}.", uid);
+        String username = principal.getName();
+        LOGGER.debug("Get contact of {}.", username);
 
-        return searchContactsService.findByUid(uid);
+        return searchContactsService.findEmployee(username);
     }
 
     /**
@@ -44,10 +44,10 @@ public class RestController {
     @RequestMapping(value = "coworkers", method = RequestMethod.GET)
     @ResponseBody
     public List<Contact> coworkers(Principal principal) {
-        String uid = principal.getName();
-        LOGGER.debug("Get coworkers of {}.", uid);
+        String username = principal.getName();
+        LOGGER.debug("Get coworkers of {}.", username);
 
-        List<Contact> contacts = searchContactsService.findCoworkers(uid);
+        List<Contact> contacts = searchContactsService.findCoworkers(username);
         LOGGER.debug("Found {} coworkers.", contacts.size());
 
         return contacts;

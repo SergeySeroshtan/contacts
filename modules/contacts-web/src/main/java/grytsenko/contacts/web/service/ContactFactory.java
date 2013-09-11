@@ -47,7 +47,6 @@ public final class ContactFactory {
     private static String getVersion(Employee employee, Extras extras) {
         String major = employee.getVersion();
         String minor = extras != null ? extras.getVersion() : "";
-
         return major + minor;
     }
 
