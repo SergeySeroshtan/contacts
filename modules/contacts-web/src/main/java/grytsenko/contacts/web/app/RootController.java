@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class RootController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public String onEnter() {
-        return "redirect:/coworkers";
+    public String home() {
+        return "redirect:/home";
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public String onLogin() {
+    public String login() {
         return "/login";
     }
 

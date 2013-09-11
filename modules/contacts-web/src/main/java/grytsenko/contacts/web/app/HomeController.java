@@ -1,12 +1,9 @@
 package grytsenko.contacts.web.app;
 
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.web.service.FullNameComparator;
 import grytsenko.contacts.web.service.SearchContactsService;
 
 import java.security.Principal;
-import java.util.Collections;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,29 +13,30 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+/**
+ * Controller for home page.
+ */
 @Controller
-@RequestMapping("/coworkers")
-public class CoworkersController {
+@RequestMapping("/home")
+public class HomeController {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(CoworkersController.class);
+            .getLogger(HomeController.class);
 
     @Autowired
     SearchContactsService searchContactsService;
 
     /**
-     * Finds contacts of coworkers of current user.
+     * Finds contact of current user.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public String coworkers(Principal principal, Model model) {
+    public String home(Principal principal, Model model) {
         String username = principal.getName();
-        LOGGER.debug("Get coworkers of {}.", username);
+        LOGGER.debug("Get contact of {}.", username);
 
-        List<Contact> contacts = searchContactsService.findCoworkers(username);
-        Collections.sort(contacts, new FullNameComparator());
-        model.addAttribute("contacts", contacts);
+        Contact contact = searchContactsService.findEmployee(username);
+        model.addAttribute("contact", contact);
 
-        return "/coworkers";
+        return "/home";
     }
-
 }

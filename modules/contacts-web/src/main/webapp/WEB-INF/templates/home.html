@@ -8,8 +8,7 @@
     <div th:include="fragments/common :: navbar"></div>
 
     <div class="container">
-        <div class="row row-contact" th:each="contact : ${contacts}"
-            th:include="fragments/contacts :: contact"></div>
+        <div class="row" th:include="fragments/contacts :: contact"></div>
     </div>
 
     <div th:include="fragments/common :: scripts"></div>

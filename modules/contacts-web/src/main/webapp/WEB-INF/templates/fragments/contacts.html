@@ -1,0 +1,40 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+    <div th:fragment="contact">
+        <div class="col-md-6">
+            <h3 th:text="${contact.lastName} + ' ' + ${contact.firstName}"></h3>
+            <span th:text="${contact.position}"
+                th:if="${not #strings.isEmpty(contact.position)}"></span>
+        </div>
+        <div class="col-md-6">
+            <ul class="list-unstyled">
+                <li th:if="${not #strings.isEmpty(contact.mail)}">
+                    <i class="icon-stack"> <i
+                        class="icon-envelope icon-stack-base"></i>
+                    </i>
+                    <a th:href="'mailto:' + ${contact.mail}"
+                        th:text="${contact.mail}"></a>
+                </li>
+                <li th:if="${not #strings.isEmpty(contact.phone)}">
+                    <i class="icon-stack"> <i
+                        class="icon-phone icon-stack-base"></i>
+                    </i>
+                    <a th:href="'tel:' + ${contact.phone}"
+                        th:text="${contact.phone}"></a>
+                </li>
+                <li th:if="${not #strings.isEmpty(contact.skype)}">
+                    <i class="icon-stack"> <i
+                        class="icon-skype icon-stack-base"></i>
+                    </i>
+                    <a th:href="'skype:' + ${contact.skype}"
+                        th:text="${contact.skype}"></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</body>
+
+</html>
