@@ -75,6 +75,10 @@ public class SearchContactsService {
         List<Contact> contacts = new ArrayList<Contact>();
         for (Employee coworker : coworkers) {
             String coworkerUid = coworker.getUid();
+            if (employeeUid.equals(coworkerUid)) {
+                continue;
+            }
+
             Extras extras = extrasRepository.findOne(coworkerUid);
             contacts.add(createContact(coworker, extras));
         }
