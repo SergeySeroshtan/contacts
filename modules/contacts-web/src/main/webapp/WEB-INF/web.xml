@@ -33,7 +33,7 @@
 
     <servlet-mapping>
         <servlet-name>rest-servlet</servlet-name>
-        <url-pattern>*.json</url-pattern>
+        <url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
 
     <!-- Security -->

@@ -8,15 +8,17 @@
         http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.1.xsd
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
-    <util:properties id="ldapProperties" location="classpath:ldap.properties" />
-
-    <security:http auto-config="true" create-session="stateless"
+    <!-- Security for REST API -->
+    <security:http pattern="/rest/**" create-session="stateless"
         use-expressions="true">
         <security:intercept-url pattern="/*.json/**"
             access="isAuthenticated()" />
 
         <security:http-basic />
     </security:http>
+
+    <!-- LDAP -->
+    <util:properties id="ldapProperties" location="classpath:ldap.properties" />
 
     <security:ldap-server
         url="#{ldapProperties['ldap.url']}/#{ldapProperties['ldap.base']}" />
