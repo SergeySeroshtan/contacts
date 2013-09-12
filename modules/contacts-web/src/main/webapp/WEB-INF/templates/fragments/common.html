@@ -24,27 +24,34 @@
         <div class="navbar navbar-fixed-top navbar-inverse">
             <div class="container">
                 <div class="navbar-header">
+                    <button type="button" class="navbar-toggle"
+                        data-toggle="collapse"
+                        data-target=".navbar-ex1-collapse">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
                     <a class="navbar-brand" th:href="@{/home}"
                         th:text="#{app.title}"></a>
                 </div>
-                <div class="collapse navbar-collapse">
+                <div class="collapse navbar-collapse navbar-ex1-collapse">
                     <ul class="nav navbar-nav">
                         <li>
                             <a th:href="@{/coworkers}">
+                                <i class="icon-group icon-large"></i>
                                 <span th:text="#{page.coworkers}"></span>
                             </a>
                         </li>
                     </ul>
 
-                    <div class="pull-right">
-                        <ul class="nav navbar-nav">
-                            <li>
-                                <a th:href="@{/logout}">
-                                    <i class="icon-signout icon-large"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a th:href="@{/logout}">
+                                <i class="icon-signout icon-large"></i>
+                                <span th:text="#{user.signout}"></span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -55,7 +62,6 @@
         <script
             src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
     </div>
-
 </body>
 
 </html>
