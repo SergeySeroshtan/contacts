@@ -21,12 +21,14 @@
     <security:http pattern="/login" security="none" />
     <security:http pattern="/static/**" security="none" />
 
-    <security:http use-expressions="true">
+    <security:http auto-config="true" use-expressions="true"
+        disable-url-rewriting="true">
         <security:intercept-url pattern="/**"
             access="isAuthenticated()" />
 
         <security:form-login login-page="/login"
             username-parameter="username" password-parameter="password"
+            always-use-default-target="true" default-target-url="/home"
             authentication-failure-url="/login?retry" />
         <security:logout logout-success-url="/" logout-url="/logout" />
     </security:http>
