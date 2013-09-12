@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
- * Controller for home page.
+ * Provides handlers for requests for home page.
  */
 @Controller
-@RequestMapping("/home")
+@RequestMapping(Views.HOME)
 public class HomeController {
 
     private static final Logger LOGGER = LoggerFactory
@@ -37,6 +37,6 @@ public class HomeController {
         Contact contact = searchContactsService.findEmployee(username);
         model.addAttribute("contact", contact);
 
-        return "/home";
+        return Views.HOME;
     }
 }

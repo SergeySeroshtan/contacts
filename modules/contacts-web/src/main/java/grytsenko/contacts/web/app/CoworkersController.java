@@ -16,8 +16,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+/**
+ * Provides handlers for requests for page "Coworkers".
+ */
 @Controller
-@RequestMapping("/coworkers")
+@RequestMapping(Views.COWORKERS)
 public class CoworkersController {
 
     private static final Logger LOGGER = LoggerFactory
@@ -38,7 +41,7 @@ public class CoworkersController {
         Collections.sort(contacts, new FullNameComparator());
         model.addAttribute("contacts", contacts);
 
-        return "/coworkers";
+        return Views.COWORKERS;
     }
 
 }
