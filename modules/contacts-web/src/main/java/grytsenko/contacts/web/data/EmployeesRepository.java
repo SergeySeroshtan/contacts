@@ -65,7 +65,7 @@ public class EmployeesRepository {
      * @return the found employee or <code>null</code> if employee not found.
      */
     public Employee findByUid(String uid) {
-        LOGGER.debug("Search by uid: {}.", uid);
+        LOGGER.debug("Search employee by uid: {}.", uid);
 
         String filter = format(filterByUidTemplate, uid);
         List<Employee> contacts = findByFilter(filter);
@@ -82,27 +82,28 @@ public class EmployeesRepository {
      * @return the list of found employees.
      */
     public List<Employee> findByLocation(String location) {
-        LOGGER.debug("Search by location: {}.", location);
+        LOGGER.debug("Search employees by location: {}.", location);
 
         String filter = format(filterByLocationTemplate, location);
         return findByFilter(filter);
     }
 
     private List<Employee> findByFilter(String filter) {
-        LOGGER.debug("Search by filter: {}.", filter);
+        LOGGER.debug("Search emplyees by filter: {}.", filter);
 
         LdapTemplate template = new LdapTemplate(ldapContextSource);
 
         String[] attrs = new String[] { uidAttrId, firstnameAttrId,
                 lastnameAttrId, photoUrlAttrId, mailAttrId, phoneAttrId,
                 locationAttrId, versionAttrId };
+
         @SuppressWarnings("unchecked")
-        List<Employee> contacts = template.search(employeesBase, filter,
+        List<Employee> employees = template.search(employeesBase, filter,
                 SearchControls.ONELEVEL_SCOPE, attrs, new EmployeeMapper());
 
-        LOGGER.debug("Found {} contacts.", contacts.size());
+        LOGGER.debug("Found {} employees.", employees.size());
 
-        return contacts;
+        return employees;
     }
 
     /**

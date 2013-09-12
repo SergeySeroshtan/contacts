@@ -1,4 +1,4 @@
-package grytsenko.contacts.web.service;
+package grytsenko.contacts.web.util;
 
 import grytsenko.contacts.api.Contact;
 
@@ -32,4 +32,5 @@ public final class FullNameComparator implements Comparator<Contact> {
             throw new IllegalArgumentException("Last name not defined.");
         }
     }
+
 }

@@ -1,8 +1,8 @@
 package grytsenko.contacts.web.app;
 
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.web.service.FullNameComparator;
 import grytsenko.contacts.web.service.SearchContactsService;
+import grytsenko.contacts.web.util.FullNameComparator;
 
 import java.security.Principal;
 import java.util.Collections;
