@@ -9,11 +9,11 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 /**
- * Extra information about employee.
+ * Additional information about employee.
  */
 @Entity
-@Table(name = "extras")
-public final class Extras implements Serializable {
+@Table(name = "employees")
+public final class EmployeeDetails implements Serializable {
 
     private static final long serialVersionUID = 7942426620723987505L;
 
@@ -30,7 +30,7 @@ public final class Extras implements Serializable {
     @Version
     private Integer version;
 
-    private Extras() {
+    private EmployeeDetails() {
     }
 
     /**

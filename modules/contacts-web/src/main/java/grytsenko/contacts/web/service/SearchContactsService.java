@@ -3,9 +3,9 @@ package grytsenko.contacts.web.service;
 import static grytsenko.contacts.web.data.mapper.ContactsMapper.asContact;
 import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.web.data.Employee;
+import grytsenko.contacts.web.data.EmployeeDetails;
+import grytsenko.contacts.web.data.EmployeesDetailsRepository;
 import grytsenko.contacts.web.data.EmployeesRepository;
-import grytsenko.contacts.web.data.Extras;
-import grytsenko.contacts.web.data.ExtrasRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ public class SearchContactsService {
     @Autowired
     EmployeesRepository employeesRepository;
     @Autowired
-    ExtrasRepository extrasRepository;
+    EmployeesDetailsRepository employeesDetailsRepository;
 
     /**
      * Finds contact of employee.
@@ -45,9 +45,8 @@ public class SearchContactsService {
 
         LOGGER.debug("Search employee {}.", employeeUid);
         Employee employee = employeesRepository.findByUid(employeeUid);
-        Extras extras = extrasRepository.findOne(employeeUid);
 
-        return asContact(employee, extras);
+        return createContact(employee);
     }
 
     /**
@@ -79,11 +78,19 @@ public class SearchContactsService {
                 continue;
             }
 
-            Extras extras = extrasRepository.findOne(coworkerUid);
-            contacts.add(asContact(coworker, extras));
+            contacts.add(createContact(coworker));
         }
 
         return contacts;
+    }
+
+    private Contact createContact(Employee employee) {
+        String uid = employee.getUid();
+        EmployeeDetails details = employeesDetailsRepository.findOne(uid);
+        if (details != null) {
+            LOGGER.debug("Found details for {}.", employee);
+        }
+        return asContact(employee, details);
     }
 
 }
