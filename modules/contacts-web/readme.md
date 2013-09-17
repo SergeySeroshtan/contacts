@@ -1,55 +1,63 @@
-## Summary
+# Summary
 
-This module provides REST services for working with contacts, that are stored in directory service.
+The web module provides access to information about contacts.
 
-All services require basic authentication. Therefore, you should use HTTPS in production to avoid security gap.
+This module provides REST API for applications and web interface for users.
 
-## Framework
+### Frameworks and Libraries
 
 This module is based on [Spring][framework:spring] framework.
 
-## Getting Started
+[Hibernate][library:hibernate] and [Spring JPA][library:spring-jpa] are used to access data from DB.
 
-To work on this project you can use: [Git][tool:git], [Maven][tool:maven], [Eclipse][tool:eclipse], [Tomcat][tool:tomcat] and [Open DJ][tool:opendj].
+[Bootstrap][framework:bootstrap] is used as front-end framework for web application.
+And [Thymeleaf][library:thymeleaf] is used as view technology.
+
+### Getting Started
+
+To work on this project you can use: [Git][tool:git], [Maven][tool:maven], [Tomcat][tool:tomcat], [Open DJ][tool:opendj] and [MySQL][tool:mysql]
 
 To run application locally, follow next steps:
 
-1. Install and configure local directory service (for example, [Open DJ][tool:opendj]). File [test.ldif](https://github.com/grytsenko/contacts/blob/master/modules/rest/config/test.ldif) contains test data for directory service (password for all users is `pass`).
+1. Install and configure DS (file `test.ldif` contains test data, password for all users is `pass`).
+1. Install and configure RDBMS.
 1. Build module and deploy it on web server.
-1. Open `http://localhost:8080/contacts/my.json` in browser and enter your credentials for authentication.
+1. Open `http://localhost:8080/contacts/`.
 
-## REST API
+# REST API
 
-Each object has version. Versions can be compared for equality only.
+### Secutiry
 
-### GET my.json
+REST API requires basic authentication.
 
-Returns contact of user.
+Authenticated user and current user are synonyms.
 
-##### JSON
+### Synchronization
 
-```json
-{"uid":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"3800000004","location":"Donetsk","version":"20130722110100Z"}
-```
+If client application uses REST API for synchronization, then it should rely on UIDs and versions.
 
-### GET coworkers.json
+UID of object can not be changed during its lifetime.
+Therefore, application can use UIDs to identify different objects.
 
-Returns contacts of people from one location with user.
+Versions of objects can be compared for equality.
+If versions are not equal then object should be synchronized.
 
-##### JSON
+### Services
 
-```json
-[{"uid":"ivanov","firstName":"Ivan","lastName":"Ivanov","photoUrl":"","mail":"ivanov@test.com","phone":"+3800000000","location":"Donetsk","version":"20130722110100Z"},
-{"uid":"petrov","firstName":"Petr","lastName":"Petrov","photoUrl":"","mail":"petrov@test.ua.com","phone":"+3800000001","location":"Donetsk","version":"20130722110100Z"},
-{"uid":"kuznetsov","firstName":"Kuzma","lastName":"Kuznetsov","photoUrl":"","mail":"kuznetsov@test.com","phone":"+3800000002","location":"Donetsk","version":"20130722110100Z"},
-{"uid":"popov","firstName":"Pavel","lastName":"Popov","photoUrl":"","mail":"popov@test.com","phone":"","location":"Donetsk","version":"20130722110100Z"},
-{"uid":"grytsenko","firstName":"Anton","lastName":"Grytsenko","photoUrl":"","mail":"grytsenko@test.com","phone":"+3800000004","location":"Donetsk","version":"20130722110100Z"}]
-```
+`GET my.json` - returns contact of current user.
+
+`GET coworkers.json` - returns contacts of coworkers of current user.
 
 [framework:spring]: http://www.springsource.org/
+
+[framework:bootstrap]: http://getbootstrap.com/
+[library:thymeleaf]: http://www.thymeleaf.org/
+
+[library:hibernate]: http://www.hibernate.org/
+[library:spring-jpa]: http://projects.spring.io/spring-data-jpa/
 
 [tool:git]: http://git-scm.com/
 [tool:maven]: http://maven.apache.org/
 [tool:tomcat]: http://tomcat.apache.org/
-[tool:eclipse]: http://www.eclipse.org/
-[tool:opendj]: http://forgerock.com/what-we-offer/open-identity-stack/opendj/
+[tool:opendj]: http://opendj.forgerock.org/
+[tool:mysql]: http://www.mysql.com/
