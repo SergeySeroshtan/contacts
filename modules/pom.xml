@@ -40,15 +40,15 @@
         <module>contacts-api</module>
         <module>contacts-web</module>
         <module>contacts-android</module>
-  </modules>
+    </modules>
 
     <developers>
         <developer>
             <id>grytsenko</id>
-            <name>Anthony Grytsenko</name>
+            <name>Anton Grytsenko</name>
             <email>anthony.grytsenko@gmail.com</email>
             <roles>
-                <role>developer</role>
+                <role>owner</role>
             </roles>
         </developer>
     </developers>
@@ -94,6 +94,31 @@
                     <preparationGoals>clean verify</preparationGoals>
                     <goals>package</goals>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
+                    <properties>
+                        <owner>Anton Grytsenko</owner>
+                        <year>${project.inceptionYear}</year>
+                        <email>anthony.grytsenko@gmail.com</email>
+                    </properties>
+                    <includes>
+                        <include>**/*.java</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
