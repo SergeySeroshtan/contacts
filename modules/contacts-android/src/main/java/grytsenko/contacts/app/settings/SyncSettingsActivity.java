@@ -38,7 +38,7 @@ public class SyncSettingsActivity extends PreferenceActivity {
 
         addPreferencesFromResource(R.xml.sync_settings);
 
-        Preference syncPhotos = findPreference(getString(R.string.syncPhotos));
+        Preference syncPhotos = findPreference(getString(R.string.sync_photos));
         syncPhotos
                 .setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
@@ -46,13 +46,13 @@ public class SyncSettingsActivity extends PreferenceActivity {
                     public boolean onPreferenceChange(Preference preference,
                             Object newValue) {
                         if (Boolean.TRUE.equals(newValue)) {
-                            showToast(R.string.syncPhotosWarning);
+                            showToast(R.string.sync_photos_warning);
                         }
                         return true;
                     }
                 });
 
-        Preference syncAnywhere = findPreference(getString(R.string.syncAnywhere));
+        Preference syncAnywhere = findPreference(getString(R.string.sync_anywhere));
         syncAnywhere
                 .setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
@@ -60,14 +60,14 @@ public class SyncSettingsActivity extends PreferenceActivity {
                     public boolean onPreferenceChange(Preference preference,
                             Object newValue) {
                         if (Boolean.TRUE.equals(newValue)) {
-                            showToast(R.string.syncAnywhereWarning);
+                            showToast(R.string.sync_anywhere_warning);
                         }
                         return true;
                     }
 
                 });
 
-        Preference coworkers = findPreference(getString(R.string.groupCoworkers));
+        Preference coworkers = findPreference(getString(R.string.group_coworkers));
         coworkers
                 .setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 
@@ -83,7 +83,7 @@ public class SyncSettingsActivity extends PreferenceActivity {
     private boolean validateGroupTitle(Object newValue) {
         boolean empty = TextUtils.isEmpty((String) newValue);
         if (empty) {
-            showToast(R.string.groupTitleEmpty);
+            showToast(R.string.group_coworkers_empty);
         }
         return !empty;
     }

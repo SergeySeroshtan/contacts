@@ -25,18 +25,18 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_main"
-        android:label="@string/appName"
+        android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
             android:name="grytsenko.contacts.app.service.account.SignInActivity"
-            android:label="@string/appName">
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
         <activity
             android:name="grytsenko.contacts.app.settings.SyncSettingsActivity"
-            android:label="@string/syncSettingsTitle"
+            android:label="@string/sync_settings_title"
             android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Dialog" />
 

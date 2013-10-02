@@ -1,42 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <resources>
 
-    <string name="appName">Corporate Contacts</string>
+    <string name="app_name">Corporate Contacts</string>
 
-    <string name="accountType">grytsenko.contacts.app</string>
+    <string name="account_type">grytsenko.contacts.app</string>
 
-    <string name="accountNameHint">Name</string>
-    <string name="accountPasswordHint">Password</string>
-    <string name="accountSignInAction">Sign in</string>
+    <string name="username_hint">Username</string>
+    <string name="username_empty">Please enter username.</string>
+    <string name="password_hint">Password</string>
+    <string name="password_empty">Please enter password.</string>
 
-    <string name="accountNameEmpty">Please enter your name.</string>
-    <string name="accountPasswordEmpty">Please enter your password.</string>
-    <string name="accountAlreadyExists">This name is already used.</string>
-    <string name="accountNotAdded">Could not add account.</string>
+    <string name="sign_in_action">Sign in</string>
+    <string name="sign_in_wait">Please wait&#8230;</string>
+    <string name="sign_in_failed">Please check your credentials.</string>
 
-    <string name="accountAuthInProgress">Authentication in progress&#8230;</string>
+    <string name="account_exists">Account already exists.</string>
+    <string name="account_not_created">Could not create account.</string>
 
-    <string name="accountAuthFailed">Your name or password is not valid.</string>
-    <string name="accountAuthCancelled">Authentication is required.</string>
+    <string name="settings_title">Settings</string>
+    <string name="sync_settings_title">Sync Settings</string>
+    <string name="sync_settings_summary">Customize sync of contacts.</string>
 
-    <string name="generalSettingsTitle">General Settings</string>
-    <string name="syncSettingsTitle">Sync Settings</string>
-    <string name="syncSettingsSummary">Customize sync of contacts.</string>
+    <string name="sync_photos_title">Load Photos</string>
+    <string name="sync_photos_summary">Permit download of photos.</string>
+    <string name="sync_photos_warning">This will increase network usage.</string>
 
-    <string name="syncPhotosTitle">Load Photos</string>
-    <string name="syncPhotosSummary">Permit download of photos.</string>
-    <string name="syncPhotosWarning">This will increase network usage.</string>
+    <string name="sync_anywhere_title">Use Mobile Networks</string>
+    <string name="sync_anywhere_summary">Permit usage of mobile networks.</string>
+    <string name="sync_anywhere_warning">This may increase your expenses.</string>
 
-    <string name="syncAnywhereTitle">Use Mobile Networks</string>
-    <string name="syncAnywhereSummary">Permit usage of mobile networks.</string>
-    <string name="syncAnywhereWarning">This may increase your expenses.</string>
-
-    <string name="groupCoworkersTitle">Group for Coworkers</string>
-    <string name="groupCoworkersSummary">Set the custom name of group.</string>
-    <string name="groupCoworkersDefaultValue">Coworkers</string>
-
-    <string name="groupCoworkersUid">coworkers</string>
-
-    <string name="groupTitleEmpty">The title of group could not be empty.</string>
+    <string name="group_coworkers_uid">coworkers</string>
+    <string name="group_coworkers_title">Group for Coworkers</string>
+    <string name="group_coworkers_summary">Change title of group.</string>
+    <string name="group_coworkers_default">Coworkers</string>
+    <string name="group_coworkers_empty">The title could not be empty.</string>
 
 </resources>

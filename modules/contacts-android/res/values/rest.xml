@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <resources>
 
-    <string name="restScheme">http</string>
-    <string name="restAuthority">10.0.2.2:8080</string>
-    <string name="restPathMy">/contacts/rest/my.json</string>
-    <string name="restPathCoworkers">/contacts/rest/coworkers.json</string>
+    <string name="rest_scheme">http</string>
+    <string name="rest_authority">10.0.2.2:8080</string>
+    <string name="rest_path_my">/contacts/rest/my.json</string>
+    <string name="rest_path_coworkers">/contacts/rest/coworkers.json</string>
 
 </resources>

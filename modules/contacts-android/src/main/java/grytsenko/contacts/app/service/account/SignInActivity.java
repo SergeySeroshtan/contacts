@@ -51,7 +51,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
 
     private static final String TAG = SignInActivity.class.getName();
 
-    private EditText nameInput;
+    private EditText usernameInput;
     private EditText passwordInput;
 
     private String accountType;
@@ -68,12 +68,12 @@ public class SignInActivity extends AccountAuthenticatorActivity {
 
         SettingsManager.setDefaultValues(this);
 
-        setContentView(R.layout.signin_activity_layout);
+        setContentView(R.layout.signin_activity);
 
-        accountType = getString(R.string.accountType);
+        accountType = getString(R.string.account_type);
 
         signInDialog = new AlertDialog.Builder(this)
-                .setMessage(R.string.accountAuthInProgress)
+                .setMessage(R.string.sign_in_wait)
                 .setOnCancelListener(new Dialog.OnCancelListener() {
 
                     public void onCancel(DialogInterface dialog) {
@@ -82,7 +82,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
 
                 }).create();
 
-        nameInput = (EditText) findViewById(R.id.username);
+        usernameInput = (EditText) findViewById(R.id.username);
         passwordInput = (EditText) findViewById(R.id.password);
 
         Button signInButton = (Button) findViewById(R.id.signIn);
@@ -105,9 +105,9 @@ public class SignInActivity extends AccountAuthenticatorActivity {
         /*
          * Checks that user has entered name.
          */
-        username = nameInput.getText().toString();
+        username = usernameInput.getText().toString();
         if (TextUtils.isEmpty(username)) {
-            showToast(R.string.accountNameEmpty);
+            showToast(R.string.username_empty);
             return;
         }
 
@@ -119,7 +119,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
         for (Account account : accounts) {
             if (username.equals(account.name)) {
                 Log.d(TAG, format("Account for {0} already exists.", username));
-                showToast(R.string.accountAlreadyExists);
+                showToast(R.string.account_exists);
                 return;
             }
         }
@@ -129,7 +129,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
          */
         password = passwordInput.getText().toString();
         if (TextUtils.isEmpty(password)) {
-            showToast(R.string.accountPasswordEmpty);
+            showToast(R.string.password_empty);
             return;
         }
 
@@ -145,7 +145,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
         signInDialog.dismiss();
 
         if (!authenticated) {
-            showToast(R.string.accountAuthFailed);
+            showToast(R.string.sign_in_failed);
             return;
         }
 
@@ -166,7 +166,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
                 null);
         if (!accountAdded) {
             Log.d(TAG, format("Account for {0} was not created.", username));
-            showToast(R.string.accountNotAdded);
+            showToast(R.string.account_not_created);
             return;
         }
 
@@ -178,7 +178,6 @@ public class SignInActivity extends AccountAuthenticatorActivity {
 
     public void onAuthCancelled() {
         Log.d(TAG, "Authentication cancelled by user.");
-        showToast(R.string.accountAuthCancelled);
     }
 
     private void showToast(int messageId) {

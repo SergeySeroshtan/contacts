@@ -64,14 +64,14 @@ public class SettingsManager {
             throw new IllegalArgumentException("Context not defined.");
         }
 
-        syncPhotosKey = context.getString(R.string.syncPhotos);
-        syncAnywhereKey = context.getString(R.string.syncAnywhere);
+        syncPhotosKey = context.getString(R.string.sync_photos);
+        syncAnywhereKey = context.getString(R.string.sync_anywhere);
 
-        lastSyncTimeKey = context.getString(R.string.lastSyncTime);
+        lastSyncTimeKey = context.getString(R.string.last_sync_time);
 
-        groupCoworkersKey = context.getString(R.string.groupCoworkers);
+        groupCoworkersKey = context.getString(R.string.group_coworkers);
         groupCoworkersDefaultValue = context
-                .getString(R.string.groupCoworkersDefaultValue);
+                .getString(R.string.group_coworkers_default);
 
         preferences = PreferenceManager.getDefaultSharedPreferences(context);
         packageInfo = getPackageInfo(context);

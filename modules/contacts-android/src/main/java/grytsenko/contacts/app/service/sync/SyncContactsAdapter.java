@@ -153,7 +153,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      */
     private SyncedGroup syncCoworkersGroup(Account account)
             throws SyncOperationException {
-        String uid = getContext().getString(R.string.groupCoworkersUid);
+        String uid = getContext().getString(R.string.group_coworkers_uid);
         String title = settingsManager.getCoworkersTitle();
 
         SyncedGroup group = groupsManager.findGroup(account, uid);

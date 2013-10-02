@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <CheckBoxPreference
-        android:key="@string/syncPhotos"
-        android:title="@string/syncPhotosTitle"
-        android:summary="@string/syncPhotosSummary"
+    <CheckBoxPreference android:key="@string/sync_photos"
+        android:title="@string/sync_photos_title" android:summary="@string/sync_photos_summary"
         android:defaultValue="false" />
-    <CheckBoxPreference
-        android:key="@string/syncAnywhere"
-        android:title="@string/syncAnywhereTitle"
-        android:summary="@string/syncAnywhereSummary"
+
+    <CheckBoxPreference android:key="@string/sync_anywhere"
+        android:title="@string/sync_anywhere_title" android:summary="@string/sync_anywhere_summary"
         android:defaultValue="false" />
-    <EditTextPreference
-        android:key="@string/groupCoworkers"
-        android:title="@string/groupCoworkersTitle"
-        android:summary="@string/groupCoworkersSummary"
-        android:defaultValue="@string/groupCoworkersDefaultValue" />
+
+    <EditTextPreference android:key="@string/group_coworkers"
+        android:title="@string/group_coworkers_title" android:summary="@string/group_coworkers_summary"
+        android:defaultValue="@string/group_coworkers_default" />
 
 </PreferenceScreen>

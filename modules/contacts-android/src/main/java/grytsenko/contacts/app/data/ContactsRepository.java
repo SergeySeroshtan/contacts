@@ -91,7 +91,7 @@ public final class ContactsRepository {
             throws NotAvailableException, NotAuthorizedException {
         Log.d(TAG, format("Get contact {0}.", username));
 
-        URI url = buildUrl(context.getString(R.string.restPathMy));
+        URI url = buildUrl(context.getString(R.string.rest_path_my));
         return doGet(url, username, password, Contact.class);
     }
 
@@ -114,7 +114,7 @@ public final class ContactsRepository {
             throws NotAvailableException, NotAuthorizedException {
         Log.d(TAG, format("Get coworkers of {0}.", username));
 
-        URI url = buildUrl(context.getString(R.string.restPathCoworkers));
+        URI url = buildUrl(context.getString(R.string.rest_path_coworkers));
         return doGet(url, username, password, Contact[].class);
     }
 
@@ -157,8 +157,8 @@ public final class ContactsRepository {
     }
 
     private URI buildUrl(String path) throws NotAvailableException {
-        String scheme = context.getString(R.string.restScheme);
-        String authority = context.getString(R.string.restAuthority);
+        String scheme = context.getString(R.string.rest_scheme);
+        String authority = context.getString(R.string.rest_authority);
         try {
             return new URI(scheme, authority, path, null, null);
         } catch (URISyntaxException exception) {
