@@ -107,6 +107,10 @@
                     <includes>
                         <include>**/*.java</include>
                     </includes>
+                    <excludes>
+                        <!-- Files generated for Android. -->
+                        <exclude>gen/**</exclude>
+                    </excludes>
                 </configuration>
                 <executions>
                     <execution>
