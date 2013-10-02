@@ -41,6 +41,7 @@ import android.provider.ContactsContract.CommonDataKinds.Organization;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.CommonDataKinds.Photo;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
+import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.text.TextUtils;
@@ -205,6 +206,9 @@ public class ContactsManager {
         ContentValues skype = skypeValues(loadedContact);
         batch.add(doInsert(Im.CONTENT_ITEM_TYPE, skype));
 
+        ContentValues postal = postalValues(loadedContact);
+        batch.add(doInsert(StructuredPostal.CONTENT_ITEM_TYPE, postal));
+
         ContentValues organization = organizationValues(loadedContact);
         batch.add(doInsert(Organization.CONTENT_ITEM_TYPE, organization));
 
@@ -268,6 +272,9 @@ public class ContactsManager {
         ContentValues skype = skypeValues(loadedContact);
         batch.add(doUpdate(id, Im.CONTENT_ITEM_TYPE, skype));
 
+        ContentValues postal = postalValues(loadedContact);
+        batch.add(doUpdate(id, StructuredPostal.CONTENT_ITEM_TYPE, postal));
+
         ContentValues organization = organizationValues(loadedContact);
         batch.add(doUpdate(id, Organization.CONTENT_ITEM_TYPE, organization));
 
@@ -318,6 +325,13 @@ public class ContactsManager {
         skype.put(Im.PROTOCOL, Im.PROTOCOL_SKYPE);
         skype.put(Im.TYPE, Im.TYPE_OTHER);
         return skype;
+    }
+
+    private static ContentValues postalValues(Contact contact) {
+        ContentValues postal = new ContentValues();
+        postal.put(StructuredPostal.CITY, contact.getLocation());
+        postal.put(StructuredPostal.TYPE, StructuredPostal.TYPE_WORK);
+        return postal;
     }
 
     private static ContentValues organizationValues(Contact contact) {
