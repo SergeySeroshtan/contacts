@@ -15,12 +15,16 @@
  */
 package grytsenko.contacts.web.service;
 
-import static grytsenko.contacts.web.data.mapper.ContactsMapper.asContact;
+import grytsenko.contacts.api.Address;
 import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.web.data.Employee;
 import grytsenko.contacts.web.data.EmployeeDetails;
 import grytsenko.contacts.web.data.EmployeesDetailsRepository;
 import grytsenko.contacts.web.data.EmployeesRepository;
+import grytsenko.contacts.web.data.Office;
+import grytsenko.contacts.web.data.OfficesRepository;
+import grytsenko.contacts.web.data.mapper.AddressMapper;
+import grytsenko.contacts.web.data.mapper.ContactMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,15 +39,18 @@ import org.springframework.util.StringUtils;
  * Searches a contacts.
  */
 @Service
-public class SearchContactsService {
+public class SearchService {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(SearchContactsService.class);
+            .getLogger(SearchService.class);
 
     @Autowired
     EmployeesRepository employeesRepository;
     @Autowired
     EmployeesDetailsRepository employeesDetailsRepository;
+
+    @Autowired
+    OfficesRepository officesRepository;
 
     /**
      * Finds contact of employee.
@@ -105,7 +112,17 @@ public class SearchContactsService {
         if (details != null) {
             LOGGER.debug("Found details for {}.", employee);
         }
-        return asContact(employee, details);
+        return ContactMapper.map(employee, details);
+    }
+
+    /**
+     * Finds addresses of all offices.
+     * 
+     * @return the list of addresses.
+     */
+    public List<Address> findAddresses() {
+        List<Office> offices = officesRepository.findAll();
+        return AddressMapper.map(offices);
     }
 
 }

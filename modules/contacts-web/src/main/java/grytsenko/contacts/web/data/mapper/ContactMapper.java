@@ -20,21 +20,21 @@ import grytsenko.contacts.web.data.Employee;
 import grytsenko.contacts.web.data.EmployeeDetails;
 
 /**
- * Provides facilities for mapping data from repositories to contacts.
+ * Helps to get contact information.
  */
-public final class ContactsMapper {
+public final class ContactMapper {
 
     /**
-     * Represents information about employee as contact.
+     * Gets contact of employee.
      * 
      * @param employee
-     *            the information about employee.
+     *            the employee.
      * @param details
-     *            the additional information about employee (optional).
+     *            the optional employee details.
      * 
      * @return the created contact.
      */
-    public static Contact asContact(Employee employee, EmployeeDetails details) {
+    public static Contact map(Employee employee, EmployeeDetails details) {
         Contact contact = new Contact();
 
         contact.setUid(employee.getUid());
@@ -66,7 +66,7 @@ public final class ContactsMapper {
         return major + minor;
     }
 
-    private ContactsMapper() {
+    private ContactMapper() {
     }
 
 }

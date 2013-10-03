@@ -16,7 +16,7 @@
 package grytsenko.contacts.web.app;
 
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.web.service.SearchContactsService;
+import grytsenko.contacts.web.service.SearchService;
 
 import java.security.Principal;
 
@@ -39,7 +39,7 @@ public class HomeController {
             .getLogger(HomeController.class);
 
     @Autowired
-    SearchContactsService searchContactsService;
+    SearchService searchContactsService;
 
     /**
      * Finds contact of current user.

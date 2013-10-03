@@ -16,7 +16,7 @@
 package grytsenko.contacts.web.app;
 
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.web.service.SearchContactsService;
+import grytsenko.contacts.web.service.SearchService;
 import grytsenko.contacts.web.util.FullNameComparator;
 
 import java.security.Principal;
@@ -42,7 +42,7 @@ public class CoworkersController {
             .getLogger(CoworkersController.class);
 
     @Autowired
-    SearchContactsService searchContactsService;
+    SearchService searchContactsService;
 
     /**
      * Finds contacts of coworkers of current user.

@@ -15,9 +15,10 @@
  */
 package grytsenko.contacts.web.rest;
 
+import grytsenko.contacts.api.Address;
 import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.api.MobileAppHeaders;
-import grytsenko.contacts.web.service.SearchContactsService;
+import grytsenko.contacts.web.service.SearchService;
 
 import java.security.Principal;
 import java.util.List;
@@ -42,7 +43,7 @@ public class RestController {
             .getLogger(RestController.class);
 
     @Autowired
-    SearchContactsService searchContactsService;
+    SearchService searchService;
 
     /**
      * Finds contact of current user.
@@ -57,7 +58,7 @@ public class RestController {
 
         processMobileAppInfo(username, mobileAppPlatform);
 
-        return searchContactsService.findEmployee(username);
+        return searchService.findEmployee(username);
     }
 
     /**
@@ -73,10 +74,29 @@ public class RestController {
 
         processMobileAppInfo(username, mobileAppPlatform);
 
-        List<Contact> contacts = searchContactsService.findCoworkers(username);
+        List<Contact> contacts = searchService.findCoworkers(username);
         LOGGER.debug("Found {} coworkers.", contacts.size());
 
         return contacts;
+    }
+
+    /**
+     * Finds addresses of all offices.
+     */
+    @RequestMapping(value = "locations", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Address> postals(
+            Principal principal,
+            @RequestHeader(value = MobileAppHeaders.Platform.HEADER_NAME, required = false) String mobileAppPlatform) {
+        String username = principal.getName();
+        LOGGER.debug("Get addresses of all offices.");
+
+        processMobileAppInfo(username, mobileAppPlatform);
+
+        List<Address> addresses = searchService.findAddresses();
+        LOGGER.debug("Found {} addresses.", addresses.size());
+
+        return addresses;
     }
 
     private void processMobileAppInfo(String username, String platform) {
