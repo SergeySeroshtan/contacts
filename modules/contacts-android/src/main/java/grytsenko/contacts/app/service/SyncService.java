@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package grytsenko.contacts.app.service.account;
+package grytsenko.contacts.app.service;
 
 import android.app.Service;
 import android.content.Intent;
@@ -21,26 +21,26 @@ import android.os.IBinder;
 import android.util.Log;
 
 /**
- * Service that allows user to create new account.
+ * Service for synchronization of contacts.
  */
-public class SignInService extends Service {
+public class SyncService extends Service {
 
-    private static final String TAG = SignInService.class.getName();
+    private static final String TAG = SyncService.class.getName();
 
-    private BasicAutheticator autheticator;
+    private SyncAdapter adapter;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        autheticator = new BasicAutheticator(this);
+        adapter = new SyncAdapter(this, true);
 
         Log.d(TAG, "Service created.");
     }
 
     @Override
     public IBinder onBind(Intent intent) {
-        return autheticator.getIBinder();
+        return adapter.getSyncAdapterBinder();
     }
 
 }

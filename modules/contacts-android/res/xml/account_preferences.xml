@@ -8,7 +8,7 @@
         android:title="@string/sync_settings_title" android:summary="@string/sync_settings_summary">
         <intent android:action="grytsenko.contacts.app.settings.ACCOUNT_SETTINGS"
             android:targetPackage="grytsenko.contacts.app"
-            android:targetClass="grytsenko.contacts.app.settings.SyncSettingsActivity" />
+            android:targetClass="grytsenko.contacts.app.ui.SyncSettingsActivity" />
     </PreferenceScreen>
 
 </PreferenceScreen>

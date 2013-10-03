@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package grytsenko.contacts.app.service.account;
+package grytsenko.contacts.app.ui;
 
 import static java.text.MessageFormat.format;
 import grytsenko.contacts.app.R;

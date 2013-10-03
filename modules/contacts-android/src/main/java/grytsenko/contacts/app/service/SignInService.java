@@ -13,22 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package grytsenko.contacts.app.sync;
+package grytsenko.contacts.app.service;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.util.Log;
 
 /**
- * Thrown if operation, that is required for synchronization, could not be
- * completed.
+ * Service that allows user to create new account.
  */
-public class SyncOperationException extends Exception {
+public class SignInService extends Service {
 
-    private static final long serialVersionUID = -7368186952748292754L;
+    private static final String TAG = SignInService.class.getName();
 
-    public SyncOperationException(String message) {
-        super(message);
+    private Autheticator autheticator;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        autheticator = new Autheticator(this);
+
+        Log.d(TAG, "Service created.");
     }
 
-    public SyncOperationException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    public IBinder onBind(Intent intent) {
+        return autheticator.getIBinder();
     }
 
 }

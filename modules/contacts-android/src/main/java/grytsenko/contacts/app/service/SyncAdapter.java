@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package grytsenko.contacts.app.service.sync;
+package grytsenko.contacts.app.service;
 
 import static java.lang.Thread.currentThread;
 import static java.text.MessageFormat.format;
@@ -26,7 +26,7 @@ import grytsenko.contacts.app.sync.ContactsManager;
 import grytsenko.contacts.app.sync.GroupsManager;
 import grytsenko.contacts.app.sync.NetworkManager;
 import grytsenko.contacts.app.sync.SettingsManager;
-import grytsenko.contacts.app.sync.SyncOperationException;
+import grytsenko.contacts.app.sync.SyncException;
 import grytsenko.contacts.app.sync.SyncedContact;
 import grytsenko.contacts.app.sync.SyncedGroup;
 
@@ -51,9 +51,9 @@ import android.util.Log;
 /**
  * Synchronizes contacts.
  */
-public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
+public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
-    private static final String TAG = SyncContactsAdapter.class.getName();
+    private static final String TAG = SyncAdapter.class.getName();
 
     private ContactsRepository contactsRepository;
 
@@ -62,7 +62,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     private SettingsManager settingsManager;
     private NetworkManager networkManager;
 
-    public SyncContactsAdapter(Context context, boolean autoInitialize) {
+    public SyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
 
         contactsRepository = new ContactsRepository(context);
@@ -90,7 +90,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             SyncedGroup groupCoworkers;
             try {
                 groupCoworkers = syncCoworkersGroup(account);
-            } catch (SyncOperationException exception) {
+            } catch (SyncException exception) {
                 Log.e(TAG, "Could not sync group.", exception);
                 return;
             }
@@ -141,7 +141,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             notifyCompleted();
 
             Log.d(TAG, "Sync completed.");
-        } catch (SyncCanceledException exception) {
+        } catch (CanceledException exception) {
             Log.w(TAG, "Sync canceled.", exception);
         }
     }
@@ -154,11 +154,11 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * 
      * @return the synchronized group.
      * 
-     * @throws SyncOperationException
+     * @throws SyncException
      *             the group could not be synchronized.
      */
     private SyncedGroup syncCoworkersGroup(Account account)
-            throws SyncOperationException {
+            throws SyncException {
         String uid = getContext().getString(R.string.group_coworkers_uid);
         String title = settingsManager.getCoworkersTitle();
 
@@ -184,9 +184,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      */
     private Map<String, Contact> loadCoworkersContacts(Account account)
             throws NotAuthorizedException, NotAvailableException,
-            SyncCanceledException {
+            CanceledException {
         if (!isSuitableNetwork()) {
-            throw new SyncCanceledException("Unsuitable network.");
+            throw new CanceledException("Not suitable network.");
         }
 
         String username = account.name;
@@ -207,8 +207,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      */
     private Map<String, SyncedContact> syncCreatedContacts(Account account,
             SyncedGroup group, Map<String, Contact> loadedContacts,
-            Map<String, SyncedContact> syncedContacts)
-            throws SyncCanceledException {
+            Map<String, SyncedContact> syncedContacts) throws CanceledException {
         Map<String, SyncedContact> createdContacts = new HashMap<String, SyncedContact>();
 
         for (Contact loadedContact : loadedContacts.values()) {
@@ -223,7 +222,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
                 SyncedContact createdContact = contactsManager.createContact(
                         account, group, loadedContact);
                 createdContacts.put(uid, createdContact);
-            } catch (SyncOperationException exception) {
+            } catch (SyncException exception) {
                 Log.w(TAG, format("Contact {0} was not created.", uid),
                         exception);
             }
@@ -239,8 +238,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      */
     private Map<String, SyncedContact> syncUpdatedContacts(
             Map<String, Contact> loadedContacts,
-            Map<String, SyncedContact> syncedContacts)
-            throws SyncCanceledException {
+            Map<String, SyncedContact> syncedContacts) throws CanceledException {
         Map<String, SyncedContact> updatedContacts = new HashMap<String, SyncedContact>();
 
         boolean appUpdated = settingsManager.isAppUpdated();
@@ -269,7 +267,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
                 SyncedContact updatedContact = contactsManager.updateContact(
                         syncedContact, loadedContact);
                 updatedContacts.put(uid, updatedContact);
-            } catch (SyncOperationException exception) {
+            } catch (SyncException exception) {
                 Log.w(TAG, format("Contact {0} was not updated.", uid),
                         exception);
             }
@@ -284,8 +282,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      */
     private Map<String, SyncedContact> syncRemovedContacts(
             Map<String, Contact> loadedContacts,
-            Map<String, SyncedContact> syncedContacts)
-            throws SyncCanceledException {
+            Map<String, SyncedContact> syncedContacts) throws CanceledException {
         Map<String, SyncedContact> removedContacts = new HashMap<String, SyncedContact>();
 
         for (SyncedContact syncedContact : syncedContacts.values()) {
@@ -299,7 +296,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             try {
                 contactsManager.removeContact(syncedContact);
                 removedContacts.put(uid, syncedContact);
-            } catch (SyncOperationException exception) {
+            } catch (SyncException exception) {
                 Log.w(TAG, format("Contact {0} was not removed.", uid),
                         exception);
             }
@@ -313,7 +310,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * Synchronizes photos.
      */
     private void syncPhotos(Map<String, SyncedContact> syncedContacts)
-            throws SyncCanceledException {
+            throws CanceledException {
         if (!settingsManager.isSyncPhotos()) {
             Log.d(TAG, "Sync of photos is disabled.");
             return;
@@ -324,7 +321,7 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             try {
                 syncPhoto(syncedContact);
-            } catch (SyncOperationException exception) {
+            } catch (SyncException exception) {
                 Log.w(TAG,
                         format("Photo for {0} was not synced.",
                                 syncedContact.getUid()), exception);
@@ -335,8 +332,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Synchronizes photo of contact.
      */
-    private void syncPhoto(SyncedContact syncedContact)
-            throws SyncOperationException, SyncCanceledException {
+    private void syncPhoto(SyncedContact syncedContact) throws SyncException,
+            CanceledException {
         String uid = syncedContact.getUid();
         String photoUrl = syncedContact.getPhotoUrl();
 
@@ -364,14 +361,14 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * 
      * @return the loaded photo.
      */
-    private byte[] loadPhoto(String photoUrl) throws SyncOperationException,
-            SyncCanceledException {
+    private byte[] loadPhoto(String photoUrl) throws SyncException,
+            CanceledException {
         if (TextUtils.isEmpty(photoUrl)) {
             throw new IllegalArgumentException("URL is required.");
         }
 
         if (!isSuitableNetwork()) {
-            throw new SyncCanceledException("Unsuitable network.");
+            throw new CanceledException("Not suitable network.");
         }
 
         try {
@@ -385,11 +382,9 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
                 compressStream.close();
             }
         } catch (NotAvailableException exception) {
-            throw new SyncOperationException("Could not download photo.",
-                    exception);
+            throw new SyncException("Could not download photo.", exception);
         } catch (IOException exception) {
-            throw new SyncOperationException("Could not convert photo.",
-                    exception);
+            throw new SyncException("Could not convert photo.", exception);
         }
     }
 
@@ -397,8 +392,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
      * Notifies user that synchronization completed.
      */
     private void notifyCompleted() {
-        Intent intent = new Intent(getContext(), UpdateStatusService.class);
-        intent.setAction(UpdateStatusService.ACTION_NOTIFY_COMPLETED);
+        Intent intent = new Intent(getContext(), StatusService.class);
+        intent.setAction(StatusService.ACTION_NOTIFY_COMPLETED);
         getContext().startService(intent);
     }
 
@@ -419,21 +414,21 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Checks, that synchronization was canceled.
      */
-    private void checkCanceled() throws SyncCanceledException {
+    private void checkCanceled() throws CanceledException {
         boolean canceled = currentThread().isInterrupted();
         if (canceled) {
-            throw new SyncCanceledException("Sync interrupted.");
+            throw new CanceledException("Sync interrupted.");
         }
     }
 
     /**
-     * Thrown if synchronization was cancelled.
+     * Thrown if synchronization was canceled.
      */
-    private static class SyncCanceledException extends Exception {
+    private static class CanceledException extends Exception {
 
         private static final long serialVersionUID = 1678007155060368790L;
 
-        public SyncCanceledException(String message) {
+        public CanceledException(String message) {
             super(message);
         }
 

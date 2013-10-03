@@ -13,34 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package grytsenko.contacts.app.service.sync;
-
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
-import android.util.Log;
+package grytsenko.contacts.app.sync;
 
 /**
- * Service for synchronization of contacts.
+ * Thrown if operation, that is required for synchronization, could not be
+ * completed.
  */
-public class SyncContactsService extends Service {
+public class SyncException extends Exception {
 
-    private static final String TAG = SyncContactsService.class.getName();
+    private static final long serialVersionUID = -7368186952748292754L;
 
-    private SyncContactsAdapter adapter;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        adapter = new SyncContactsAdapter(this, true);
-
-        Log.d(TAG, "Service created.");
+    public SyncException(String message) {
+        super(message);
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return adapter.getSyncAdapterBinder();
+    public SyncException(String message, Throwable cause) {
+        super(message, cause);
     }
 
 }

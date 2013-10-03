@@ -106,11 +106,11 @@ public class GroupsManager {
      * 
      * @return the created group.
      * 
-     * @throws SyncOperationException
+     * @throws SyncException
      *             if group could not be created.
      */
     public SyncedGroup createGroup(Account account, String uid, String title)
-            throws SyncOperationException {
+            throws SyncException {
         Log.d(TAG, format("Create group {0}.", uid));
 
         ArrayList<ContentProviderOperation> batch = new ArrayList<ContentProviderOperation>();
@@ -129,8 +129,8 @@ public class GroupsManager {
             Log.d(TAG, format("Group {0} was created.", uid));
             return SyncedGroup.create(id, uid, title);
         } catch (Exception exception) {
-            throw new SyncOperationException(format(
-                    "Could not create group {0}.", uid), exception);
+            throw new SyncException(format("Could not create group {0}.", uid),
+                    exception);
         }
     }
 
@@ -144,11 +144,11 @@ public class GroupsManager {
      * 
      * @return the updated group.
      * 
-     * @throws SyncOperationException
+     * @throws SyncException
      *             if contact could not be updated.
      */
     public SyncedGroup updateTitle(SyncedGroup syncedGroup, String title)
-            throws SyncOperationException {
+            throws SyncException {
         long id = syncedGroup.getId();
         String uid = syncedGroup.getUid();
         Log.d(TAG, format("Update title of group {0} to {1}.", uid, title));
@@ -165,8 +165,7 @@ public class GroupsManager {
 
             return SyncedGroup.create(id, uid, title);
         } catch (Exception exception) {
-            throw new SyncOperationException("Could not update photo.",
-                    exception);
+            throw new SyncException("Could not update photo.", exception);
         }
     }
 

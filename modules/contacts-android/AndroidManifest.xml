@@ -20,18 +20,18 @@
 
     <application android:allowBackup="true" android:icon="@drawable/ic_main"
         android:label="@string/app_name" android:theme="@style/AppTheme">
-        <activity android:name="grytsenko.contacts.app.service.account.SignInActivity"
+        <activity android:name="grytsenko.contacts.app.ui.SignInActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
 
-        <activity android:name="grytsenko.contacts.app.settings.SyncSettingsActivity"
+        <activity android:name="grytsenko.contacts.app.ui.SyncSettingsActivity"
             android:label="@string/sync_settings_title"
             android:excludeFromRecents="true" android:theme="@android:style/Theme.Dialog" />
 
-        <service android:name="grytsenko.contacts.app.service.account.SignInService"
+        <service android:name="grytsenko.contacts.app.service.SignInService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -40,7 +40,7 @@
                 android:resource="@xml/account_authenticator" />
         </service>
 
-        <service android:name="grytsenko.contacts.app.service.sync.SyncContactsService"
+        <service android:name="grytsenko.contacts.app.service.SyncService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -49,7 +49,7 @@
                 android:resource="@xml/sync_adapter" />
         </service>
 
-        <service android:name="grytsenko.contacts.app.service.sync.UpdateStatusService"
+        <service android:name="grytsenko.contacts.app.service.StatusService"
             android:enabled="true">
         </service>
     </application>

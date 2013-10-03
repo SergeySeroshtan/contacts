@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package grytsenko.contacts.app.settings;
+package grytsenko.contacts.app.ui;
 
 import grytsenko.contacts.app.R;
 import android.os.Bundle;

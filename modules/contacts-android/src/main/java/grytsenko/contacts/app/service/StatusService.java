@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package grytsenko.contacts.app.service.sync;
+package grytsenko.contacts.app.service;
 
 import grytsenko.contacts.app.R;
 import android.app.IntentService;
@@ -25,12 +25,12 @@ import android.support.v4.app.NotificationCompat;
 /**
  * Manages notifications about status of synchronization.
  */
-public class UpdateStatusService extends IntentService {
+public class StatusService extends IntentService {
 
     /**
      * The name of service.
      */
-    private static final String SERVICE_NAME = UpdateStatusService.class
+    private static final String SERVICE_NAME = StatusService.class
             .getName();
 
     /**
@@ -50,7 +50,7 @@ public class UpdateStatusService extends IntentService {
     /**
      * Creates manager in the specified context.
      */
-    public UpdateStatusService() {
+    public StatusService() {
         super(SERVICE_NAME);
     }
 
@@ -74,7 +74,7 @@ public class UpdateStatusService extends IntentService {
         builder.setContentText(getString(R.string.sync_completed));
         builder.setSmallIcon(R.drawable.ic_main);
 
-        Intent cancelIntent = new Intent(this, UpdateStatusService.class);
+        Intent cancelIntent = new Intent(this, StatusService.class);
         cancelIntent.setAction(ACTION_CANCEL_STATUS);
         PendingIntent contentIntent = PendingIntent.getService(this, 0,
                 cancelIntent, 0);

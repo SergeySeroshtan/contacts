@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package grytsenko.contacts.app.service.account;
+package grytsenko.contacts.app.service;
 
 import static android.accounts.AccountManager.KEY_ACCOUNT_AUTHENTICATOR_RESPONSE;
+import grytsenko.contacts.app.ui.SignInActivity;
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;
 import android.accounts.AccountAuthenticatorResponse;
@@ -29,11 +30,11 @@ import android.os.Bundle;
  * The simple implementation of authenticator, which allow to create new
  * accounts using {@link SignInActivity}.
  */
-public class BasicAutheticator extends AbstractAccountAuthenticator {
+public class Autheticator extends AbstractAccountAuthenticator {
 
     private Context context;
 
-    public BasicAutheticator(Context context) {
+    public Autheticator(Context context) {
         super(context);
 
         this.context = context;

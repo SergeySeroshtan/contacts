@@ -169,11 +169,11 @@ public class ContactsManager {
      * 
      * @return the created contact.
      * 
-     * @throws SyncOperationException
+     * @throws SyncException
      *             if contact could not be created.
      */
     public SyncedContact createContact(Account account, SyncedGroup group,
-            Contact loadedContact) throws SyncOperationException {
+            Contact loadedContact) throws SyncException {
         String uid = loadedContact.getUid();
         String version = loadedContact.getVersion();
         String photoUrl = loadedContact.getPhotoUrl();
@@ -222,8 +222,7 @@ public class ContactsManager {
             return SyncedContact
                     .create(id, uid, version, photoUrl, photoSynced);
         } catch (Exception exception) {
-            throw new SyncOperationException("Could not create contact.",
-                    exception);
+            throw new SyncException("Could not create contact.", exception);
         }
     }
 
@@ -237,11 +236,11 @@ public class ContactsManager {
      * 
      * @return the updated contact.
      * 
-     * @throws SyncOperationException
+     * @throws SyncException
      *             if contact could not be updated.
      */
     public SyncedContact updateContact(SyncedContact syncedContact,
-            Contact loadedContact) throws SyncOperationException {
+            Contact loadedContact) throws SyncException {
         long id = syncedContact.getId();
         String uid = syncedContact.getUid();
         String version = loadedContact.getVersion();
@@ -291,8 +290,7 @@ public class ContactsManager {
             return SyncedContact
                     .create(id, uid, version, photoUrl, photoSynced);
         } catch (Exception exception) {
-            throw new SyncOperationException("Could not update photo.",
-                    exception);
+            throw new SyncException("Could not update photo.", exception);
         }
     }
 
@@ -348,11 +346,11 @@ public class ContactsManager {
      * @param photo
      *            the new photo for contact (can be <code>null</code>).
      * 
-     * @throws SyncOperationException
+     * @throws SyncException
      *             if contact could not be updated.
      */
     public void updatePhoto(SyncedContact syncedContact, byte[] photo)
-            throws SyncOperationException {
+            throws SyncException {
         long id = syncedContact.getId();
         String uid = syncedContact.getUid();
         Log.d(TAG, format("Update photo of contact {0}.", uid));
@@ -369,8 +367,7 @@ public class ContactsManager {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
             Log.d(TAG, format("Photo of contact {0} was updated.", uid));
         } catch (Exception exception) {
-            throw new SyncOperationException("Could not update photo.",
-                    exception);
+            throw new SyncException("Could not update photo.", exception);
         }
     }
 
@@ -380,11 +377,10 @@ public class ContactsManager {
      * @param syncedContact
      *            the removed contact.
      * 
-     * @throws SyncOperationException
+     * @throws SyncException
      *             if contact could not be removed.
      */
-    public void removeContact(SyncedContact syncedContact)
-            throws SyncOperationException {
+    public void removeContact(SyncedContact syncedContact) throws SyncException {
         long id = syncedContact.getId();
         String uid = syncedContact.getUid();
         Log.d(TAG, format("Remove contact {0}.", uid));
@@ -401,8 +397,7 @@ public class ContactsManager {
             contentResolver.applyBatch(ContactsContract.AUTHORITY, batch);
             Log.d(TAG, format("Contact {0} was removed.", uid));
         } catch (Exception exception) {
-            throw new SyncOperationException("Could not remove contact.",
-                    exception);
+            throw new SyncException("Could not remove contact.", exception);
         }
     }
 
