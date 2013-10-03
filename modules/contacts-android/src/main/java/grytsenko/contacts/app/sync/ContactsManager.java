@@ -19,7 +19,6 @@ import static java.text.MessageFormat.format;
 import grytsenko.contacts.api.Contact;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -90,16 +89,16 @@ public class ContactsManager {
                         GroupMembership.CONTENT_ITEM_TYPE }, null);
 
         try {
-            int contactsNum = cursor.getCount();
+            Map<String, SyncedContact> contacts = new HashMap<String, SyncedContact>();
+
             if (!cursor.moveToFirst()) {
                 Log.d(TAG, format("Group {0} is empty.", groupUid));
-                return Collections.emptyMap();
+                return contacts;
             }
 
             Log.d(TAG,
                     format("Group {0} contains {1} contacts.", groupUid,
-                            contactsNum));
-            Map<String, SyncedContact> contacts = new HashMap<String, SyncedContact>();
+                            cursor.getCount()));
             do {
                 long contactId = cursor.getLong(cursor
                         .getColumnIndexOrThrow(GroupMembership.RAW_CONTACT_ID));
