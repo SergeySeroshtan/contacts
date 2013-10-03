@@ -44,7 +44,7 @@ import android.widget.Toast;
  * In this activity we set the default settings for synchronization.
  * 
  * <p>
- * We use {@link ContactsRepository#getMyContact(String, String)} to check
+ * We use {@link ContactsRepository#getMy(String, String)} to check
  * credentials.
  */
 public class SignInActivity extends AccountAuthenticatorActivity {
@@ -191,7 +191,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
             try {
                 ContactsRepository contactsRepository = new ContactsRepository(
                         SignInActivity.this);
-                contactsRepository.getMyContact(username, password);
+                contactsRepository.getMy(username, password);
                 return true;
             } catch (NotAvailableException exception) {
                 Log.d(TAG, "Not available.", exception);

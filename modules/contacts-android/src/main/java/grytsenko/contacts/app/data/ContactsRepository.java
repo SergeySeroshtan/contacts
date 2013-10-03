@@ -48,7 +48,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 /**
- * Remote repository of contacts.
+ * Remote repository of contact information.
  * 
  * <p>
  * We access repository through REST API.
@@ -87,7 +87,7 @@ public final class ContactsRepository {
      * @throws NotAuthorizedException
      *             if user is not authorized to use repository.
      */
-    public Contact getMyContact(String username, String password)
+    public Contact getMy(String username, String password)
             throws NotAvailableException, NotAuthorizedException {
         Log.d(TAG, format("Get contact {0}.", username));
 
@@ -110,7 +110,7 @@ public final class ContactsRepository {
      * @throws NotAuthorizedException
      *             if user is not authorized to use repository.
      */
-    public Contact[] getMyCoworkers(String username, String password)
+    public Contact[] getCoworkers(String username, String password)
             throws NotAvailableException, NotAuthorizedException {
         Log.d(TAG, format("Get coworkers of {0}.", username));
 

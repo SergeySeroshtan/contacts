@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="grytsenko.contacts.app"
-    android:versionCode="6"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="grytsenko.contacts.app" android:versionCode="6"
     android:versionName="0.3.0">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -18,47 +16,41 @@
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
 
-    <uses-sdk
-        android:minSdkVersion="9"
-        android:targetSdkVersion="17" />
+    <uses-sdk android:minSdkVersion="9" android:targetSdkVersion="17" />
 
-    <application
-        android:allowBackup="true"
-        android:icon="@drawable/ic_main"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme">
-        <activity
-            android:name="grytsenko.contacts.app.service.account.SignInActivity"
+    <application android:allowBackup="true" android:icon="@drawable/ic_main"
+        android:label="@string/app_name" android:theme="@style/AppTheme">
+        <activity android:name="grytsenko.contacts.app.service.account.SignInActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="grytsenko.contacts.app.settings.SyncSettingsActivity"
-            android:label="@string/sync_settings_title"
-            android:excludeFromRecents="true"
-            android:theme="@android:style/Theme.Dialog" />
 
-        <service
-            android:name="grytsenko.contacts.app.service.account.SignInService"
+        <activity android:name="grytsenko.contacts.app.settings.SyncSettingsActivity"
+            android:label="@string/sync_settings_title"
+            android:excludeFromRecents="true" android:theme="@android:style/Theme.Dialog" />
+
+        <service android:name="grytsenko.contacts.app.service.account.SignInService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
-            <meta-data
-                android:name="android.accounts.AccountAuthenticator"
+            <meta-data android:name="android.accounts.AccountAuthenticator"
                 android:resource="@xml/account_authenticator" />
         </service>
-        <service
-            android:name="grytsenko.contacts.app.service.sync.SyncContactsService"
+
+        <service android:name="grytsenko.contacts.app.service.sync.SyncContactsService"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
-            <meta-data
-                android:name="android.content.SyncAdapter"
+            <meta-data android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_adapter" />
+        </service>
+
+        <service android:name="grytsenko.contacts.app.service.sync.UpdateStatusService"
+            android:enabled="true">
         </service>
     </application>
 

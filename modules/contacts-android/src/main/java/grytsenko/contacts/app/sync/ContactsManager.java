@@ -99,8 +99,7 @@ public class ContactsManager {
             Log.d(TAG,
                     format("Group {0} contains {1} contacts.", groupUid,
                             contactsNum));
-            Map<String, SyncedContact> contacts = new HashMap<String, SyncedContact>(
-                    contactsNum);
+            Map<String, SyncedContact> contacts = new HashMap<String, SyncedContact>();
             do {
                 long contactId = cursor.getLong(cursor
                         .getColumnIndexOrThrow(GroupMembership.RAW_CONTACT_ID));

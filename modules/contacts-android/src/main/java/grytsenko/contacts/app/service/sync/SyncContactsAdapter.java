@@ -40,6 +40,7 @@ import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SyncResult;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -122,17 +123,22 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
                     account, groupCoworkers, loadedCoworkers, syncedCoworkers);
             Map<String, SyncedContact> updatedCoworkers = syncUpdatedContacts(
                     loadedCoworkers, syncedCoworkers);
-            syncRemovedContacts(loadedCoworkers, syncedCoworkers);
+            Map<String, SyncedContact> removedContacts = syncRemovedContacts(
+                    loadedCoworkers, syncedCoworkers);
 
-            Log.d(TAG, "Sync photos.");
-            syncedCoworkers = new HashMap<String, SyncedContact>(
-                    syncedCoworkers);
+            Log.d(TAG, "Update set of contacts.");
             syncedCoworkers.putAll(createdCoworkers);
             syncedCoworkers.putAll(updatedCoworkers);
+            for (String uid : removedContacts.keySet()) {
+                syncedCoworkers.remove(uid);
+            }
 
+            Log.d(TAG, "Sync photos.");
             syncPhotos(syncedCoworkers);
 
             settingsManager.updateLastSyncTime();
+
+            notifyCompleted();
 
             Log.d(TAG, "Sync completed.");
         } catch (SyncCanceledException exception) {
@@ -187,8 +193,8 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
         AccountManager accountManager = AccountManager.get(getContext());
         String password = accountManager.getPassword(account);
 
-        Contact[] contacts = contactsRepository.getMyCoworkers(username,
-                password);
+        Contact[] contacts = contactsRepository
+                .getCoworkers(username, password);
         Map<String, Contact> loadedContacts = new HashMap<String, Contact>();
         for (Contact contact : contacts) {
             loadedContacts.put(contact.getUid(), contact);
@@ -276,10 +282,11 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Removes obsolete contacts.
      */
-    private void syncRemovedContacts(Map<String, Contact> loadedContacts,
+    private Map<String, SyncedContact> syncRemovedContacts(
+            Map<String, Contact> loadedContacts,
             Map<String, SyncedContact> syncedContacts)
             throws SyncCanceledException {
-        int removedContactsNum = 0;
+        Map<String, SyncedContact> removedContacts = new HashMap<String, SyncedContact>();
 
         for (SyncedContact syncedContact : syncedContacts.values()) {
             String uid = syncedContact.getUid();
@@ -291,14 +298,15 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
 
             try {
                 contactsManager.removeContact(syncedContact);
-                ++removedContactsNum;
+                removedContacts.put(uid, syncedContact);
             } catch (SyncOperationException exception) {
                 Log.w(TAG, format("Contact {0} was not removed.", uid),
                         exception);
             }
         }
 
-        Log.d(TAG, format("Removed {0} contacts.", removedContactsNum));
+        Log.d(TAG, format("Removed {0} contacts.", removedContacts.size()));
+        return removedContacts;
     }
 
     /**
@@ -383,6 +391,15 @@ public class SyncContactsAdapter extends AbstractThreadedSyncAdapter {
             throw new SyncOperationException("Could not convert photo.",
                     exception);
         }
+    }
+
+    /**
+     * Notifies user that synchronization completed.
+     */
+    private void notifyCompleted() {
+        Intent intent = new Intent(getContext(), UpdateStatusService.class);
+        intent.setAction(UpdateStatusService.ACTION_NOTIFY_COMPLETED);
+        getContext().startService(intent);
     }
 
     /**
