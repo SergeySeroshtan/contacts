@@ -10,6 +10,7 @@
     <string name="username_empty">Please enter username.</string>
     <string name="password_hint">Password</string>
     <string name="password_empty">Please enter password.</string>
+    <string name="password_show">Show password</string>
 
     <string name="sign_in_action">Sign in</string>
     <string name="sign_in_wait">Please wait&#8230;</string>

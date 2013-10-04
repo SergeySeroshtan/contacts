@@ -30,10 +30,12 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -44,8 +46,7 @@ import android.widget.Toast;
  * In this activity we set the default settings for synchronization.
  * 
  * <p>
- * We use {@link ContactsRepository#getMy(String, String)} to check
- * credentials.
+ * We use {@link ContactsRepository#getMy(String, String)} to check credentials.
  */
 public class SignInActivity extends AccountAuthenticatorActivity {
 
@@ -84,6 +85,18 @@ public class SignInActivity extends AccountAuthenticatorActivity {
 
         usernameInput = (EditText) findViewById(R.id.username);
         passwordInput = (EditText) findViewById(R.id.password);
+
+        final CheckBox showPassword = (CheckBox) findViewById(R.id.show_password);
+        showPassword.setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                boolean checked = showPassword.isChecked();
+                passwordInput.setTransformationMethod(checked ? null
+                        : new PasswordTransformationMethod());
+            }
+
+        });
 
         Button signInButton = (Button) findViewById(R.id.signIn);
         signInButton.setOnClickListener(new OnClickListener() {
