@@ -36,6 +36,7 @@
     <string name="group_coworkers_default">Coworkers</string>
     <string name="group_coworkers_empty">The title could not be empty.</string>
 
-    <string name="sync_completed">Successfully updated.</string>
+    <string name="sync_completed">Sync completed.</string>
+    <string name="sync_failed">Sync failed.</string>
 
 </resources>

@@ -30,14 +30,18 @@ public class StatusService extends IntentService {
     /**
      * The name of service.
      */
-    private static final String SERVICE_NAME = StatusService.class
-            .getName();
+    private static final String SERVICE_NAME = StatusService.class.getName();
 
     /**
-     * Notifies user that update completed.
+     * Notifies user that synchronization completed.
      */
     public static final String ACTION_NOTIFY_COMPLETED = SERVICE_NAME
             + ".ACTION_NOTIFY_COMPLETED";
+    /**
+     * Notifies user that synchronization failed.
+     */
+    public static final String ACTION_NOTIFY_FAILED = SERVICE_NAME
+            + ".ACTION_NOTIFY_FAILED";
 
     /**
      * Cancels notification about status.
@@ -60,18 +64,20 @@ public class StatusService extends IntentService {
 
         String action = intent.getAction();
         if (ACTION_NOTIFY_COMPLETED.equals(action)) {
-            notifyCompleted(notificationManager);
+            notify(notificationManager, R.string.sync_completed);
+        } else if (ACTION_NOTIFY_FAILED.equals(action)) {
+            notify(notificationManager, R.string.sync_failed);
         } else if (ACTION_CANCEL_STATUS.equals(action)) {
             cancel(notificationManager);
         }
     }
 
-    private void notifyCompleted(NotificationManager notificationManager) {
+    private void notify(NotificationManager notificationManager, int textId) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 this);
         builder.setAutoCancel(true);
         builder.setContentTitle(getString(R.string.app_name));
-        builder.setContentText(getString(R.string.sync_completed));
+        builder.setContentText(getString(textId));
         builder.setSmallIcon(R.drawable.ic_main);
 
         Intent cancelIntent = new Intent(this, StatusService.class);

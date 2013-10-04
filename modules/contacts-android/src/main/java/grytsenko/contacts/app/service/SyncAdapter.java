@@ -94,6 +94,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             } catch (SyncException exception) {
                 syncResult.databaseError = true;
                 Log.e(TAG, "Could not sync group.", exception);
+                notifyFailed();
                 return;
             }
 
@@ -108,10 +109,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             } catch (NotAuthorizedException exception) {
                 syncResult.tooManyRetries = true;
                 Log.e(TAG, "Access denied.", exception);
+                notifyFailed();
                 return;
             } catch (NotAvailableException exception) {
                 syncResult.tooManyRetries = true;
                 Log.e(TAG, "Not available.", exception);
+                notifyFailed();
                 return;
             }
 
@@ -415,6 +418,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     private void notifyCompleted() {
         Intent intent = new Intent(getContext(), StatusService.class);
         intent.setAction(StatusService.ACTION_NOTIFY_COMPLETED);
+        getContext().startService(intent);
+    }
+
+    /**
+     * Notifies user that synchronization failed.
+     */
+    private void notifyFailed() {
+        Intent intent = new Intent(getContext(), StatusService.class);
+        intent.setAction(StatusService.ACTION_NOTIFY_FAILED);
         getContext().startService(intent);
     }
 
