@@ -94,6 +94,7 @@ public class SignInActivity extends AccountAuthenticatorActivity {
                 boolean checked = showPassword.isChecked();
                 passwordInput.setTransformationMethod(checked ? null
                         : new PasswordTransformationMethod());
+                passwordInput.setSelection(passwordInput.getText().length());
             }
 
         });

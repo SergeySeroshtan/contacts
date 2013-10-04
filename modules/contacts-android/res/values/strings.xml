@@ -6,9 +6,9 @@
 
     <string name="account_type">grytsenko.contacts.app</string>
 
-    <string name="username_hint">Username</string>
+    <string name="username_hint">username</string>
     <string name="username_empty">Please enter username.</string>
-    <string name="password_hint">Password</string>
+    <string name="password_hint">password</string>
     <string name="password_empty">Please enter password.</string>
     <string name="password_show">Show password</string>
 
