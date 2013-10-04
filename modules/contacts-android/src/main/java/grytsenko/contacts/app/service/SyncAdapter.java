@@ -42,6 +42,7 @@ import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
+import android.content.SyncStats;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 import android.os.Bundle;
@@ -84,13 +85,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
         Log.d(TAG, "Sync started.");
 
         try {
-            Log.d(TAG, "Sync contacts of coworkers.");
+            Log.d(TAG, "Sync coworkers.");
 
             Log.d(TAG, "Sync group.");
             SyncedGroup groupCoworkers;
             try {
                 groupCoworkers = syncCoworkersGroup(account);
             } catch (SyncException exception) {
+                syncResult.databaseError = true;
                 Log.e(TAG, "Could not sync group.", exception);
                 return;
             }
@@ -104,29 +106,42 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 Log.d(TAG,
                         format("Loaded {0} contacts.", loadedCoworkers.size()));
             } catch (NotAuthorizedException exception) {
+                syncResult.tooManyRetries = true;
                 Log.e(TAG, "Access denied.", exception);
                 return;
             } catch (NotAvailableException exception) {
-                Log.e(TAG, "Contacts not available.", exception);
+                syncResult.tooManyRetries = true;
+                Log.e(TAG, "Not available.", exception);
                 return;
             }
 
             checkCanceled();
 
-            Log.d(TAG, "Search contacts in address book.");
+            Log.d(TAG, "Search contacts.");
             Map<String, SyncedContact> syncedCoworkers = contactsManager
                     .findAll(groupCoworkers);
             Log.d(TAG, format("Found {0} contacts.", syncedCoworkers.size()));
 
             Log.d(TAG, "Sync contacts.");
-            Map<String, SyncedContact> createdCoworkers = syncCreatedContacts(
-                    account, groupCoworkers, loadedCoworkers, syncedCoworkers);
-            Map<String, SyncedContact> updatedCoworkers = syncUpdatedContacts(
-                    loadedCoworkers, syncedCoworkers);
-            Map<String, SyncedContact> removedContacts = syncRemovedContacts(
-                    loadedCoworkers, syncedCoworkers);
+            SyncStats syncStats = syncResult.stats;
 
-            Log.d(TAG, "Update set of contacts.");
+            Map<String, SyncedContact> createdCoworkers = syncCreatedContacts(
+                    account, groupCoworkers, loadedCoworkers, syncedCoworkers,
+                    syncStats);
+            Log.d(TAG, format("Created {0} contacts.", syncStats.numInserts));
+
+            Map<String, SyncedContact> updatedCoworkers = syncUpdatedContacts(
+                    loadedCoworkers, syncedCoworkers, syncStats);
+            Log.d(TAG, format("Updated {0} contacts.", syncStats.numUpdates));
+
+            Map<String, SyncedContact> removedContacts = syncRemovedContacts(
+                    loadedCoworkers, syncedCoworkers, syncStats);
+            Log.d(TAG, format("Removed {0} contacts.", syncStats.numDeletes));
+
+            Log.d(TAG,
+                    format("Skipped {0} contacts.", syncStats.numSkippedEntries));
+
+            Log.d(TAG, "Prepare for further sync.");
             syncedCoworkers.putAll(createdCoworkers);
             syncedCoworkers.putAll(updatedCoworkers);
             for (String uid : removedContacts.keySet()) {
@@ -207,7 +222,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      */
     private Map<String, SyncedContact> syncCreatedContacts(Account account,
             SyncedGroup group, Map<String, Contact> loadedContacts,
-            Map<String, SyncedContact> syncedContacts) throws CanceledException {
+            Map<String, SyncedContact> syncedContacts, SyncStats syncStats)
+            throws CanceledException {
         Map<String, SyncedContact> createdContacts = new HashMap<String, SyncedContact>();
 
         for (Contact loadedContact : loadedContacts.values()) {
@@ -222,13 +238,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 SyncedContact createdContact = contactsManager.createContact(
                         account, group, loadedContact);
                 createdContacts.put(uid, createdContact);
+                ++syncStats.numInserts;
             } catch (SyncException exception) {
                 Log.w(TAG, format("Contact {0} was not created.", uid),
                         exception);
+                ++syncStats.numSkippedEntries;
             }
         }
 
-        Log.d(TAG, format("Created {0} contacts.", createdContacts.size()));
         return createdContacts;
     }
 
@@ -238,7 +255,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      */
     private Map<String, SyncedContact> syncUpdatedContacts(
             Map<String, Contact> loadedContacts,
-            Map<String, SyncedContact> syncedContacts) throws CanceledException {
+            Map<String, SyncedContact> syncedContacts, SyncStats syncStats)
+            throws CanceledException {
         Map<String, SyncedContact> updatedContacts = new HashMap<String, SyncedContact>();
 
         boolean appUpdated = settingsManager.isAppUpdated();
@@ -267,13 +285,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                 SyncedContact updatedContact = contactsManager.updateContact(
                         syncedContact, loadedContact);
                 updatedContacts.put(uid, updatedContact);
+                ++syncStats.numUpdates;
             } catch (SyncException exception) {
                 Log.w(TAG, format("Contact {0} was not updated.", uid),
                         exception);
+                ++syncStats.numSkippedEntries;
             }
         }
 
-        Log.d(TAG, format("Updated {0} contacts.", updatedContacts.size()));
         return updatedContacts;
     }
 
@@ -282,7 +301,8 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      */
     private Map<String, SyncedContact> syncRemovedContacts(
             Map<String, Contact> loadedContacts,
-            Map<String, SyncedContact> syncedContacts) throws CanceledException {
+            Map<String, SyncedContact> syncedContacts, SyncStats syncStats)
+            throws CanceledException {
         Map<String, SyncedContact> removedContacts = new HashMap<String, SyncedContact>();
 
         for (SyncedContact syncedContact : syncedContacts.values()) {
@@ -296,13 +316,14 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             try {
                 contactsManager.removeContact(syncedContact);
                 removedContacts.put(uid, syncedContact);
+                ++syncStats.numDeletes;
             } catch (SyncException exception) {
                 Log.w(TAG, format("Contact {0} was not removed.", uid),
                         exception);
+                ++syncStats.numSkippedEntries;
             }
         }
 
-        Log.d(TAG, format("Removed {0} contacts.", removedContacts.size()));
         return removedContacts;
     }
 
