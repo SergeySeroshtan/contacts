@@ -11,5 +11,9 @@ The [Web Module][module:web] collects contacts from DS and DB and provides acces
 The [Android App][module:android] synchronizes contacts on Android smartphones using this REST API.
 In addition, web module provides web interface to access contacts using browser.
 
+# License
+
+[Apache Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
+
 [module:web]: http://github.com/grytsenko/contacts/blob/master/modules/contacts-web
 [module:android]: http://github.com/grytsenko/contacts/blob/master/modules/contacts-android
