@@ -2,11 +2,11 @@
 
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/settings_title" />
+    <PreferenceCategory android:title="@string/common_settings_title" />
 
     <PreferenceScreen android:key="account_settings"
         android:title="@string/sync_settings_title" android:summary="@string/sync_settings_summary">
-        <intent android:action="grytsenko.contacts.app.settings.ACCOUNT_SETTINGS"
+        <intent android:action="grytsenko.contacts.app.ACCOUNT_SETTINGS"
             android:targetPackage="grytsenko.contacts.app"
             android:targetClass="grytsenko.contacts.app.ui.SyncSettingsActivity" />
     </PreferenceScreen>
