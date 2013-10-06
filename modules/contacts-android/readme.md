@@ -39,7 +39,7 @@ If photo already synchronized, application will update it only when its URL will
 
 Application updates contacts in address book in next cases:
 
-1. The downloaded contact has another version.
+1. The loaded contact has another version.
 1. Application was updated since the last synchronization.
 
 # User Guide
@@ -63,6 +63,7 @@ You can customize synchronization using `Sync Settings`:
 
 1. `Load Photos` - enable or disable synchronization of photos.
 1. `Use Mobile Networks` - enable or disable synchronization in mobile networks.
+1. `Use Notifications` - enable or disable notifications about synchronization of contacts.
 1. `Group for Coworkers` - change title for group for coworkers.
 
 [tool:git]: http://git-scm.com/
