@@ -77,11 +77,6 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
             ContentProviderClient provider, SyncResult syncResult) {
-        if (!isSuitableNetwork()) {
-            Log.d(TAG, "Unsuitable network.");
-            return;
-        }
-
         Log.d(TAG, "Sync started.");
 
         try {
@@ -94,7 +89,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             } catch (SyncException exception) {
                 syncResult.databaseError = true;
                 Log.e(TAG, "Could not sync group.", exception);
-                updateStatus(StatusService.NOTIFY_INTERNAL_ERROR);
+                notifyStatus(R.string.sync_internal_error);
                 return;
             }
 
@@ -108,13 +103,13 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
                         format("Loaded {0} contacts.", loadedCoworkers.size()));
             } catch (NotAuthorizedException exception) {
                 syncResult.tooManyRetries = true;
-                Log.e(TAG, "Access denied.", exception);
-                updateStatus(StatusService.NOTIFY_USER_NOT_AUTHORIZED);
+                Log.e(TAG, "User not authorized.", exception);
+                notifyStatus(R.string.sync_user_not_authorized);
                 return;
             } catch (NotAvailableException exception) {
                 syncResult.tooManyRetries = true;
-                Log.e(TAG, "Not available.", exception);
-                updateStatus(StatusService.NOTIFY_DATA_NOT_AVAILABLE);
+                Log.e(TAG, "Server not available.", exception);
+                notifyStatus(R.string.sync_data_not_available);
                 return;
             }
 
@@ -156,7 +151,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             settingsManager.updateLastSyncTime();
 
-            updateStatus(StatusService.NOTIFY_COMPLETED);
+            notifyStatus(R.string.sync_completed);
 
             Log.d(TAG, "Sync completed.");
         } catch (CanceledException exception) {
@@ -415,14 +410,15 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Notifies user about status of synchronization.
      */
-    private void updateStatus(String action) {
+    private void notifyStatus(int messageId) {
         if (!settingsManager.canUseNotifications()) {
             Log.d(TAG, "Notifications are disabled.");
             return;
         }
 
         Intent intent = new Intent(getContext(), StatusService.class);
-        intent.setAction(action);
+        intent.setAction(StatusService.ACTION_NOTIFY_STATUS);
+        intent.putExtra(StatusService.STATUS_MESSAGE, messageId);
         getContext().startService(intent);
     }
 

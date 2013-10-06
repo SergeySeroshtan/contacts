@@ -23,7 +23,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
 /**
- * Manages notifications about status of synchronization.
+ * Notifies user about status of synchronization.
  */
 public class StatusService extends IntentService {
 
@@ -33,30 +33,19 @@ public class StatusService extends IntentService {
     private static final String SERVICE_NAME = StatusService.class.getName();
 
     /**
-     * Notifies user that sync completed.
+     * Notifies user about status of synchronization.
      */
-    public static final String NOTIFY_COMPLETED = SERVICE_NAME
-            + ".NOTIFY_COMPLETED";
+    public static final String ACTION_NOTIFY_STATUS = SERVICE_NAME
+            + ".ACTION_NOTIFY_STATUS";
     /**
-     * Notifies user that he is not authorized.
+     * Contains identifier of string that contains status message.
      */
-    public static final String NOTIFY_USER_NOT_AUTHORIZED = SERVICE_NAME
-            + ".NOTIFY_USER_NOT_AUTHORIZED";
-    /**
-     * Notifies user that server not available.
-     */
-    public static final String NOTIFY_DATA_NOT_AVAILABLE = SERVICE_NAME
-            + ".NOTIFY_DATA_NOT_AVAILABLE";
-    /**
-     * Notifies user that sync failed due to internal error.
-     */
-    public static final String NOTIFY_INTERNAL_ERROR = SERVICE_NAME
-            + ".NOTIFY_INTERNAL_ERROR";
+    public static final String STATUS_MESSAGE = "STATUS_MESSAGE";
 
     /**
      * Cancels status notification.
      */
-    private static final String CANCEL_STATUS = SERVICE_NAME
+    private static final String ACTION_CANCEL_STATUS = SERVICE_NAME
             + ".ACTION_CANCEL_STATUS";
     /**
      * Identifier for status notification.
@@ -75,28 +64,24 @@ public class StatusService extends IntentService {
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         String action = intent.getAction();
-        if (NOTIFY_COMPLETED.equals(action)) {
-            notify(manager, R.string.sync_completed);
-        } else if (NOTIFY_USER_NOT_AUTHORIZED.equals(action)) {
-            notify(manager, R.string.sync_user_not_authorized);
-        } else if (NOTIFY_DATA_NOT_AVAILABLE.equals(action)) {
-            notify(manager, R.string.sync_data_not_available);
-        } else if (NOTIFY_INTERNAL_ERROR.equals(action)) {
-            notify(manager, R.string.sync_internal_error);
-        } else if (CANCEL_STATUS.equals(action)) {
-            cancel(manager);
+        if (ACTION_NOTIFY_STATUS.equals(action)) {
+            int messageId = intent.getIntExtra(STATUS_MESSAGE,
+                    R.string.sync_internal_error);
+            notifyStatus(manager, messageId);
+        } else if (ACTION_CANCEL_STATUS.equals(action)) {
+            cancelStatus(manager);
         }
     }
 
-    private void notify(NotificationManager manager, int textId) {
+    private void notifyStatus(NotificationManager manager, int messageId) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 this);
         builder.setContentTitle(getString(R.string.app_name));
-        builder.setContentText(getString(textId));
+        builder.setContentText(getString(messageId));
         builder.setSmallIcon(R.drawable.ic_main);
 
         Intent cancelIntent = new Intent(this, StatusService.class);
-        cancelIntent.setAction(CANCEL_STATUS);
+        cancelIntent.setAction(ACTION_CANCEL_STATUS);
         PendingIntent contentIntent = PendingIntent.getService(this, 0,
                 cancelIntent, 0);
         builder.setContentIntent(contentIntent);
@@ -104,7 +89,7 @@ public class StatusService extends IntentService {
         manager.notify(STATUS_NOFITICATION, builder.getNotification());
     }
 
-    private void cancel(NotificationManager manager) {
+    private void cancelStatus(NotificationManager manager) {
         manager.cancel(STATUS_NOFITICATION);
     }
 

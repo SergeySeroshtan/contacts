@@ -41,7 +41,7 @@
     <string name="group_coworkers_empty">The title could not be empty.</string>
 
     <string name="sync_completed">Contacts updated successfully.</string>
-    <string name="sync_data_not_available">Server not available.</string>
+    <string name="sync_data_not_available">Data not available.</string>
     <string name="sync_user_not_authorized">You are not authorized.</string>
     <string name="sync_internal_error">Could not update contacts.</string>
 
