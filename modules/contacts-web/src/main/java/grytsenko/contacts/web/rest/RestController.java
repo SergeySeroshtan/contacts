@@ -17,7 +17,6 @@ package grytsenko.contacts.web.rest;
 
 import grytsenko.contacts.api.Address;
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.api.MobileAppHeaders;
 import grytsenko.contacts.web.service.SearchService;
 
 import java.security.Principal;
@@ -27,8 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,13 +47,9 @@ public class RestController {
      */
     @RequestMapping(value = "my", method = RequestMethod.GET)
     @ResponseBody
-    public Contact my(
-            Principal principal,
-            @RequestHeader(value = MobileAppHeaders.Platform.HEADER_NAME, required = false) String mobileAppPlatform) {
+    public Contact my(Principal principal) {
         String username = principal.getName();
         LOGGER.debug("Get contact of {}.", username);
-
-        processMobileAppInfo(username, mobileAppPlatform);
 
         return searchService.findEmployee(username);
     }
@@ -66,13 +59,9 @@ public class RestController {
      */
     @RequestMapping(value = "coworkers", method = RequestMethod.GET)
     @ResponseBody
-    public List<Contact> coworkers(
-            Principal principal,
-            @RequestHeader(value = MobileAppHeaders.Platform.HEADER_NAME, required = false) String mobileAppPlatform) {
+    public List<Contact> coworkers(Principal principal) {
         String username = principal.getName();
         LOGGER.debug("Get coworkers of {}.", username);
-
-        processMobileAppInfo(username, mobileAppPlatform);
 
         List<Contact> contacts = searchService.findCoworkers(username);
         LOGGER.debug("Found {} coworkers.", contacts.size());
@@ -85,26 +74,13 @@ public class RestController {
      */
     @RequestMapping(value = "locations", method = RequestMethod.GET)
     @ResponseBody
-    public List<Address> postals(
-            Principal principal,
-            @RequestHeader(value = MobileAppHeaders.Platform.HEADER_NAME, required = false) String mobileAppPlatform) {
-        String username = principal.getName();
+    public List<Address> postals() {
         LOGGER.debug("Get addresses of all offices.");
-
-        processMobileAppInfo(username, mobileAppPlatform);
 
         List<Address> addresses = searchService.findAddresses();
         LOGGER.debug("Found {} addresses.", addresses.size());
 
         return addresses;
-    }
-
-    private void processMobileAppInfo(String username, String platform) {
-        if (!StringUtils.hasLength(platform)) {
-            return;
-        }
-
-        LOGGER.debug("{} has used mobile app for {}.", username, platform);
     }
 
 }

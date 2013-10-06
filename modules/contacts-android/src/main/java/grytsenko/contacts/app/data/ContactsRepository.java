@@ -18,7 +18,6 @@ package grytsenko.contacts.app.data;
 import static java.text.MessageFormat.format;
 import static java.util.Collections.singletonList;
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.api.MobileAppHeaders;
 import grytsenko.contacts.app.R;
 
 import java.io.IOException;
@@ -178,8 +177,6 @@ public final class ContactsRepository {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(singletonList(MediaType.APPLICATION_JSON));
         headers.setAuthorization(new HttpBasicAuthentication(username, password));
-        headers.set(MobileAppHeaders.Platform.HEADER_NAME,
-                MobileAppHeaders.Platform.ANDROID);
         HttpEntity<?> request = new HttpEntity<Object>(headers);
 
         try {
