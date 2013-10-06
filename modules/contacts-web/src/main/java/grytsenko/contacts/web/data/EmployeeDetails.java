@@ -24,7 +24,7 @@ import javax.persistence.Table;
 import javax.persistence.Version;
 
 /**
- * Additional information about employee.
+ * Detailed information about employee from DB.
  */
 @Entity
 @Table(name = "employees")

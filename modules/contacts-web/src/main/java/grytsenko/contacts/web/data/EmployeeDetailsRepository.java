@@ -18,8 +18,8 @@ package grytsenko.contacts.web.data;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * Stores additional information about employees.
+ * Repository for the detailed information about employees.
  */
-public interface EmployeesDetailsRepository extends
+public interface EmployeeDetailsRepository extends
         JpaRepository<EmployeeDetails, String> {
 }

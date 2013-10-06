@@ -16,10 +16,10 @@
 package grytsenko.contacts.web.service;
 
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.web.data.Employee;
 import grytsenko.contacts.web.data.EmployeeDetails;
-import grytsenko.contacts.web.data.EmployeesDetailsRepository;
-import grytsenko.contacts.web.data.EmployeesRepository;
+import grytsenko.contacts.web.data.EmployeeDetailsRepository;
+import grytsenko.contacts.web.data.EmployeeRecord;
+import grytsenko.contacts.web.data.EmployeeRecordRepository;
 import grytsenko.contacts.web.data.mapper.ContactMapper;
 
 import java.util.ArrayList;
@@ -41,9 +41,9 @@ public class SearchService {
             .getLogger(SearchService.class);
 
     @Autowired
-    EmployeesRepository employeesRepository;
+    EmployeeRecordRepository employeesRepository;
     @Autowired
-    EmployeesDetailsRepository employeesDetailsRepository;
+    EmployeeDetailsRepository employeesDetailsRepository;
 
     /**
      * Finds contact of employee.
@@ -59,7 +59,7 @@ public class SearchService {
         }
 
         LOGGER.debug("Search employee {}.", employeeUid);
-        Employee employee = employeesRepository.findByUid(employeeUid);
+        EmployeeRecord employee = employeesRepository.findByUid(employeeUid);
 
         return createContact(employee);
     }
@@ -78,16 +78,17 @@ public class SearchService {
         }
 
         LOGGER.debug("Search employee {}.", employeeUid);
-        Employee employee = employeesRepository.findByUid(employeeUid);
+        EmployeeRecord employee = employeesRepository.findByUid(employeeUid);
         String location = employee.getLocation();
         LOGGER.debug("Location of {} is {}.", employeeUid, location);
 
         LOGGER.debug("Search employees from {}.", location);
-        List<Employee> coworkers = employeesRepository.findByLocation(location);
+        List<EmployeeRecord> coworkers = employeesRepository
+                .findByLocation(location);
         LOGGER.debug("Found {} employees.", coworkers.size());
 
         List<Contact> contacts = new ArrayList<Contact>();
-        for (Employee coworker : coworkers) {
+        for (EmployeeRecord coworker : coworkers) {
             String coworkerUid = coworker.getUid();
             if (employeeUid.equals(coworkerUid)) {
                 continue;
@@ -99,12 +100,13 @@ public class SearchService {
         return contacts;
     }
 
-    private Contact createContact(Employee employee) {
+    private Contact createContact(EmployeeRecord employee) {
         String uid = employee.getUid();
         EmployeeDetails details = employeesDetailsRepository.findOne(uid);
         if (details != null) {
-            LOGGER.debug("Found details for {}.", employee);
+            LOGGER.debug("Found detailed information for {}.", employee);
         }
+
         return ContactMapper.map(employee, details);
     }
 

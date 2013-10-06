@@ -35,13 +35,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 /**
- * Repository of employees, that uses directory service as data source.
+ * Repository for the information about employees.
  */
 @Repository
-public class EmployeesRepository {
+public class EmployeeRecordRepository {
 
     private static final Logger LOGGER = LoggerFactory
-            .getLogger(EmployeesRepository.class);
+            .getLogger(EmployeeRecordRepository.class);
 
     @Autowired
     LdapContextSource ldapContextSource;
@@ -79,11 +79,11 @@ public class EmployeesRepository {
      * 
      * @return the found employee or <code>null</code> if employee not found.
      */
-    public Employee findByUid(String uid) {
+    public EmployeeRecord findByUid(String uid) {
         LOGGER.debug("Search employee by uid: {}.", uid);
 
         String filter = format(filterByUidTemplate, uid);
-        List<Employee> contacts = findByFilter(filter);
+        List<EmployeeRecord> contacts = findByFilter(filter);
 
         return contacts.isEmpty() ? null : contacts.get(0);
     }
@@ -96,14 +96,14 @@ public class EmployeesRepository {
      * 
      * @return the list of found employees.
      */
-    public List<Employee> findByLocation(String location) {
+    public List<EmployeeRecord> findByLocation(String location) {
         LOGGER.debug("Search employees by location: {}.", location);
 
         String filter = format(filterByLocationTemplate, location);
         return findByFilter(filter);
     }
 
-    private List<Employee> findByFilter(String filter) {
+    private List<EmployeeRecord> findByFilter(String filter) {
         LOGGER.debug("Search emplyees by filter: {}.", filter);
 
         LdapTemplate template = new LdapTemplate(ldapContextSource);
@@ -113,8 +113,9 @@ public class EmployeesRepository {
                 locationAttrId, versionAttrId };
 
         @SuppressWarnings("unchecked")
-        List<Employee> employees = template.search(employeesBase, filter,
-                SearchControls.ONELEVEL_SCOPE, attrs, new EmployeeMapper());
+        List<EmployeeRecord> employees = template.search(employeesBase, filter,
+                SearchControls.ONELEVEL_SCOPE, attrs,
+                new EmployeeRecordMapper());
 
         LOGGER.debug("Found {} employees.", employees.size());
 
@@ -124,12 +125,12 @@ public class EmployeesRepository {
     /**
      * Creates employee from attributes.
      */
-    private class EmployeeMapper implements AttributesMapper {
+    private class EmployeeRecordMapper implements AttributesMapper {
 
         @Override
-        public Employee mapFromAttributes(Attributes attrs)
+        public EmployeeRecord mapFromAttributes(Attributes attrs)
                 throws NamingException {
-            Employee employee = new Employee();
+            EmployeeRecord employee = new EmployeeRecord();
 
             employee.setUid(asString(uidAttrId, attrs));
 

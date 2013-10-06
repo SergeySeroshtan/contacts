@@ -18,9 +18,9 @@ package grytsenko.contacts.web.data;
 import java.io.Serializable;
 
 /**
- * Primary information about employee.
+ * Record for employee in DS.
  */
-public final class Employee implements Serializable {
+public final class EmployeeRecord implements Serializable {
 
     private static final long serialVersionUID = -5048037776329416647L;
 
@@ -38,7 +38,7 @@ public final class Employee implements Serializable {
 
     private String version;
 
-    public Employee() {
+    public EmployeeRecord() {
     }
 
     public String getUid() {

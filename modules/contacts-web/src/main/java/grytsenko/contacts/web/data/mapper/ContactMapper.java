@@ -16,8 +16,8 @@
 package grytsenko.contacts.web.data.mapper;
 
 import grytsenko.contacts.api.Contact;
-import grytsenko.contacts.web.data.Employee;
 import grytsenko.contacts.web.data.EmployeeDetails;
+import grytsenko.contacts.web.data.EmployeeRecord;
 
 /**
  * Helps to get contact information.
@@ -27,41 +27,51 @@ public final class ContactMapper {
     /**
      * Gets contact of employee.
      * 
-     * @param employee
-     *            the employee.
+     * @param record
+     *            the information about employee.
      * @param details
-     *            the optional employee details.
+     *            the detailed information about employee (optional).
      * 
      * @return the created contact.
      */
-    public static Contact map(Employee employee, EmployeeDetails details) {
-        Contact contact = new Contact();
-
-        contact.setUid(employee.getUid());
-
-        contact.setFirstName(employee.getFirstName());
-        contact.setLastName(employee.getLastName());
-
-        contact.setPhotoUrl(employee.getPhotoUrl());
-
-        contact.setMail(employee.getMail());
-        contact.setPhone(employee.getPhone());
-
-        contact.setLocation(employee.getLocation());
-
-        if (details != null) {
-            contact.setSkype(details.getSkype());
-            contact.setPosition(details.getPosition());
+    public static Contact map(EmployeeRecord record, EmployeeDetails details) {
+        if (record == null) {
+            throw new IllegalArgumentException("Invalid record.");
         }
 
-        contact.setVersion(buildVersion(employee, details));
+        Contact contact = new Contact();
+
+        contact.setUid(record.getUid());
+
+        contact.setFirstName(record.getFirstName());
+        contact.setLastName(record.getLastName());
+
+        contact.setPhotoUrl(record.getPhotoUrl());
+
+        contact.setMail(record.getMail());
+        contact.setPhone(record.getPhone());
+
+        contact.setLocation(record.getLocation());
+
+        mapDetails(details, contact);
+
+        contact.setVersion(mapVersion(record, details));
 
         return contact;
     }
 
-    private static String buildVersion(Employee employee,
+    private static void mapDetails(EmployeeDetails details, Contact contact) {
+        if (details == null) {
+            return;
+        }
+
+        contact.setSkype(details.getSkype());
+        contact.setPosition(details.getPosition());
+    }
+
+    private static String mapVersion(EmployeeRecord record,
             EmployeeDetails details) {
-        String major = employee.getVersion();
+        String major = record.getVersion();
         String minor = details != null ? "." + details.getVersion() : "";
         return major + minor;
     }
