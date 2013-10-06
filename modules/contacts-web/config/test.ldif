@@ -8,74 +8,74 @@ dn: ou=Users,dc=test,dc=com
 objectClass: organizationalUnit
 objectClass: top
 ou: Users
-entryUUID: 00e708c9-550e-4f16-97c4-c0c38bba6bdf
 createTimestamp: 20130603081444Z
 creatorsName: cn=Directory Manager,cn=Root DNs,cn=config
+entryUUID: 00e708c9-550e-4f16-97c4-c0c38bba6bdf
 
 dn: cn=ivanov,ou=Users,dc=test,dc=com
 objectClass: person
-objectClass: inetOrgPerson
 objectClass: organizationalPerson
+objectClass: inetOrgPerson
 objectClass: top
 givenName: Ivan
-mobile: 3800000000
 uid: ivanov
+mobile: 3800000000
 cn: ivanov
 sn: Ivanov
 userPassword: {SSHA}/qCDya2OT7MBv6od0Ynk7ABV12BKK2tH43Qhhw==
 l: Donetsk
 mail: ivanov@test.com
+entryUUID: 9d922472-2899-4fc6-a271-84762bcf6e0f
 pwdChangedTime: 20130722083340.512Z
 createTimestamp: 20130722083340Z
-entryUUID: 9d922472-2899-4fc6-a271-84762bcf6e0f
 creatorsName: cn=Directory Manager,cn=Root DNs,cn=config
 modifyTimestamp: 20130722110100Z
 modifiersName: cn=Directory Manager,cn=Root DNs,cn=config
 
 dn: cn=petrov,ou=Users,dc=test,dc=com
 objectClass: person
-objectClass: inetOrgPerson
 objectClass: organizationalPerson
+objectClass: inetOrgPerson
 objectClass: top
 givenName: Petr
-mobile: 3800000001
 uid: petrov
+mobile: 3800000001
 cn: petrov
 sn: Petrov
 userPassword: {SSHA}rULrvLcT7kh1AioXGWed4ge5xzvWaGErmPnOpQ==
-mail: petrov@test.ua.com
 l: Donetsk
-createTimestamp: 20130722083619Z
+mail: petrov@test.com
 pwdChangedTime: 20130722083619.010Z
+createTimestamp: 20130722083619Z
 entryUUID: 7b197e1f-cfa6-4a81-8850-d57d92d0a4a3
 creatorsName: cn=Directory Manager,cn=Root DNs,cn=config
-modifyTimestamp: 20130722110114Z
+modifyTimestamp: 20131006164607Z
 modifiersName: cn=Directory Manager,cn=Root DNs,cn=config
 
 dn: cn=kuznetsov,ou=Users,dc=test,dc=com
 objectClass: person
-objectClass: inetOrgPerson
 objectClass: organizationalPerson
+objectClass: inetOrgPerson
 objectClass: top
 givenName: Kuzma
-mobile: 3800000002
 uid: kuznetsov
+mobile: 3800000002
 cn: kuznetsov
 sn: Kuznetsov
 userPassword: {SSHA}mHFbuSKyzaNYE0FzTp/02sU7BD68ySn4T6BxAQ==
 mail: kuznetsov@test.com
 l: Donetsk
+entryUUID: 22f4ac62-da72-4368-9758-a6e5d59b3da3
 pwdChangedTime: 20130722105010.206Z
 createTimestamp: 20130722105010Z
-entryUUID: 22f4ac62-da72-4368-9758-a6e5d59b3da3
 creatorsName: cn=Directory Manager,cn=Root DNs,cn=config
 modifyTimestamp: 20130722110121Z
 modifiersName: cn=Directory Manager,cn=Root DNs,cn=config
 
 dn: cn=popov,ou=Users,dc=test,dc=com
 objectClass: person
-objectClass: inetOrgPerson
 objectClass: organizationalPerson
+objectClass: inetOrgPerson
 objectClass: top
 givenName: Pavel
 uid: popov
@@ -84,17 +84,17 @@ sn: Popov
 userPassword: {SSHA}wYWVZu7MiSem1kIkok+LG9hh5eKyhCW1v5LLrw==
 l: Donetsk
 mail: popov@test.com
+entryUUID: 90822041-f190-44f9-9e72-deefeab92cf5
 pwdChangedTime: 20130722105132.702Z
 createTimestamp: 20130722105132Z
-entryUUID: 90822041-f190-44f9-9e72-deefeab92cf5
 creatorsName: cn=Directory Manager,cn=Root DNs,cn=config
 modifyTimestamp: 20130816115254Z
 modifiersName: cn=Directory Manager,cn=Root DNs,cn=config
 
 dn: cn=grytsenko,ou=Users,dc=test,dc=com
 objectClass: person
-objectClass: inetOrgPerson
 objectClass: organizationalPerson
+objectClass: inetOrgPerson
 objectClass: top
 givenName: Anton
 uid: grytsenko
@@ -105,9 +105,9 @@ userPassword: {SSHA}j1jzYlI7hKlqKE13D0Rbx41CvuBO6Vyy6E7rtg==
 mail: grytsenko@test.com
 l: Donetsk
 labeledURI: http://www.gravatar.com/avatar/f5d2ccf3d729f67f42445ece7747e3e8.png
+entryUUID: 2a242de3-61f3-423e-ace0-b721dbfc6312
 createTimestamp: 20130722105220Z
 pwdChangedTime: 20130722105546.872Z
-entryUUID: 2a242de3-61f3-423e-ace0-b721dbfc6312
 creatorsName: cn=Directory Manager,cn=Root DNs,cn=config
 modifyTimestamp: 20130816084558Z
 modifiersName: cn=Directory Manager,cn=Root DNs,cn=config
