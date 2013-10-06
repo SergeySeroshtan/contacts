@@ -33,26 +33,38 @@ public class StatusService extends IntentService {
     private static final String SERVICE_NAME = StatusService.class.getName();
 
     /**
-     * Notifies user that synchronization completed.
+     * Notifies user that sync completed.
      */
-    public static final String ACTION_NOTIFY_COMPLETED = SERVICE_NAME
-            + ".ACTION_NOTIFY_COMPLETED";
+    public static final String NOTIFY_COMPLETED = SERVICE_NAME
+            + ".NOTIFY_COMPLETED";
     /**
-     * Notifies user that synchronization failed.
+     * Notifies user that he is not authorized.
      */
-    public static final String ACTION_NOTIFY_FAILED = SERVICE_NAME
-            + ".ACTION_NOTIFY_FAILED";
+    public static final String NOTIFY_USER_NOT_AUTHORIZED = SERVICE_NAME
+            + ".NOTIFY_USER_NOT_AUTHORIZED";
+    /**
+     * Notifies user that server not available.
+     */
+    public static final String NOTIFY_DATA_NOT_AVAILABLE = SERVICE_NAME
+            + ".NOTIFY_DATA_NOT_AVAILABLE";
+    /**
+     * Notifies user that sync failed due to internal error.
+     */
+    public static final String NOTIFY_INTERNAL_ERROR = SERVICE_NAME
+            + ".NOTIFY_INTERNAL_ERROR";
 
     /**
-     * Cancels notification about status.
+     * Cancels status notification.
      */
-    public static final String ACTION_CANCEL_STATUS = SERVICE_NAME
+    private static final String CANCEL_STATUS = SERVICE_NAME
             + ".ACTION_CANCEL_STATUS";
-
+    /**
+     * Identifier for status notification.
+     */
     private static final int STATUS_NOFITICATION = 0;
 
     /**
-     * Creates manager in the specified context.
+     * Creates service.
      */
     public StatusService() {
         super(SERVICE_NAME);
@@ -60,38 +72,40 @@ public class StatusService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
 
         String action = intent.getAction();
-        if (ACTION_NOTIFY_COMPLETED.equals(action)) {
-            notify(notificationManager, R.string.sync_completed);
-        } else if (ACTION_NOTIFY_FAILED.equals(action)) {
-            notify(notificationManager, R.string.sync_failed);
-        } else if (ACTION_CANCEL_STATUS.equals(action)) {
-            cancel(notificationManager);
+        if (NOTIFY_COMPLETED.equals(action)) {
+            notify(manager, R.string.sync_completed);
+        } else if (NOTIFY_USER_NOT_AUTHORIZED.equals(action)) {
+            notify(manager, R.string.sync_user_not_authorized);
+        } else if (NOTIFY_DATA_NOT_AVAILABLE.equals(action)) {
+            notify(manager, R.string.sync_data_not_available);
+        } else if (NOTIFY_INTERNAL_ERROR.equals(action)) {
+            notify(manager, R.string.sync_internal_error);
+        } else if (CANCEL_STATUS.equals(action)) {
+            cancel(manager);
         }
     }
 
-    private void notify(NotificationManager notificationManager, int textId) {
+    private void notify(NotificationManager manager, int textId) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 this);
-        builder.setAutoCancel(true);
         builder.setContentTitle(getString(R.string.app_name));
         builder.setContentText(getString(textId));
         builder.setSmallIcon(R.drawable.ic_main);
 
         Intent cancelIntent = new Intent(this, StatusService.class);
-        cancelIntent.setAction(ACTION_CANCEL_STATUS);
+        cancelIntent.setAction(CANCEL_STATUS);
         PendingIntent contentIntent = PendingIntent.getService(this, 0,
                 cancelIntent, 0);
         builder.setContentIntent(contentIntent);
 
-        notificationManager.notify(STATUS_NOFITICATION,
-                builder.getNotification());
+        manager.notify(STATUS_NOFITICATION, builder.getNotification());
     }
 
-    private void cancel(NotificationManager notificationManager) {
-        notificationManager.cancel(STATUS_NOFITICATION);
+    private void cancel(NotificationManager manager) {
+        manager.cancel(STATUS_NOFITICATION);
     }
 
 }

@@ -94,7 +94,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             } catch (SyncException exception) {
                 syncResult.databaseError = true;
                 Log.e(TAG, "Could not sync group.", exception);
-                notifyFailed();
+                updateStatus(StatusService.NOTIFY_INTERNAL_ERROR);
                 return;
             }
 
@@ -109,12 +109,12 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
             } catch (NotAuthorizedException exception) {
                 syncResult.tooManyRetries = true;
                 Log.e(TAG, "Access denied.", exception);
-                notifyFailed();
+                updateStatus(StatusService.NOTIFY_USER_NOT_AUTHORIZED);
                 return;
             } catch (NotAvailableException exception) {
                 syncResult.tooManyRetries = true;
                 Log.e(TAG, "Not available.", exception);
-                notifyFailed();
+                updateStatus(StatusService.NOTIFY_DATA_NOT_AVAILABLE);
                 return;
             }
 
@@ -156,7 +156,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
 
             settingsManager.updateLastSyncTime();
 
-            notifyCompleted();
+            updateStatus(StatusService.NOTIFY_COMPLETED);
 
             Log.d(TAG, "Sync completed.");
         } catch (CanceledException exception) {
@@ -413,20 +413,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     /**
-     * Notifies user that synchronization completed.
+     * Notifies user about status of synchronization.
      */
-    private void notifyCompleted() {
+    private void updateStatus(String action) {
         Intent intent = new Intent(getContext(), StatusService.class);
-        intent.setAction(StatusService.ACTION_NOTIFY_COMPLETED);
-        getContext().startService(intent);
-    }
-
-    /**
-     * Notifies user that synchronization failed.
-     */
-    private void notifyFailed() {
-        Intent intent = new Intent(getContext(), StatusService.class);
-        intent.setAction(StatusService.ACTION_NOTIFY_FAILED);
+        intent.setAction(action);
         getContext().startService(intent);
     }
 
