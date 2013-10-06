@@ -15,7 +15,6 @@
  */
 package grytsenko.contacts.web.rest;
 
-import grytsenko.contacts.api.Address;
 import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.web.service.SearchService;
 
@@ -67,20 +66,6 @@ public class RestController {
         LOGGER.debug("Found {} coworkers.", contacts.size());
 
         return contacts;
-    }
-
-    /**
-     * Finds addresses of all offices.
-     */
-    @RequestMapping(value = "locations", method = RequestMethod.GET)
-    @ResponseBody
-    public List<Address> postals() {
-        LOGGER.debug("Get addresses of all offices.");
-
-        List<Address> addresses = searchService.findAddresses();
-        LOGGER.debug("Found {} addresses.", addresses.size());
-
-        return addresses;
     }
 
 }

@@ -15,15 +15,11 @@
  */
 package grytsenko.contacts.web.service;
 
-import grytsenko.contacts.api.Address;
 import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.web.data.Employee;
 import grytsenko.contacts.web.data.EmployeeDetails;
 import grytsenko.contacts.web.data.EmployeesDetailsRepository;
 import grytsenko.contacts.web.data.EmployeesRepository;
-import grytsenko.contacts.web.data.Office;
-import grytsenko.contacts.web.data.OfficesRepository;
-import grytsenko.contacts.web.data.mapper.AddressMapper;
 import grytsenko.contacts.web.data.mapper.ContactMapper;
 
 import java.util.ArrayList;
@@ -48,9 +44,6 @@ public class SearchService {
     EmployeesRepository employeesRepository;
     @Autowired
     EmployeesDetailsRepository employeesDetailsRepository;
-
-    @Autowired
-    OfficesRepository officesRepository;
 
     /**
      * Finds contact of employee.
@@ -113,16 +106,6 @@ public class SearchService {
             LOGGER.debug("Found details for {}.", employee);
         }
         return ContactMapper.map(employee, details);
-    }
-
-    /**
-     * Finds addresses of all offices.
-     * 
-     * @return the list of addresses.
-     */
-    public List<Address> findAddresses() {
-        List<Office> offices = officesRepository.findAll();
-        return AddressMapper.map(offices);
     }
 
 }
