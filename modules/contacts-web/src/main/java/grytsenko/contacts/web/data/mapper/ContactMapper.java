@@ -19,6 +19,9 @@ import grytsenko.contacts.api.Contact;
 import grytsenko.contacts.web.data.EmployeeDetails;
 import grytsenko.contacts.web.data.EmployeeRecord;
 
+import org.dozer.DozerBeanMapper;
+import org.dozer.Mapper;
+
 /**
  * Helps to get contact information.
  */
@@ -38,35 +41,17 @@ public final class ContactMapper {
         if (record == null) {
             throw new IllegalArgumentException("Invalid record.");
         }
-
         Contact contact = new Contact();
 
-        contact.setUid(record.getUid());
-
-        contact.setFirstName(record.getFirstName());
-        contact.setLastName(record.getLastName());
-
-        contact.setPhotoUrl(record.getPhotoUrl());
-
-        contact.setMail(record.getMail());
-        contact.setPhone(record.getPhone());
-
-        contact.setLocation(record.getLocation());
-
-        mapDetails(details, contact);
+        Mapper mapper = new DozerBeanMapper();
+        mapper.map(record, contact);
+        if (details != null) {
+            mapper.map(details, contact);
+        }
 
         contact.setVersion(mapVersion(record, details));
 
         return contact;
-    }
-
-    private static void mapDetails(EmployeeDetails details, Contact contact) {
-        if (details == null) {
-            return;
-        }
-
-        contact.setSkype(details.getSkype());
-        contact.setPosition(details.getPosition());
     }
 
     private static String mapVersion(EmployeeRecord record,

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -28,6 +29,9 @@
         <hibernate>4.2.5.Final</hibernate>
         <spring.jpa>1.3.4.RELEASE</spring.jpa>
         <mysql>5.1.26</mysql>
+
+        <!-- Beans -->
+        <dozer>5.4.0</dozer>
 
         <!-- Logs -->
         <slf4j>1.7.5</slf4j>
@@ -140,6 +144,13 @@
         <dependency>
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-mapper-asl</artifactId>
+        </dependency>
+
+        <!-- Beans -->
+        <dependency>
+            <groupId>net.sf.dozer</groupId>
+            <artifactId>dozer</artifactId>
+            <version>${dozer}</version>
         </dependency>
 
         <!-- Logs -->
