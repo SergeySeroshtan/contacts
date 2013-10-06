@@ -335,7 +335,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      */
     private void syncPhotos(Map<String, SyncedContact> syncedContacts)
             throws CanceledException {
-        if (!settingsManager.isSyncPhotos()) {
+        if (!settingsManager.canSyncPhotos()) {
             Log.d(TAG, "Sync of photos is disabled.");
             return;
         }
@@ -416,6 +416,11 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      * Notifies user about status of synchronization.
      */
     private void updateStatus(String action) {
+        if (!settingsManager.canUseNotifications()) {
+            Log.d(TAG, "Notifications are disabled.");
+            return;
+        }
+
         Intent intent = new Intent(getContext(), StatusService.class);
         intent.setAction(action);
         getContext().startService(intent);
@@ -428,7 +433,7 @@ public class SyncAdapter extends AbstractThreadedSyncAdapter {
      *         otherwise.
      */
     public boolean isSuitableNetwork() {
-        if (settingsManager.isSyncAnywhere()) {
+        if (settingsManager.canSyncAnywhere()) {
             return networkManager.isConnected();
         }
 

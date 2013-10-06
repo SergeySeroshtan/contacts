@@ -45,6 +45,7 @@ public class SettingsManager {
 
     private final String syncPhotosKey;
     private final String syncAnywhereKey;
+    private final String useNotificationsKey;
     private final String lastSyncTimeKey;
 
     private final String groupCoworkersKey;
@@ -66,6 +67,8 @@ public class SettingsManager {
 
         syncPhotosKey = context.getString(R.string.sync_photos);
         syncAnywhereKey = context.getString(R.string.sync_anywhere);
+
+        useNotificationsKey = context.getString(R.string.use_notifications);
 
         lastSyncTimeKey = context.getString(R.string.last_sync_time);
 
@@ -89,12 +92,12 @@ public class SettingsManager {
     }
 
     /**
-     * Checks that sync of photos is allowed.
+     * Checks that photos can be synchronized.
      * 
      * @return <code>true</code> if sync is allowed and <code>false</code>
      *         otherwise.
      */
-    public boolean isSyncPhotos() {
+    public boolean canSyncPhotos() {
         return preferences.getBoolean(syncPhotosKey, false);
     }
 
@@ -104,8 +107,18 @@ public class SettingsManager {
      * @return <code>true</code> if sync is allowed and <code>false</code>
      *         otherwise.
      */
-    public boolean isSyncAnywhere() {
+    public boolean canSyncAnywhere() {
         return preferences.getBoolean(syncAnywhereKey, false);
+    }
+
+    /**
+     * Checks that notifications can be used.
+     * 
+     * @return <code>true</code> if notifications can be used and
+     *         <code>false</code> otherwise.
+     */
+    public boolean canUseNotifications() {
+        return preferences.getBoolean(useNotificationsKey, false);
     }
 
     /**

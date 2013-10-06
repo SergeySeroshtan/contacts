@@ -31,9 +31,12 @@
     <string name="sync_anywhere_summary">Permit usage of mobile networks.</string>
     <string name="sync_anywhere_warning">This may increase your expenses.</string>
 
+    <string name="use_notifications_title">Use Notifications</string>
+    <string name="use_notifications_summary">Notify about syncing of contacts.</string>
+
     <string name="group_coworkers_uid">coworkers</string>
     <string name="group_coworkers_title">Group for Coworkers</string>
-    <string name="group_coworkers_summary">Change title of group.</string>
+    <string name="group_coworkers_summary">Set the title of group.</string>
     <string name="group_coworkers_default">Coworkers</string>
     <string name="group_coworkers_empty">The title could not be empty.</string>
 

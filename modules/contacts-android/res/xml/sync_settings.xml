@@ -10,6 +10,10 @@
         android:title="@string/sync_anywhere_title" android:summary="@string/sync_anywhere_summary"
         android:defaultValue="false" />
 
+    <CheckBoxPreference android:key="@string/use_notifications"
+        android:title="@string/use_notifications_title" android:summary="@string/use_notifications_summary"
+        android:defaultValue="false" />
+
     <EditTextPreference android:key="@string/group_coworkers"
         android:title="@string/group_coworkers_title" android:summary="@string/group_coworkers_summary"
         android:defaultValue="@string/group_coworkers_default" />
